@@ -28,7 +28,7 @@ sub new {
 	my $class = shift;
 	my %args = @_;
 	$args{logfile} ||= "syslogd.log";
-	$args{up} ||= "Started";
+	$args{up} ||= "syslogd: started";
 	$args{down} ||= "syslogd: exiting";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "syslogd.conf";
@@ -57,19 +57,8 @@ sub new {
 	return $self;
 }
 
-sub up {
-	my $self = Proc::up(shift, @_);
-	my $timeout = shift || 10;
-	my $regex = "syslogd: started";
-	$self->loggrep(qr/$regex/, $timeout)
-	    or croak ref($self), " no $regex in $self->{logfile} ".
-		"after $timeout seconds";
-	return $self;
-}
-
 sub child {
 	my $self = shift;
-	print STDERR $self->{up}, "\n";
 	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
 
 	my @pkill = (@sudo, "pkill", "-x", "syslogd");
