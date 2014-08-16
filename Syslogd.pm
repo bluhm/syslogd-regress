@@ -35,6 +35,8 @@ sub new {
 	$args{outfile} ||= "file.log";
 	$args{outpipe} ||= "pipe.log";
 	my $self = Proc::new($class, %args);
+	$self->{connectaddr}
+	    or croak "$class connect addr not given";
 
 	_make_abspath(\$self->{$_}) foreach (qw(conffile outfile outpipe));
 
@@ -42,6 +44,9 @@ sub new {
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	print $fh "*.*\t$self->{outfile}\n";
 	print $fh "*.*\t|dd of=$self->{outpipe} status=none\n";
+	my $loghost = "\@$self->{connectaddr}";
+	$loghost .= ":$self->{connectport}" if $self->{connectport};
+	print $fh "*.*\t$loghost\n";
 	close $fh;
 
 	open($fh, '>', $self->{outfile})

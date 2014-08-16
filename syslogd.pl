@@ -40,7 +40,7 @@ if (@ARGV and -f $ARGV[-1]) {
 
 my($sport) = find_ports();
 my $s = Server->new(
-    func                => \&read_line,
+    func                => \&read_log,
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
     listenport          => $sport,

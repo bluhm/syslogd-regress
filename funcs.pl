@@ -66,15 +66,15 @@ sub errignore {
 # Server funcs
 ########################################################################
 
-sub read_line {
+sub read_log {
 	my $self = shift;
 	my $max = shift // $self->{max} // 1;
 
-	my $num = 0;
-	while (<STDIN>) {
-		chomp;
-		print STDERR ">>> $_\n";
-		last if ++$num >= $max;
+	for (my $num = 0; $num < $max; $num++) {
+		defined(sysread(STDIN, my $line, 8194))
+		    or die "read log line failed: $!";
+		chomp $line;
+		print STDERR ">>> $line\n";
 	}
 }
 
