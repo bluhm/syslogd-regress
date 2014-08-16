@@ -56,12 +56,23 @@ sub child {
 	my $self = shift;
 	print STDERR $self->{up}, "\n";
 	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
+
+	my @pkill = (@sudo, "pkill", "-x", "syslogd");
+	my @pgrep = ("pgrep", "-x", "syslogd");
+	system(@pkill) >= 1
+	    and die "System '@pkill' failed: $?";
+	while ($? == 0) {
+		print STDERR "syslogd still running\n";
+		system(@pgrep) >= 1
+		    and die "System '@pgrep' failed: $?";
+	}
+
 	my @ktrace = $ENV{KTRACE} ? ($ENV{KTRACE}, "-i") : ();
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
-	my @cmd = (@sudo, @ktrace, $syslogd, '-d', '-f', $self->{conffile});
+	my @cmd = (@sudo, @ktrace, $syslogd, "-d", "-f", $self->{conffile});
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
-	die "Exec @cmd failed: $!";
+	die "Exec '@cmd' failed: $!";
 }
 
 1;

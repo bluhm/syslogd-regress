@@ -69,7 +69,7 @@ sub run {
 sub up {
 	my $self = Proc::up(shift, @_);
 	my $timeout = shift || 10;
-	my $lsock = $self->loggrep(qr/^listen sock: /, $timeout)
+	my $lsock = $self->loggrep(qr/^init$/, $timeout)
 	    or croak ref($self), " no listen sock in $self->{logfile} ".
 		"after $timeout seconds";
 	my($addr, $port) = $lsock =~ /: (\S+) (\S+)$/
@@ -88,15 +88,15 @@ sub child {
 	my @ktrace = $ENV{KTRACE} ? "KTRACE=$ENV{KTRACE}" : ();
 	my @syslogd = $ENV{SYSLOGD} ? "SYSLOGD=$ENV{SYSLOGD}" : ();
 	my $curdir = dirname($0) || ".";
-	$curdir = getcwd() if $curdir eq '.';
-	my @cmd = ('ssh', @opts, $self->{remotessh},
-	    @sudo, @ktrace, @syslogd, 'perl',
-	    '-I', $curdir, "$curdir/".basename($0),
+	$curdir = getcwd() if $curdir eq ".";
+	my @cmd = ("ssh", @opts, $self->{remotessh},
+	    @sudo, @ktrace, @syslogd, "perl",
+	    "-I", $curdir, "$curdir/".basename($0),
 	    $self->{forwardaddr}, $self->{udpport},
 	    "$curdir/".basename($self->{testfile}));
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
-	die "Exec @cmd failed: $!";
+	die "Exec '@cmd' failed: $!";
 }
 
 sub close_child {
