@@ -58,7 +58,7 @@ my $r = Syslogd->new(
     testfile            => $testfile,
 );
 my $c = Client->new(
-    func                => \&write_char,
+    func                => \&write_log,
     connectdomain       => AF_INET,
     connectaddr         => "127.0.0.1",
     connectport         => $rport,

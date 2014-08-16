@@ -19,6 +19,7 @@ use warnings;
 use Errno;
 use Socket;
 use Socket6;
+use Sys::Syslog qw(:standard :macros);
 use IO::Socket;
 use IO::Socket::INET6;
 
@@ -44,6 +45,10 @@ sub find_ports {
 ########################################################################
 # Client funcs
 ########################################################################
+
+sub write_log {
+	syslog(LOG_INFO, "foo");
+}
 
 sub errignore {
 	$SIG{PIPE} = 'IGNORE';
