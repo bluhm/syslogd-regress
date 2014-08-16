@@ -26,13 +26,14 @@ use IO::Socket::INET6;
 sub find_ports {
 	my %args = @_;
 	my $num    = delete $args{num}    // 1;
+	my $proto  = delete $args{proto}  // "udp";
 	my $domain = delete $args{domain} // AF_INET;
 	my $addr   = delete $args{addr}   // "127.0.0.1";
 
 	my @sockets = (1..$num);
 	foreach my $s (@sockets) {
 		$s = IO::Socket::INET6->new(
-		    Proto  => "tcp",
+		    Proto  => $proto,
 		    Domain => $domain,
 		    $addr ? (LocalAddr => $addr) : (),
 		) or die "find_ports: create and bind socket failed: $!";

@@ -32,7 +32,7 @@ sub new {
 	$args{logfile} ||= "server.log";
 	$args{up} ||= "Accepted";
 	my $self = Proc::new($class, %args);
-	$self->{protocol} ||= "tcp";
+	$self->{protocol} ||= "udp";
 	$self->{listendomain}
 	    or croak "$class listen domain not given";
 	$SSL_ERROR = "";
