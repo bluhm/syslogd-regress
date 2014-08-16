@@ -66,29 +66,16 @@ sub errignore {
 # Server funcs
 ########################################################################
 
-sub read_char {
+sub read_line {
 	my $self = shift;
-	my $max = shift // $self->{max};
+	my $max = shift // $self->{max} // 1;
 
-	my $ctx = Digest::MD5->new();
-	my $len = 0;
-	if (defined($max) && $max == 0) {
-		print STDERR "Max\n";
-	} else {
-		while (<STDIN>) {
-			$len += length($_);
-			$ctx->add($_);
-			print STDERR ".";
-			if (defined($max) && $len >= $max) {
-				print STDERR "\nMax";
-				last;
-			}
-		}
-		print STDERR "\n";
+	my $num = 0;
+	while (<STDIN>) {
+		chomp;
+		print STDERR ">>> $_\n";
+		last if ++$num >= $max;
 	}
-
-	print STDERR "LEN: ", $len, "\n";
-	print STDERR "MD5: ", $ctx->hexdigest, "\n";
 }
 
 ########################################################################
