@@ -48,7 +48,7 @@ if (@ARGV and -f $ARGV[-1]) {
 }
 my $mode =
 	@ARGV == 2 ? "syslog"  :
-	@ARGV == 3 ? "auto"   :
+	@ARGV == 3 ? "local"   :
 	usage();
 
 my $r;
