@@ -21,6 +21,7 @@ use warnings;
 package Syslogd;
 use parent 'Proc';
 use Carp;
+use Cwd;
 use File::Basename;
 
 sub new {
@@ -33,8 +34,9 @@ sub new {
 	$args{conffile} ||= "syslogd.conf";
 	my $self = Proc::new($class, %args);
 
-	# generate syslogd.conf from config keys in %args
-	unlink $self->{conffile};
+	if (substr($self->{conffile}, 0, 1) ne "/") {
+		$self->{conffile} = getcwd()."/".$self->{conffile};
+	}
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " conf file $self->{conffile} create failed: $!";
 	close $fh;
@@ -59,13 +61,14 @@ sub child {
 
 	my @pkill = (@sudo, "pkill", "-x", "syslogd");
 	my @pgrep = ("pgrep", "-x", "syslogd");
-	system(@pkill) >= 1
+	system(@pkill) && $? != 256
 	    and die "System '@pkill' failed: $?";
 	while ($? == 0) {
 		print STDERR "syslogd still running\n";
-		system(@pgrep) >= 1
+		system(@pgrep) && $? != 256
 		    and die "System '@pgrep' failed: $?";
 	}
+	print STDERR "syslogd not running\n";
 
 	my @ktrace = $ENV{KTRACE} ? ($ENV{KTRACE}, "-i") : ();
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";

@@ -36,7 +36,7 @@ if (@ARGV and -f $ARGV[-1]) {
 	do $testfile
 	    or die "Do test file $testfile failed: ", $@ || $!;
 }
-@ARGV == 1 or usage();
+@ARGV == 0 or usage();
 
 my($sport, $rport) = find_ports(num => 2);
 my $s = Server->new(
@@ -44,7 +44,6 @@ my $s = Server->new(
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
     listenport          => $sport,
-    redo                => $redo,
     %{$args{server}},
     testfile            => $testfile,
 ) unless $args{server}{noserver};
