@@ -1,0 +1,7 @@
+Run syslogd regressions tests.  As only one syslogd may run per
+machine the test target is running remote.
+
+The test framework logs into the remote machine, kills any syslogd
+and starts a new one with a local config.  This gets logger events
+and has to forward to local local machine where the test scripts
+are executed.
