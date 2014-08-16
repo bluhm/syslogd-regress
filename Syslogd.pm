@@ -29,17 +29,30 @@ sub new {
 	my %args = @_;
 	$args{logfile} ||= "syslogd.log";
 	$args{up} ||= "Started";
-	$args{down} ||= "terminating";
+	$args{down} ||= "syslogd: exiting";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "syslogd.conf";
+	$args{outfile} ||= "file.log";
+	$args{outpipe} ||= "pipe.log";
 	my $self = Proc::new($class, %args);
 
-	if (substr($self->{conffile}, 0, 1) ne "/") {
-		$self->{conffile} = getcwd()."/".$self->{conffile};
-	}
+	_make_abspath(\$self->{$_}) foreach (qw(conffile outfile outpipe));
+
 	open(my $fh, '>', $self->{conffile})
-	    or die ref($self), " conf file $self->{conffile} create failed: $!";
+	    or die ref($self), " create conf file $self->{conffile} failed: $!";
+	print $fh "*.*\t$self->{outfile}\n";
+	print $fh "*.*\t|dd of=$self->{outpipe} status=none\n";
 	close $fh;
+
+	open($fh, '>', $self->{outfile})
+	    or die ref($self), " create log file $self->{outfile} failed: $!";
+	close $fh;
+
+	open($fh, '>', $self->{outpipe})
+	    or die ref($self), " create pipe file $self->{outpipe} failed: $!";
+	close $fh;
+	chmod(0666, $self->{outpipe})
+	    or die ref($self), " chmod pipe file $self->{outpipe} failed: $!";
 
 	return $self;
 }
@@ -76,6 +89,15 @@ sub child {
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
 	die "Exec '@cmd' failed: $!";
+}
+
+sub _make_abspath {
+	my $file = ref($_[0]) ? ${$_[0]} : $_[0];
+	if (substr($file, 0, 1) ne "/") {
+		$file = getcwd(). "/". $file;
+		${$_[0]} = $file if ref($_[0]);
+	}
+	return $file;
 }
 
 1;
