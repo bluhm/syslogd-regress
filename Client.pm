@@ -1,6 +1,6 @@
-#	$OpenBSD: Client.pm,v 1.8 2014/07/11 15:38:44 bluhm Exp $
+#	$OpenBSD$
 
-# Copyright (c) 2010-2012 Alexander Bluhm <bluhm@openbsd.org>
+# Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -20,48 +20,21 @@ use warnings;
 package Client;
 use parent 'Proc';
 use Carp;
-use Socket qw(IPPROTO_TCP TCP_NODELAY);
-use Socket6;
-use IO::Socket;
-use IO::Socket::INET6;
-use IO::Socket::SSL;
+use Sys::Syslog qw(:standard :macros);
 
 sub new {
 	my $class = shift;
 	my %args = @_;
 	$args{logfile} ||= "client.log";
-	$args{up} ||= "Connected";
-	$args{timefile} //= "time.log";
+	$args{up} ||= "Openlog";
 	my $self = Proc::new($class, %args);
-	$self->{connectdomain}
-	    or croak "$class connect domain not given";
-	$self->{connectaddr}
-	    or croak "$class connect addr not given";
-	$self->{connectport}
-	    or croak "$class connect port not given";
 	return $self;
 }
 
 sub child {
 	my $self = shift;
 
-	# in case we redo the connect, shutdown the old one
-	shutdown(\*STDOUT, SHUT_WR);
-	delete $self->{cs};
-
-	$SSL_ERROR = "";
-	my $iosocket = $self->{ssl} ? "IO::Socket::SSL" : "IO::Socket::INET6";
-	my $cs = $iosocket->new(
-	    Proto		=> "tcp",
-	    Domain		=> $self->{connectdomain},
-	    PeerAddr		=> $self->{connectaddr},
-	    PeerPort		=> $self->{connectport},
-	    SSL_verify_mode	=> SSL_VERIFY_NONE,
-	) or die ref($self), " $iosocket socket connect failed: $!,$SSL_ERROR";
-	print STDERR "connect sock: ",$cs->sockhost()," ",$cs->sockport(),"\n";
-	print STDERR "connect peer: ",$cs->peerhost()," ",$cs->peerport(),"\n";
-
-	*STDIN = *STDOUT = $self->{cs} = $cs;
+	openlog("syslogd-regress", "ndelay,perror,pid", LOG_UUCP);
 }
 
 1;
