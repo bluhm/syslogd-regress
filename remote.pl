@@ -104,10 +104,9 @@ my $s = Server->new(
 $r = Remote->new(
     logfile             => "syslogd.log",
     %{$args{syslogd}},
-    remotessh           => $ARGV[3],
-    listenaddr          => $ARGV[2],
-    connectaddr         => $ARGV[1],
-    connectport         => $s ? $s->{listenport} : 1,
+    remotessh           => $ARGV[2],
+    forwardaddr         => $ARGV[0],
+    udpport             => $s ? $s->{listenport} : 1,
     testfile            => $testfile,
 );
 $r->run->up;

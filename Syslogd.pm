@@ -37,23 +37,6 @@ sub new {
 	unlink $self->{conffile};
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " conf file $self->{conffile} create failed: $!";
-	my %global_conf = %{$args{conf}{global}};
-	foreach my $key (keys %global_conf) {
-		print $fh "$key $global_conf{$key}\n";
-	}
-	my %area_conf = %{$args{conf}{areas}};
-	foreach my $area (keys %area_conf) {
-		print $fh "area $area {\n";
-		foreach my $if (keys %{${area_conf}{$area}}) {
-			print $fh "\tinterface $if {\n";
-			foreach my $if_opt (keys %{${area_conf}{$area}{$if}}) {
-				print $fh "\t\t$if_opt "
-				    . "$area_conf{$area}{$if}{$if_opt}\n";
-			}
-			print $fh "\t}\n";
-		}
-		print $fh "}\n";
-	}
 	close $fh;
 
 	return $self;
