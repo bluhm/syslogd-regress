@@ -46,7 +46,7 @@ my $s = Server->new(
     listenport          => $sport,
     %{$args{server}},
     testfile            => $testfile,
-) unless $args{server}{noserver};
+) if $args{server} && !$args{server}{noserver};
 my $r = Syslogd->new(
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
@@ -66,14 +66,14 @@ my $c = Client->new(
     testfile            => $testfile,
 ) unless $args{client}{noclient};
 
-$s->run unless $args{server}{noserver};
+$s->run if $s;
 $r->run;
 $r->up;
-$c->run->up unless $args{client}{noclient};
-$s->up unless $args{server}{noserver};
+$c->run->up if $c;
+$s->up if $s;
 
-$c->down unless $args{client}{noclient};
-$s->down unless $args{server}{noserver};
+$c->down if $c;
+$s->down if $s;
 $r->kill_child;
 $r->down;
 
