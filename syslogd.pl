@@ -48,8 +48,6 @@ my $s = Server->new(
     testfile            => $testfile,
 ) unless $args{client}{noserver};
 my $r = Syslogd->new(
-    listendomain        => AF_INET,
-    listenaddr          => "127.0.0.1",
     connectdomain       => AF_INET,
     connectaddr         => "127.0.0.1",
     connectport         => $sport,
@@ -58,8 +56,6 @@ my $r = Syslogd->new(
 );
 my $c = Client->new(
     func                => \&write_log,
-    connectdomain       => AF_INET,
-    connectaddr         => "127.0.0.1",
     %{$args{client}},
     testfile            => $testfile,
 ) unless $args{client}{noclient};
