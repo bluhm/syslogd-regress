@@ -40,6 +40,19 @@ TARGETS ?=		${ARGS}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 CLEANFILES +=		*.log *.pem *.crt *.key syslog.conf ktrace.out stamp-*
 
+.MAIN: all
+
+.if empty (REMOTE_SSH)
+.if make (regress) || make (all)
+.BEGIN:
+	@echo
+	[ -z "${SUDO}" ] || ${SUDO} true
+.END:
+	@echo
+	${SUDO} /etc/rc.d/syslogd restart
+.endif
+.endif
+
 # Set variables so that make runs with and without obj directory.
 # Only do that if necessary to keep visible output short.
 
