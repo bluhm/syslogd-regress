@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-#	$OpenBSD: relayd.pl,v 1.12 2014/07/11 15:38:44 bluhm Exp $
+#	$OpenBSD$
 
-# Copyright (c) 2010-2013 Alexander Bluhm <bluhm@openbsd.org>
+# Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,55 +21,50 @@ use Socket;
 use Socket6;
 
 use Client;
-use Relayd;
+use Syslogd;
 use Server;
 require 'funcs.pl';
 
 sub usage {
-	die "usage: relay.pl copy|splice [test-args.pl]\n";
+	die "usage: syslogd.pl [test-args.pl]\n";
 }
 
-my $test;
+my $testfile;
 our %args;
 if (@ARGV and -f $ARGV[-1]) {
-	$test = pop;
-	do $test
-	    or die "Do test file $test failed: ", $@ || $!;
+	$testfile = pop;
+	do $testfile
+	    or die "Do test file $testfile failed: ", $@ || $!;
 }
 @ARGV == 1 or usage();
 
-my $redo = $args{lengths} && @{$args{lengths}};
-$redo = 0 if $args{client}{http_vers};  # run only one persistent connection
 my($sport, $rport) = find_ports(num => 2);
 my $s = Server->new(
-    forward             => $ARGV[0],
     func                => \&read_char,
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
     listenport          => $sport,
     redo                => $redo,
     %{$args{server}},
-    testfile            => $test,
+    testfile            => $testfile,
 ) unless $args{server}{noserver};
-my $r = Relayd->new(
-    forward             => $ARGV[0],
+my $r = Syslogd->new(
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
     listenport          => $rport,
     connectdomain       => AF_INET,
     connectaddr         => "127.0.0.1",
     connectport         => $sport,
-    %{$args{relayd}},
-    testfile            => $test,
+    %{$args{syslogd}},
+    testfile            => $testfile,
 );
 my $c = Client->new(
-    forward             => $ARGV[0],
     func                => \&write_char,
     connectdomain       => AF_INET,
     connectaddr         => "127.0.0.1",
     connectport         => $rport,
     %{$args{client}},
-    testfile            => $test,
+    testfile            => $testfile,
 ) unless $args{client}{noclient};
 
 $s->run unless $args{server}{noserver};
