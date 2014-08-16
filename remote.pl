@@ -31,21 +31,19 @@ require 'funcs.pl';
 sub usage {
 	die <<"EOF";
 usage:
-    remote.pl forwardaddr udpport [test-args.pl]
+    remote.pl forwardaddr udpport test-args.pl
 	Only start remote syslogd on local machine.
-    remote.pl localaddr remoteaddr remotessh [test-args.pl]
+    remote.pl localaddr remoteaddr remotessh test-args.pl
 	Run test with local server.  Remote syslogd is
 	started automatically with ssh on remotessh.
 EOF
 }
 
-my $test;
+usage() unless @ARGV and -f $ARGV[-1];
+my $testfile = pop;
 our %args;
-if (@ARGV and -f $ARGV[-1]) {
-	$test = pop;
-	do $test
-	    or die "Do test file $test failed: ", $@ || $!;
-}
+do $testfile
+    or die "Do test file $testfile failed: ", $@ || $!;
 my $mode =
 	@ARGV == 2 ? "syslog"  :
 	@ARGV == 3 ? "local"   :
@@ -60,7 +58,7 @@ if ($mode eq "syslog") {
 	    forwardport         => $ARGV[1],
 	    logfile             => dirname($0)."/remote.log",
 	    conffile            => dirname($0)."/syslogd.conf",
-	    testfile            => $test,
+	    testfile            => $testfile,
 	);
 	open(my $log, '<', $r->{logfile})
 	    or die "Remote log file open failed: $!";
@@ -80,7 +78,7 @@ if ($mode eq "syslog") {
 	my $c = Client->new(
 	    func                => \&write_char,
 	    %{$args{client}},
-	    testfile            => $test,
+	    testfile            => $testfile,
 	) unless $args{client}{noclient};
 	$c->run->up unless $args{client}{noclient};
 	$c->down unless $args{client}{noclient};
@@ -102,7 +100,7 @@ my $s = Server->new(
     listendomain        => AF_INET,
     listenaddr          => ($mode eq "auto" ? $ARGV[1] : undef),
     listenport          => ($mode eq "manual" ? $ARGV[0] : undef),
-    testfile            => $test,
+    testfile            => $testfile,
 ) unless $args{server}{noserver};
 
 $r = Remote->new(
@@ -112,7 +110,7 @@ $r = Remote->new(
     listenaddr          => $ARGV[2],
     connectaddr         => $ARGV[1],
     connectport         => $s ? $s->{listenport} : 1,
-    testfile            => $test,
+    testfile            => $testfile,
 );
 $r->run->up;
 
