@@ -23,7 +23,7 @@ use Socket;
 use Socket6;
 
 use Client;
-use Relayd;
+use Syslogd;
 use Server;
 use Remote;
 require 'funcs.pl';
@@ -59,7 +59,7 @@ if ($mode eq "syslog") {
 	    forwardaddr         => $ARGV[0],
 	    forwardport         => $ARGV[1],
 	    logfile             => dirname($0)."/remote.log",
-	    conffile            => dirname($0)."/syslog.conf",
+	    conffile            => dirname($0)."/syslogd.conf",
 	    testfile            => $test,
 	);
 	open(my $log, '<', $r->{logfile})
@@ -108,8 +108,8 @@ my $s = Server->new(
 
 $r = Remote->new(
     forward             => $ARGV[0],
-    logfile             => "relayd.log",
-    %{$args{relayd}},
+    logfile             => "syslogd.log",
+    %{$args{syslogd}},
     remotessh           => $ARGV[3],
     listenaddr          => $ARGV[2],
     connectaddr         => $ARGV[1],
