@@ -1,4 +1,4 @@
-#	$OpenBSD: Ospfd.pm,v 1.2 2014/07/11 22:28:51 bluhm Exp $
+#	$OpenBSD$
 
 # Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 # Copyright (c) 2014 Florian Riehm <mail@friehm.de>
@@ -18,7 +18,7 @@
 use strict;
 use warnings;
 
-package Ospfd;
+package Syslogd;
 use parent 'Proc';
 use Carp;
 use File::Basename;
@@ -26,14 +26,14 @@ use File::Basename;
 sub new {
 	my $class = shift;
 	my %args = @_;
-	$args{logfile} ||= "ospfd.log";
+	$args{logfile} ||= "syslogd.log";
 	$args{up} ||= "Started";
 	$args{down} ||= "terminating";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
-	$args{conffile} ||= "ospfd.conf";
+	$args{conffile} ||= "syslogd.conf";
 	my $self = Proc::new($class, %args);
 
-	# generate ospfd.conf from config keys in %args
+	# generate syslogd.conf from config keys in %args
 	unlink $self->{conffile};
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " conf file $self->{conffile} create failed: $!";
@@ -55,11 +55,6 @@ sub new {
 		print $fh "}\n";
 	}
 	close $fh;
-	chmod(0600, $self->{conffile});
-	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
-	my @cmd = (@sudo, "/sbin/chown", "0:0", $self->{conffile});
-	system(@cmd)
-	    and die "System '@cmd' failed: $?";
 
 	return $self;
 }
@@ -79,8 +74,8 @@ sub child {
 	print STDERR $self->{up}, "\n";
 	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
 	my @ktrace = $ENV{KTRACE} ? ($ENV{KTRACE}, "-i") : ();
-	my $ospfd = $ENV{OSPFD} ? $ENV{OSPFD} : "ospfd";
-	my @cmd = (@sudo, @ktrace, $ospfd, '-d', '-v', '-f', $self->{conffile});
+	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
+	my @cmd = (@sudo, @ktrace, $syslogd, '-d', '-f', $self->{conffile});
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
 	die "Exec @cmd failed: $!";
