@@ -94,7 +94,7 @@ sub check_logs {
 
 	return if $args{nocheck};
 
-	check_loggrep($c, $r, $s, %args);
+	check_loggrep($r, $s, %args);
 }
 
 sub check_loggrep {
