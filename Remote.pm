@@ -1,6 +1,6 @@
-#	$OpenBSD: Remote.pm,v 1.4 2014/07/11 16:13:11 bluhm Exp $
+#	$OpenBSD$
 
-# Copyright (c) 2010-2013 Alexander Bluhm <bluhm@openbsd.org>
+# Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -48,19 +48,15 @@ sub new {
 	my %args = @_;
 	$args{logfile} ||= "remote.log";
 	$args{up} ||= "Started";
-	$args{down} ||= $args{dryrun} ? "relayd.conf" : "parent terminating";
+	$args{down} ||= "syslogd: exiting";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{remotessh}
 	    or croak "$class remote ssh host not given";
-	$args{forward}
-	    or croak "$class forward not given";
 	my $self = Proc::new($class, %args);
-	$self->{listenaddr}
-	    or croak "$class listen addr not given";
-	$self->{connectaddr}
-	    or croak "$class connect addr not given";
-	$self->{connectport}
-	    or croak "$class connect port not given";
+	$self->{forwardaddr}
+	    or croak "$class forward addr not given";
+	$self->{udpport}
+	    or croak "$class udp port not given";
 	return $self;
 }
 
@@ -90,14 +86,14 @@ sub child {
 	my @opts = split(' ', $ENV{SSH_OPTIONS}) if $ENV{SSH_OPTIONS};
 	my @sudo = $ENV{SUDO} ? "SUDO=$ENV{SUDO}" : ();
 	my @ktrace = $ENV{KTRACE} ? "KTRACE=$ENV{KTRACE}" : ();
-	my @relayd = $ENV{RELAYD} ? "RELAYD=$ENV{RELAYD}" : ();
+	my @syslogd = $ENV{SYSLOGD} ? "SYSLOGD=$ENV{SYSLOGD}" : ();
 	my $curdir = dirname($0) || ".";
 	$curdir = getcwd() if $curdir eq '.';
 	my @cmd = ('ssh', @opts, $self->{remotessh},
-	    @sudo, @ktrace, @relayd, 'perl',
-	    '-I', $curdir, "$curdir/".basename($0), $self->{forward},
-	    $self->{listenaddr}, $self->{connectaddr}, $self->{connectport},
-	    ($self->{testfile} ? "$curdir/".basename($self->{testfile}) : ()));
+	    @sudo, @ktrace, @syslogd, 'perl',
+	    '-I', $curdir, "$curdir/".basename($0),
+	    $self->{forwardaddr}, $self->{udpport},
+	    "$curdir/".basename($self->{testfile}));
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
 	die "Exec @cmd failed: $!";

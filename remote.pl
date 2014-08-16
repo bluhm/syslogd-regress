@@ -96,7 +96,6 @@ if ($mode eq "syslog") {
 }
 
 my $s = Server->new(
-    forward             => $ARGV[0],
     func                => \&read_char,
     redo                => $redo,
     %{$args{server}},
@@ -107,7 +106,6 @@ my $s = Server->new(
 ) unless $args{server}{noserver};
 
 $r = Remote->new(
-    forward             => $ARGV[0],
     logfile             => "syslogd.log",
     %{$args{syslogd}},
     remotessh           => $ARGV[3],
