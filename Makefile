@@ -1,4 +1,4 @@
-#	$OpenBSD: Makefile,v 1.9 2014/07/11 20:41:20 bluhm Exp $
+#	$OpenBSD$
 
 # The following ports must be installed for the regression tests:
 # p5-IO-Socket-INET6	object interface for AF_INET and AF_INET6 domain sockets
@@ -19,22 +19,35 @@ regress:
 	@echo install these perl packages for additional tests
 .endif
 
-# Fill out these variables if you want to test relayd with
-# the relayd process running on a remote machine.  You have to specify
-# a local and remote ip address for the tcp connections.  To control
+# Fill out these variables if you have to test syslogd with
+# the syslogd process running on a remote machine.  You have to specify
+# a local and remote ip address for the test connections.  To control
 # the remote machine you need a hostname for ssh to log in.  All the
 # test files must be in the same directory local and remote.
+#
+# Run make check-setup to see if you got the setup correct.
 
 LOCAL_ADDR ?=
 REMOTE_ADDR ?=
+LOCAL_ADDR6 ?=
+REMOTE_ADDR6 ?=
 REMOTE_SSH ?=
+
+.if empty (LOCAL_ADDR) || empty (REMOTE_ADDR) || \
+    empty (LOCAL_ADDR6) || empty (REMOTE_ADDR6) || \
+    empty (REMOTE_SSH)
+regress:
+	@echo This tests needs a remote machine to operate on.
+	@echo LOCAL_ADDR REMOTE_ADDR LOCAL_ADDR6 REMOTE_ADDR6 REMOTE_SSH
+	@echo are empty.  Fill out these variables for additional tests.
+.endif
 
 # Automatically generate regress targets from test cases in directory.
 
 ARGS !=			cd ${.CURDIR} && ls args-*.pl
 TARGETS ?=		${ARGS}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
-CLEANFILES +=		*.log *.pem *.crt *.key relayd.conf ktrace.out stamp-*
+CLEANFILES +=		*.log *.pem *.crt *.key syslog.conf ktrace.out stamp-*
 
 # Set variables so that make runs with and without obj directory.
 # Only do that if necessary to keep visible output short.
@@ -98,5 +111,14 @@ stamp-syntax: ${ARGS}
 	@perl -c ${PERLPATH}$a
 .endfor
 	@date >$@
+
+# Check wether the address, route and remote setup is correct
+check-setup:
+	@echo '\n======== $@ ========'
+	ping -n -c 1 ${LOCAL_ADDR}
+	ping -n -c 1 ${REMOTE_ADDR}
+	ping6 -n -c 1 ${LOCAL_ADDR6}
+	ping6 -n -c 1 ${REMOTE_ADDR6}
+	ssh ${REMOTE_SSH} perl -MIO::Socket::INET6 -MSocket6 -e 1
 
 .include <bsd.regress.mk>
