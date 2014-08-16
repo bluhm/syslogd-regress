@@ -19,7 +19,7 @@ regress:
 	@echo install these perl packages for additional tests
 .endif
 
-# Fill out these variables if you have to test syslogd with
+# Fill out these variables if you want to test syslogd with
 # the syslogd process running on a remote machine.  You have to specify
 # a local and remote ip address for the test connections.  To control
 # the remote machine you need a hostname for ssh to log in.  All the
@@ -32,15 +32,6 @@ REMOTE_ADDR ?=
 LOCAL_ADDR6 ?=
 REMOTE_ADDR6 ?=
 REMOTE_SSH ?=
-
-.if empty (LOCAL_ADDR) || empty (REMOTE_ADDR) || \
-    empty (LOCAL_ADDR6) || empty (REMOTE_ADDR6) || \
-    empty (REMOTE_SSH)
-regress:
-	@echo This tests needs a remote machine to operate on.
-	@echo LOCAL_ADDR REMOTE_ADDR LOCAL_ADDR6 REMOTE_ADDR6 REMOTE_SSH
-	@echo are empty.  Fill out these variables for additional tests.
-.endif
 
 # Automatically generate regress targets from test cases in directory.
 
@@ -66,8 +57,12 @@ PERLPATH =	${.CURDIR}/
 .for a in ${ARGS}
 run-regress-$a: $a
 	@echo '\n======== $@ ========'
+.if empty (REMOTE_SSH)
+	time SUDO=${SUDO} KTRACE=${KTRACE} SYSLOGD=${SYSLOGD} perl ${PERLINC} ${PERLPATH}syslogd.pl ${PERLPATH}$a
+.else
 	ssh -t ${REMOTE_SSH} ${SUDO} true
 	time SUDO=${SUDO} KTRACE=${KTRACE} SYSLOGD=${SYSLOGD} perl ${PERLINC} ${PERLPATH}remote.pl ${LOCAL_ADDR} ${REMOTE_ADDR} ${REMOTE_SSH} ${PERLPATH}$a
+.endif
 .endfor
 
 # create the certificates for SSL
