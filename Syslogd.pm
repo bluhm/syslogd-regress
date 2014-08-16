@@ -47,7 +47,7 @@ sub new {
 sub up {
 	my $self = Proc::up(shift, @_);
 	my $timeout = shift || 10;
-	my $regex = "startup";
+	my $regex = "syslogd: started";
 	$self->loggrep(qr/$regex/, $timeout)
 	    or croak ref($self), " no $regex in $self->{logfile} ".
 		"after $timeout seconds";
