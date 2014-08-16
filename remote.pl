@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #	$OpenBSD$
 
-# Copyright (c) 2010-2013 Alexander Bluhm <bluhm@openbsd.org>
+# Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -31,14 +31,10 @@ require 'funcs.pl';
 sub usage {
 	die <<"EOF";
 usage:
-    remote.pl localport remoteaddr remoteport [test-args.pl]
-	Run test with local client and server.  Remote relayd
-	forwarding from remoteaddr remoteport to server localport
-	has to be started manually.
-    remote.pl copy|splice listenaddr connectaddr connectport [test-args.pl]
-	Only start remote relayd.
-    remote.pl copy|splice localaddr remoteaddr remotessh [test-args.pl]
-	Run test with local client and server.  Remote relayd is
+    remote.pl forwardaddr udpport [test-args.pl]
+	Only start remote syslogd on local machine.
+    remote.pl localaddr remoteaddr remotessh [test-args.pl]
+	Run test with local server.  Remote syslogd is
 	started automatically with ssh on remotessh.
 EOF
 }
@@ -51,25 +47,19 @@ if (@ARGV and -f $ARGV[-1]) {
 	    or die "Do test file $test failed: ", $@ || $!;
 }
 my $mode =
-	@ARGV == 3 && $ARGV[0] =~ /^\d+$/ && $ARGV[2] =~ /^\d+$/ ? "manual" :
-	@ARGV == 4 && $ARGV[1] !~ /^\d+$/ && $ARGV[3] =~ /^\d+$/ ? "relay"  :
-	@ARGV == 4 && $ARGV[1] !~ /^\d+$/ && $ARGV[3] !~ /^\d+$/ ? "auto"   :
+	@ARGV == 2 ? "syslog"  :
+	@ARGV == 3 ? "auto"   :
 	usage();
 
 my $r;
-if ($mode eq "relay") {
-	my($rport) = find_ports(num => 1);
-	$r = Relayd->new(
-	    forward             => $ARGV[0],
-	    %{$args{relayd}},
-	    listendomain        => AF_INET,
-	    listenaddr          => $ARGV[1],
-	    listenport          => $rport,
-	    connectdomain       => AF_INET,
-	    connectaddr         => $ARGV[2],
-	    connectport         => $ARGV[3],
+if ($mode eq "syslog") {
+	$r = Syslogd->new(
+	    %{$args{syslogd}},
+	    forwarddomain       => AF_INET,
+	    forwardaddr         => $ARGV[0],
+	    forwardport         => $ARGV[1],
 	    logfile             => dirname($0)."/remote.log",
-	    conffile            => dirname($0)."/relayd.conf",
+	    conffile            => dirname($0)."/syslog.conf",
 	    testfile            => $test,
 	);
 	open(my $log, '<', $r->{logfile})
@@ -86,6 +76,15 @@ if ($mode eq "relay") {
 	$r->up;
 	copy($log, \*STDERR);
 	print STDERR "listen sock: $ARGV[1] $rport\n";
+
+	my $c = Client->new(
+	    func                => \&write_char,
+	    %{$args{client}},
+	    testfile            => $test,
+	) unless $args{client}{noclient};
+	$c->run->up unless $args{client}{noclient};
+	$c->down unless $args{client}{noclient};
+
 	<STDIN>;
 	copy($log, \*STDERR);
 	print STDERR "stdin closed\n";
@@ -96,8 +95,6 @@ if ($mode eq "relay") {
 	exit;
 }
 
-my $redo = $args{lengths} && @{$args{lengths}};
-$redo = 0 if $args{client}{http_vers};  # run only one persistent connection
 my $s = Server->new(
     forward             => $ARGV[0],
     func                => \&read_char,
@@ -108,34 +105,22 @@ my $s = Server->new(
     listenport          => ($mode eq "manual" ? $ARGV[0] : undef),
     testfile            => $test,
 ) unless $args{server}{noserver};
-if ($mode eq "auto") {
-	$r = Remote->new(
-	    forward             => $ARGV[0],
-	    logfile             => "relayd.log",
-	    %{$args{relayd}},
-	    remotessh           => $ARGV[3],
-	    listenaddr          => $ARGV[2],
-	    connectaddr         => $ARGV[1],
-	    connectport         => $s ? $s->{listenport} : 1,
-	    testfile            => $test,
-	);
-	$r->run->up;
-}
-my $c = Client->new(
+
+$r = Remote->new(
     forward             => $ARGV[0],
-    func                => \&write_char,
-    %{$args{client}},
-    connectdomain       => AF_INET,
-    connectaddr         => ($mode eq "manual" ? $ARGV[1] : $r->{listenaddr}),
-    connectport         => ($mode eq "manual" ? $ARGV[2] : $r->{listenport}),
+    logfile             => "relayd.log",
+    %{$args{relayd}},
+    remotessh           => $ARGV[3],
+    listenaddr          => $ARGV[2],
+    connectaddr         => $ARGV[1],
+    connectport         => $s ? $s->{listenport} : 1,
     testfile            => $test,
-) unless $args{client}{noclient};
+);
+$r->run->up;
 
 $s->run unless $args{server}{noserver};
-$c->run->up unless $args{client}{noclient};
 $s->up unless $args{server}{noserver};
 
-$c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
 $r->close_child;
 $r->down;
