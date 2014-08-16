@@ -73,7 +73,6 @@ if ($mode eq "syslog") {
 	copy($log, \*STDERR);
 	$r->up;
 	copy($log, \*STDERR);
-	print STDERR "listen sock: $ARGV[1] $rport\n";
 
 	my $c = Client->new(
 	    func                => \&write_char,
@@ -95,7 +94,6 @@ if ($mode eq "syslog") {
 
 my $s = Server->new(
     func                => \&read_char,
-    redo                => $redo,
     %{$args{server}},
     listendomain        => AF_INET,
     listenaddr          => ($mode eq "auto" ? $ARGV[1] : undef),
@@ -121,4 +119,4 @@ $s->down unless $args{server}{noserver};
 $r->close_child;
 $r->down;
 
-check_logs($c, $r, $s, %args);
+check_logs($r, $s, %args);
