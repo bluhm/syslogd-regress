@@ -1,7 +1,8 @@
-Run syslogd regressions tests.  As only one syslogd may run per
-machine the test target is running remote.
+Run syslogd regressions tests.  As only one syslogd can run per
+machine, each test kills any syslogd first.  At the end the system's
+syslogd gets restarted.
 
-The test framework logs into the remote machine, kills any syslogd
-and starts a new one with a local config.  This gets logger events
-and has to forward to local local machine where the test scripts
-are executed.
+The test framework runs a client, and a server, and a syslogd.  The
+messages are passed via the log socket from the client to syslogd.
+From there udp transport is used to reach the server.  All processes
+write log files where the message has to show up.
