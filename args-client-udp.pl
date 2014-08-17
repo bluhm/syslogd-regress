@@ -14,7 +14,10 @@ our %args = (
     },
     syslogd => {
 	options => ["-u"],
-    }
+    },
+    file => {
+	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_log(),
+    },
 );
 
 1;

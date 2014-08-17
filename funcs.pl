@@ -71,6 +71,10 @@ sub read_log {
 # Script funcs
 ########################################################################
 
+sub get_log {
+	return $testlog;
+}
+
 sub check_logs {
 	my ($c, $r, $s, %args) = @_;
 
