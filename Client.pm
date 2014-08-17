@@ -42,7 +42,7 @@ sub child {
 		    PeerAddr            => $self->{connectaddr},
 		    PeerPort            => $self->{connectport},
 		) or die ref($self), " socket connect failed: $!";
-		print STDERR "connect sock: ",$cs->sockhost()," ",	
+		print STDERR "connect sock: ",$cs->sockhost()," ",
 		    $cs->sockport(),"\n";
 		print STDERR "connect peer: ",$cs->peerhost()," ",
 		    $cs->peerport(),"\n";
