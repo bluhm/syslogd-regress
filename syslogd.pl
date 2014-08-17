@@ -38,19 +38,17 @@ if (@ARGV and -f $ARGV[-1]) {
 }
 @ARGV == 0 or usage();
 
-my($sport) = find_ports();
 my $s = Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
-    listenport          => $sport,
     %{$args{server}},
     testfile            => $testfile,
 ) unless $args{client}{noserver};
 my $r = Syslogd->new(
     connectdomain       => AF_INET,
     connectaddr         => "127.0.0.1",
-    connectport         => $sport,
+    connectport         => $s->{listenport},
     %{$args{syslogd}},
     testfile            => $testfile,
 );
