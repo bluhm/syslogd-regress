@@ -20,6 +20,7 @@ use warnings;
 package Client;
 use parent 'Proc';
 use Carp;
+use IO::Socket::INET6;
 use Sys::Syslog qw(:standard :extended :macros);
 
 sub new {
@@ -33,6 +34,21 @@ sub new {
 
 sub child {
 	my $self = shift;
+
+	if ($self->{connect}) {
+		my $cs = IO::Socket::INET6->new(
+		    Proto               => "udp",
+		    Domain              => $self->{connect}{domain},
+		    PeerAddr            => $self->{connect}{addr},
+		    PeerPort            => $self->{connect}{port},
+		) or die ref($self), " socket connect failed: $!";
+		print STDERR "connect sock: ",$cs->sockhost()," ",	
+		    $cs->sockport(),"\n";
+		print STDERR "connect peer: ",$cs->peerhost()," ",
+		    $cs->peerport(),"\n";
+
+		*STDIN = *STDOUT = $self->{cs} = $cs;
+	}
 
 	if ($self->{logsock}) {
 		setlogsock($self->{logsock})

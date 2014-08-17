@@ -32,8 +32,14 @@ my $downlog = "syslogd regress client shutdown";
 ########################################################################
 
 sub write_log {
-	syslog(LOG_INFO, $testlog);
-	write_shutdown(@_);
+	my $self = shift;
+
+	if ($self->{connect}) {
+		print $testlog;
+	} else {
+		syslog(LOG_INFO, $testlog);
+	}
+	write_shutdown($self, @_);
 }
 
 sub write_shutdown {
