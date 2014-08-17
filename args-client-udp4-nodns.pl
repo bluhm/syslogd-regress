@@ -1,7 +1,7 @@
 # The client writes a message to a localhost IPv4 UDP socket.
 # The syslogd writes it into a file and through a pipe without dns.
-# The syslogd passes it via udp to the loghost.
-# The server receives the message on its udp socket.
+# The syslogd passes it via UDP to the loghost.
+# The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check that the file log contains the 127.0.0.1 address.
 

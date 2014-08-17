@@ -4,5 +4,5 @@ syslogd gets restarted.
 
 The test framework runs a client, and a server, and a syslogd.  The
 messages are passed via the log socket from the client to syslogd.
-From there udp transport is used to reach the server.  All processes
+From there UDP transport is used to reach the server.  All processes
 write log files where the message has to show up.
