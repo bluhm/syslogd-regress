@@ -36,6 +36,7 @@ sub write_log {
 
 	if ($self->{connect}) {
 		print $testlog;
+		print STDERR $testlog;
 	} else {
 		syslog(LOG_INFO, $testlog);
 	}
