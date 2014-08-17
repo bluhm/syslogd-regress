@@ -49,6 +49,11 @@ sub find_ports {
 
 sub write_log {
 	syslog(LOG_INFO, "log message from syslogd regress client");
+	write_shutdown();
+}
+
+sub write_shutdown {
+	syslog(LOG_NOTICE, "syslogd regress client shutdown");
 }
 
 sub errignore {
@@ -68,13 +73,14 @@ sub errignore {
 
 sub read_log {
 	my $self = shift;
-	my $max = shift // $self->{max} // 1;
+	my $max = shift // $self->{max};
 
-	for (my $num = 0; $num < $max; $num++) {
+	for (my $num = 0; !$max || $num < $max; $num++) {
 		defined(sysread(STDIN, my $line, 8194))
 		    or die "read log line failed: $!";
 		chomp $line;
 		print STDERR ">>> $line\n";
+		last if $line =~ /syslogd regress client shutdown/;
 	}
 }
 
