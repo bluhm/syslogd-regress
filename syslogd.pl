@@ -41,7 +41,7 @@ if (@ARGV and -f $ARGV[-1]) {
 foreach my $name (qw(client syslogd server)) {
 	foreach my $action (qw(connect listen)) {
 		my $h = $args{$name}{$action} or next;
-		foreach my $k (qw(domain addr port)) {
+		foreach my $k (qw(protocol domain addr port)) {
 			$args{$name}{"$action$k"} = $h->{$k};
 		}
 	}
@@ -54,7 +54,6 @@ my $s = Server->new(
     testfile            => $testfile,
 ) unless $args{client}{noserver};
 my $r = Syslogd->new(
-    connectdomain       => AF_INET,
     connectaddr         => "127.0.0.1",
     connectport         => $s->{listenport},
     %{$args{syslogd}},

@@ -32,13 +32,14 @@ sub new {
 	$args{logfile} ||= "server.log";
 	$args{up} ||= "Accepted";
 	my $self = Proc::new($class, %args);
-	$self->{protocol} ||= "udp";
+	$self->{listenprotocol} ||= "udp";
 	$self->{listendomain}
 	    or croak "$class listen domain not given";
 	$SSL_ERROR = "";
-	my $iosocket = $self->{protocol} eq "tls" ?
+	my $iosocket = $self->{listenprotocol} eq "tls" ?
 	    "IO::Socket::SSL" : "IO::Socket::INET6";
-	my $proto = $self->{protocol} eq "tls" ? "tcp" : $self->{protocol};
+	my $proto = $self->{listenprotocol};
+	$proto = "tcp" if $proto eq "tls";
 	my $ls = $iosocket->new(
 	    Proto		=> $proto,
 	    ReuseAddr		=> 1,
@@ -49,7 +50,7 @@ sub new {
 	    SSL_cert_file	=> "server-cert.pem",
 	    SSL_verify_mode	=> SSL_VERIFY_NONE,
 	) or die ref($self), " $iosocket socket listen failed: $!,$SSL_ERROR";
-	if ($self->{protocol} eq "tcp") {
+	if ($self->{listenprotocol} eq "tcp") {
 		listen($ls, 1)
 		    or die ref($self), " socket failed: $!";
 	}
@@ -66,7 +67,7 @@ sub child {
 
 	my $iosocket = $self->{ssl} ? "IO::Socket::SSL" : "IO::Socket::INET6";
 	my $as = $self->{ls};
-	if ($self->{protocol} ne "udp") {
+	if ($self->{listenprotocol} ne "udp") {
 		$as = $self->{ls}->accept()
 		    or die ref($self), " $iosocket socket accept failed: $!";
 		print STDERR "accept sock: ",$as->sockhost()," ",

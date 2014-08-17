@@ -40,12 +40,23 @@ sub new {
 
 	_make_abspath(\$self->{$_}) foreach (qw(conffile outfile outpipe));
 
+	# substitute variables in config file
+	my $connectprotocol = $self->{connectprotocol};
+	my $connectdomain = $self->{connectdomain};
+	my $connectaddr = $self->{connectaddr};
+	my $connectport = $self->{connectport};
+
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	print $fh "*.*\t$self->{outfile}\n";
 	print $fh "*.*\t|dd of=$self->{outpipe} status=none\n";
-	my $loghost = "\@$self->{connectaddr}";
-	$loghost .= ":$self->{connectport}" if $self->{connectport};
+	my $loghost = $self->{loghost};
+	if ($loghost) {
+		$loghost =~ s/(\$[a-z]+)/$1/eeg;
+	} else {
+		$loghost = "\@$connectaddr";
+		$loghost .= ":$connectport" if $connectport;
+	}
 	print $fh "*.*\t$loghost\n";
 	close $fh;
 
