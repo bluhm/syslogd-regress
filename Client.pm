@@ -20,7 +20,7 @@ use warnings;
 package Client;
 use parent 'Proc';
 use Carp;
-use Sys::Syslog qw(:standard :macros);
+use Sys::Syslog qw(:standard :extended :macros);
 
 sub new {
 	my $class = shift;
@@ -34,6 +34,10 @@ sub new {
 sub child {
 	my $self = shift;
 
+	if ($self->{logsock}) {
+		setlogsock($self->{logsock})
+		    or die ref($self), " setlogsock failed: $!";
+	}
 	# we take LOG_UUCP as it is not used nowadays
 	openlog("syslogd-regress", "ndelay,perror,pid", LOG_UUCP);
 }

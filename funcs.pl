@@ -20,7 +20,7 @@ use Errno;
 use List::Util qw(first);
 use Socket;
 use Socket6;
-use Sys::Syslog qw(:standard :macros);
+use Sys::Syslog qw(:standard :extended :macros);
 use IO::Socket;
 use IO::Socket::INET6;
 
@@ -33,10 +33,14 @@ my $downlog = "syslogd regress client shutdown";
 
 sub write_log {
 	syslog(LOG_INFO, $testlog);
-	write_shutdown();
+	write_shutdown(@_);
 }
 
 sub write_shutdown {
+	my $self = shift;
+
+	setlogsock("native")
+	    or die ref($self), " setlogsock native failed: $!";
 	syslog(LOG_NOTICE, $downlog);
 }
 
