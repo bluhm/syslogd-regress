@@ -48,7 +48,7 @@ sub find_ports {
 ########################################################################
 
 sub write_log {
-	syslog(LOG_INFO, "foo");
+	syslog(LOG_INFO, "log message from syslogd regress client");
 }
 
 sub errignore {
