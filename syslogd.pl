@@ -52,7 +52,7 @@ my $s = Server->new(
     listenaddr          => "127.0.0.1",
     %{$args{server}},
     testfile            => $testfile,
-) unless $args{client}{noserver};
+) unless $args{server}{noserver};
 my $r = Syslogd->new(
     connectaddr         => "127.0.0.1",
     connectport         => $s->{listenport},
@@ -65,14 +65,14 @@ my $c = Client->new(
     testfile            => $testfile,
 ) unless $args{client}{noclient};
 
-$s->run unless $args{client}{noserver};
+$s->run unless $args{server}{noserver};
 $r->run;
 $r->up;
 $c->run->up unless $args{client}{noclient};
-$s->up unless $args{client}{noserver};
+$s->up unless $args{server}{noserver};
 
 $c->down unless $args{client}{noclient};
-$s->down unless $args{client}{noserver};
+$s->down unless $args{server}{noserver};
 $r->kill_child;
 $r->down;
 
