@@ -34,6 +34,7 @@ sub new {
 sub child {
 	my $self = shift;
 
+	# we take LOG_UUCP as it is not used nowadays
 	openlog("syslogd-regress", "ndelay,perror,pid", LOG_UUCP);
 }
 
