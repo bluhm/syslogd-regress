@@ -35,12 +35,12 @@ sub new {
 sub child {
 	my $self = shift;
 
-	if ($self->{connect}) {
+	if ($self->{connectdomain}) {
 		my $cs = IO::Socket::INET6->new(
 		    Proto               => "udp",
-		    Domain              => $self->{connect}{domain},
-		    PeerAddr            => $self->{connect}{addr},
-		    PeerPort            => $self->{connect}{port},
+		    Domain              => $self->{connectdomain},
+		    PeerAddr            => $self->{connectaddr},
+		    PeerPort            => $self->{connectport},
 		) or die ref($self), " socket connect failed: $!";
 		print STDERR "connect sock: ",$cs->sockhost()," ",	
 		    $cs->sockport(),"\n";

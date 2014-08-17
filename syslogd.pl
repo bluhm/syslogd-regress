@@ -38,6 +38,14 @@ if (@ARGV and -f $ARGV[-1]) {
 }
 @ARGV == 0 or usage();
 
+foreach my $name (qw(client syslogd server)) {
+	foreach my $action (qw(connect listen)) {
+		my $h = $args{$name}{$action} or next;
+		foreach my $k (qw(domain addr port)) {
+			$args{$name}{"$action$k"} = $h->{$k};
+		}
+	}
+}
 my $s = Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
