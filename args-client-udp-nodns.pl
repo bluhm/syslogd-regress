@@ -4,7 +4,7 @@
 # The syslogd passes it via udp to the loghost.
 # The server receives the message on its udp socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains a localhost ip address.
+# Check that the file log contains the 127.0.0.1 address.
 
 use strict;
 use warnings;
