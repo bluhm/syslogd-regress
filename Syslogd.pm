@@ -80,6 +80,7 @@ sub child {
 	my @ktrace = $ENV{KTRACE} ? ($ENV{KTRACE}, "-i") : ();
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	my @cmd = (@sudo, @ktrace, $syslogd, "-d", "-f", $self->{conffile});
+	push @cmd, @{$self->{options}} if $self->{options};
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
 	die "Exec '@cmd' failed: $!";
