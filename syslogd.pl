@@ -65,14 +65,14 @@ my $c = Client->new(
     testfile            => $testfile,
 ) unless $args{client}{noclient};
 
-$s->run if $s;
+$s->run unless $args{client}{noserver};
 $r->run;
 $r->up;
-$c->run->up if $c;
-$s->up if $s;
+$c->run->up unless $args{client}{noclient};
+$s->up unless $args{client}{noserver};
 
-$c->down if $c;
-$s->down if $s;
+$c->down unless $args{client}{noclient};
+$s->down unless $args{client}{noserver};
 $r->kill_child;
 $r->down;
 
