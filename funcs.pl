@@ -56,17 +56,6 @@ sub write_shutdown {
 	syslog(LOG_NOTICE, "syslogd regress client shutdown");
 }
 
-sub errignore {
-	$SIG{PIPE} = 'IGNORE';
-	$SIG{__DIE__} = sub {
-		die @_ if $^S;
-		warn "Error ignored";
-		warn @_;
-		IO::Handle::flush(\*STDERR);
-		POSIX::_exit(0);
-	};
-}
-
 ########################################################################
 # Server funcs
 ########################################################################
