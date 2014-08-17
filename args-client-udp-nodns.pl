@@ -1,4 +1,3 @@
-# test with default values
 # The client writes a message to Sys::Syslog UDP method.
 # The syslogd writes it into a file and through a pipe without dns.
 # The syslogd passes it via udp to the loghost.

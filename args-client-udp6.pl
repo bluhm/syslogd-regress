@@ -1,4 +1,3 @@
-# test with default values
 # The client writes a message to a localhost IPv6 UDP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via udp to the loghost.

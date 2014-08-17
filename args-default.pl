@@ -1,4 +1,4 @@
-# test with default values
+# Test with default values, that is:
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via udp to the loghost.
