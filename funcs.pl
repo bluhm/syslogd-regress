@@ -42,9 +42,8 @@ sub write_shutdown {
 
 sub read_log {
 	my $self = shift;
-	my $max = shift // $self->{max};
 
-	for (my $num = 0; !$max || $num < $max; $num++) {
+	for (;;) {
 		defined(sysread(STDIN, my $line, 8194))
 		    or die "read log line failed: $!";
 		chomp $line;
