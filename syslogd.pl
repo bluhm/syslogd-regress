@@ -55,7 +55,7 @@ my $s = Server->new(
 ) unless $args{server}{noserver};
 my $r = Syslogd->new(
     connectaddr         => "127.0.0.1",
-    connectport         => $s->{listenport},
+    connectport         => $s && $s->{listenport},
     %{$args{syslogd}},
     testfile            => $testfile,
 );
