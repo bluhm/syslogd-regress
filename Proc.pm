@@ -66,6 +66,8 @@ sub new {
 	    or croak "$class func not given";
 	!$self->{ktrace} || $self->{ktracefile}
 	    or croak "$class ktrace file not given";
+	!$self->{fstat} || $self->{fstatfile}
+	    or croak "$class fstat file not given";
 	$self->{logfile}
 	    or croak "$class log file not given";
 	open(my $fh, '>', $self->{logfile})
@@ -176,6 +178,20 @@ sub up {
 	$self->loggrep(qr/$self->{up}/, $timeout)
 	    or croak ref($self), " no '$self->{up}' in $self->{logfile} ".
 		"after $timeout seconds";
+	if ($self->{fstat}) {
+		open(my $fh, '>', $self->{fstatfile}) or die ref($self),
+		    " open $self->{fstatfile} for writing failed: $!";
+		my @cmd = ("fstat", "-p", $$);
+		defined(my $pid = fork())
+		    or die ref($self), " fork fstat failed: $!";
+		if ($pid == 0) {
+			open(STDOUT, '>&', $fh)
+			    or die ref($self), " dup fstat failed: $!";
+			close($fh);
+			exec @cmd;
+			die ref($self), " exec '@cmd' failed: $?";
+		}
+	}
 	return $self;
 }
 

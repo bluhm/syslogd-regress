@@ -27,6 +27,7 @@ use File::Basename;
 sub new {
 	my $class = shift;
 	my %args = @_;
+	$args{fstatfile} ||= "syslogd.fstat";
 	$args{logfile} ||= "syslogd.log";
 	$args{up} ||= "syslogd: started";
 	$args{down} ||= "syslogd: exiting";
