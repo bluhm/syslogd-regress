@@ -10,8 +10,12 @@ use warnings;
 
 our %args = (
     syslogd => {
-	options => ["-4"],
 	fstat => 1,
+	loghost => '@127.0.0.1:$connectport',
+	options => ["-4"],
+    },
+    server => {
+	listen => { domain => AF_INET, addr => "127.0.0.1" },
     },
     fstat => {
 	loggrep => {
