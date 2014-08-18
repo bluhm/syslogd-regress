@@ -98,6 +98,24 @@ sub child {
 	die ref($self), " exec '@cmd' failed: $!";
 }
 
+sub up {
+	my $self = Proc::up(shift, @_);
+
+	if ($self->{fstat}) {
+		open(my $fh, '>', $self->{fstatfile}) or die ref($self),
+		    " open $self->{fstatfile} for writing failed: $!";
+		my @cmd = ("fstat");
+		open(my $fs, '-|', @cmd)
+		    or die ref($self), " open pipe from '@cmd' failed: $!";
+		print $fh grep { /^\w+ *syslogd *\d+/ } <$fs>;
+		close($fs) or die ref($self), $! ?
+		    " close pipe from '@cmd' failed: $!" :
+		    " command '@cmd' failed: $?";
+		close($fh)
+		    or die ref($self), " close $self->{fstatfile} failed: $!";
+	}
+}
+
 sub _make_abspath {
 	my $file = ref($_[0]) ? ${$_[0]} : $_[0];
 	if (substr($file, 0, 1) ne "/") {

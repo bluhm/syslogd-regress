@@ -66,8 +66,6 @@ sub new {
 	    or croak "$class func not given";
 	!$self->{ktrace} || $self->{ktracefile}
 	    or croak "$class ktrace file not given";
-	!$self->{fstat} || $self->{fstatfile}
-	    or croak "$class fstat file not given";
 	$self->{logfile}
 	    or croak "$class log file not given";
 	open(my $fh, '>', $self->{logfile})
@@ -178,19 +176,6 @@ sub up {
 	$self->loggrep(qr/$self->{up}/, $timeout)
 	    or croak ref($self), " no '$self->{up}' in $self->{logfile} ".
 		"after $timeout seconds";
-	if ($self->{fstat}) {
-		open(my $fh, '>', $self->{fstatfile}) or die ref($self),
-		    " open $self->{fstatfile} for writing failed: $!";
-		my @cmd = ("fstat");
-		open(my $fs, '-|', @cmd)
-		    or die ref($self), " open pipe from '@cmd' failed: $!";
-		print $fh grep { /^\w+ *syslogd *\d+/ } <$fs>;
-		close($fs) or die ref($self), $! ?
-		    " close pipe from '@cmd' failed: $!" :
-		    " command '@cmd' failed: $?";
-		close($fh)
-		    or die ref($self), " close $self->{fstatfile} failed: $!";
-	}
 	return $self;
 }
 
