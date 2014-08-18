@@ -139,7 +139,7 @@ sub check_stat {
 
 	foreach my $name (qw(fstat)) {
 		next if $args{$name}{nocheck};
-		my $file = $r->{$name} or next;
+		my $file = $r->{$name} && $r->{"${name}file"} or next;
 		my $pattern = $args{$name}{loggrep} or next;
 		check_pattern($name, $file, $pattern, \&filegrep);
 	}
