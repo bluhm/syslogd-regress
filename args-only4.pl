@@ -20,6 +20,9 @@ our %args = (
     server => {
 	listen => { domain => AF_INET, addr => "127.0.0.1" },
     },
+    file => {
+	loggrep => qr/ 127.0.0.1 /. get_log(),
+    },
     fstat => {
 	loggrep => {
 	    qr/ internet6 / => 0,

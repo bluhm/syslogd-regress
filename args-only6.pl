@@ -10,7 +10,7 @@ use warnings;
 
 our %args = (
     client => {
-        connect => { domain => AF_INET6, addr => "::1", port => 514 },
+	connect => { domain => AF_INET6, addr => "::1", port => 514 },
     },
     syslogd => {
 	fstat => 1,
@@ -19,6 +19,9 @@ our %args = (
     },
     server => {
 	listen => { domain => AF_INET6, addr => "::1" },
+    },
+    file => {
+	loggrep => qr/ ::1 /. get_log(),
     },
     fstat => {
 	loggrep => {
