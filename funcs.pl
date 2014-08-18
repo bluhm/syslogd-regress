@@ -82,6 +82,7 @@ sub check_logs {
 
 	check_log($c, $r, $s, %args);
 	check_out($r, %args);
+	check_stat($r, %args);
 	check_kdump($c, $s, %args);
 }
 
@@ -129,6 +130,17 @@ sub check_out {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or next;
 		my $pattern = $args{$name}{loggrep} || $testlog;
+		check_pattern($name, $file, $pattern, \&filegrep);
+	}
+}
+
+sub check_stat {
+	my ($r, %args) = @_;
+
+	foreach my $name (qw(fstat)) {
+		next if $args{$name}{nocheck};
+		my $file = $r->{$name} or next;
+		my $pattern = $args{$name}{loggrep} or next;
 		check_pattern($name, $file, $pattern, \&filegrep);
 	}
 }
