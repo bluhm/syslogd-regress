@@ -181,16 +181,20 @@ sub up {
 	if ($self->{fstat}) {
 		open(my $fh, '>', $self->{fstatfile}) or die ref($self),
 		    " open $self->{fstatfile} for writing failed: $!";
-		my @cmd = ("fstat", "-p", $$);
-		defined(my $pid = fork())
+		my @cmd = ("fstat", "-p", $self->{pid});
+		defined(my $fpid = fork())
 		    or die ref($self), " fork fstat failed: $!";
-		if ($pid == 0) {
+		if ($fpid == 0) {
 			open(STDOUT, '>&', $fh)
 			    or die ref($self), " dup fstat failed: $!";
 			close($fh);
 			exec @cmd;
 			die ref($self), " exec '@cmd' failed: $?";
 		}
+		waitpid($fpid, 0)
+		    or die ref($self), " wait fstat failed: $!";
+		$? == 0
+		    or die ref($self), " fstat failed: $?";
 	}
 	return $self;
 }
