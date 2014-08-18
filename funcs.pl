@@ -97,17 +97,23 @@ sub check_loggrep {
 		foreach my $pat (@$pattern) {
 			if (ref($pat) eq 'HASH') {
 				while (my($re, $num) = each %$pat) {
-					my @matches = $p->loggrep($re);
+					my @matches = loggrep($p, $re);
 					@matches == $num
 					    or die "$name matches @matches: ",
 					    "$re => $num";
 				}
 			} else {
-				$p->loggrep($pat)
+				loggrep($p, $pat)
 				    or die "$name log missing pattern: $pat";
 			}
 		}
 	}
+}
+
+sub loggrep {
+	my ($proc, $pattern) = @_;
+
+	return $proc->loggrep($pattern);
 }
 
 sub check_outgrep {
