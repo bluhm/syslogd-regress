@@ -80,11 +80,11 @@ sub child {
 	my @pkill = (@sudo, "pkill", "-x", "syslogd");
 	my @pgrep = ("pgrep", "-x", "syslogd");
 	system(@pkill) && $? != 256
-	    and die "System '@pkill' failed: $?";
+	    and die ref($self), " system '@pkill' failed: $?";
 	while ($? == 0) {
 		print STDERR "syslogd still running\n";
 		system(@pgrep) && $? != 256
-		    and die "System '@pgrep' failed: $?";
+		    and die ref($self), " system '@pgrep' failed: $?";
 	}
 	print STDERR "syslogd not running\n";
 
@@ -94,7 +94,7 @@ sub child {
 	push @cmd, @{$self->{options}} if $self->{options};
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
-	die "Exec '@cmd' failed: $!";
+	die ref($self), " exec '@cmd' failed: $!";
 }
 
 sub _make_abspath {
