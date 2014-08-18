@@ -1,4 +1,4 @@
-# The client writes a message to Sys::Syslog native method.
+# The client writes a message to a localhost IPv6 UDP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd -6 passes it via IPv6 UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -9,10 +9,13 @@ use strict;
 use warnings;
 
 our %args = (
+    client => {
+        connect => { domain => AF_INET6, addr => "::1", port => 514 },
+    },
     syslogd => {
 	fstat => 1,
 	loghost => '@[::1]:$connectport',
-	options => ["-6"],
+	options => ["-6nu"],
     },
     server => {
 	listen => { domain => AF_INET6, addr => "::1" },
