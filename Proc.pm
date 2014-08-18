@@ -64,6 +64,8 @@ sub new {
 	$self->{down} ||= "Shutdown";
 	$self->{func} && ref($self->{func}) eq 'CODE'
 	    or croak "$class func not given";
+	!$self->{ktrace} || $self->{ktracefile}
+	    or croak "$class ktrace file not given";
 	$self->{logfile}
 	    or croak "$class log file not given";
 	open(my $fh, '>', $self->{logfile})
@@ -104,6 +106,11 @@ sub run {
 	    or die ref($self), " dup STDIN failed: $!";
 	close($reader);
 
+	if ($self->{ktrace}) {
+		my @cmd = ("ktrace", "-f", $self->{ktracefile}, "-p", $$);
+		system(@cmd)
+		    and die ref($self), " system '@cmd' failed: $?";
+	}
 	$self->child();
 	print STDERR $self->{up}, "\n";
 	$self->{func}->($self);

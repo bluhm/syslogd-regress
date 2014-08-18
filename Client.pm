@@ -26,6 +26,7 @@ use Sys::Syslog qw(:standard :extended :macros);
 sub new {
 	my $class = shift;
 	my %args = @_;
+	$args{ktracefile} ||= "client.ktrace";
 	$args{logfile} ||= "client.log";
 	$args{up} ||= "Openlog";
 	my $self = Proc::new($class, %args);

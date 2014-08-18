@@ -24,7 +24,8 @@ regress:
 ARGS !=			cd ${.CURDIR} && ls args-*.pl
 TARGETS ?=		${ARGS}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
-CLEANFILES +=		*.log *.pem *.crt *.key syslog.conf ktrace.out stamp-*
+CLEANFILES +=		*.log *.pem *.crt *.key syslogd.conf stamp-*
+CLEANFILES +=		ktrace.out *.ktrace
 
 .MAIN: all
 

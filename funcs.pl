@@ -82,6 +82,7 @@ sub check_logs {
 
 	check_loggrep($c, $r, $s, %args);
 	check_outgrep($r, %args);
+	check_kdump($c, $s, %args);
 }
 
 sub check_loggrep {
@@ -140,6 +141,45 @@ sub filegrep {
 	    or die "Open file $file for reading failed: $!";
 	return wantarray ?
 	    grep { /$pattern/ } <$fh> : first { /$pattern/ } <$fh>;
+}
+
+sub check_kdump {
+	my ($c, $s, %args) = @_;
+
+	my %name2proc = (client => $c, server => $s);
+	foreach my $name (qw(client server)) {
+		next unless $args{$name}{ktrace};
+		my $p = $name2proc{$name} or next;
+		my $file = $p->{ktracefile} or next;
+		my $pattern = $args{$name}{kdump} or next;
+		$pattern = [ $pattern ] unless ref($pattern) eq 'ARRAY';
+		foreach my $pat (@$pattern) {
+			if (ref($pat) eq 'HASH') {
+				while (my($re, $num) = each %$pat) {
+					my @matches = kdumpgrep($file, $re);
+					@matches == $num
+					    or die "$name matches @matches: ",
+					    "$re => $num";
+				}
+			} else {
+				kdumpgrep($file, $pat)
+				    or die "$name log missing pattern: $pat";
+			}
+		}
+	}
+}
+
+sub kdumpgrep {
+	my ($file, $pattern) = @_;
+
+	my @cmd = ("kdump", "-f", $file);
+	open(my $fh, '-|', @cmd)
+	    or die "Open pipe from '@cmd' failed: $!";
+	my @matches = grep { /$pattern/ } <$fh>;
+	close($fh) or die $! ?
+	    "Close pipe from '@cmd' failed: $!" :
+	    "Command '@cmd' failed: $?";
+	return wantarray ? @matches : $matches[0];
 }
 
 1;

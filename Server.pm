@@ -29,6 +29,7 @@ use IO::Socket::SSL;
 sub new {
 	my $class = shift;
 	my %args = @_;
+	$args{ktracefile} ||= "server.ktrace";
 	$args{logfile} ||= "server.log";
 	$args{up} ||= "Accepted";
 	my $self = Proc::new($class, %args);
