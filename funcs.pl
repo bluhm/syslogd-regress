@@ -60,7 +60,7 @@ sub read_log {
 
 	for (;;) {
 		defined(sysread(STDIN, my $line, 8194))
-		    or die "read log line failed: $!";
+		    or die ref($self), " read log line failed: $!";
 		chomp $line;
 		print STDERR ">>> $line\n";
 		last if $line =~ /$downlog/;
