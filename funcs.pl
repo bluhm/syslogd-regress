@@ -80,12 +80,31 @@ sub check_logs {
 
 	return if $args{nocheck};
 
-	check_loggrep($c, $r, $s, %args);
-	check_outgrep($r, %args);
+	check_log($c, $r, $s, %args);
+	check_out($r, %args);
 	check_kdump($c, $s, %args);
 }
 
-sub check_loggrep {
+sub check_pattern {
+	my ($name, $proc, $pattern, $func) = @_;
+
+	$pattern = [ $pattern ] unless ref($pattern) eq 'ARRAY';
+	foreach my $pat (@$pattern) {
+		if (ref($pat) eq 'HASH') {
+			while (my($re, $num) = each %$pat) {
+				my @matches = $func->($proc, $re);
+				@matches == $num
+				    or die "$name matches '@matches': ",
+				    "'$re' => $num";
+			}
+		} else {
+			$func->($proc, $pat)
+			    or die "$name log missing pattern: $pat";
+		}
+	}
+}
+
+sub check_log {
 	my ($c, $r, $s, %args) = @_;
 
 	my %name2proc = (client => $c, syslogd => $r, server => $s);
@@ -93,20 +112,7 @@ sub check_loggrep {
 		next if $args{$name}{nocheck};
 		my $p = $name2proc{$name} or next;
 		my $pattern = $args{$name}{loggrep} || $testlog;
-		$pattern = [ $pattern ] unless ref($pattern) eq 'ARRAY';
-		foreach my $pat (@$pattern) {
-			if (ref($pat) eq 'HASH') {
-				while (my($re, $num) = each %$pat) {
-					my @matches = loggrep($p, $re);
-					@matches == $num
-					    or die "$name matches @matches: ",
-					    "$re => $num";
-				}
-			} else {
-				loggrep($p, $pat)
-				    or die "$name log missing pattern: $pat";
-			}
-		}
+		check_pattern($name, $p, $pattern, \&loggrep);
 	}
 }
 
@@ -116,27 +122,14 @@ sub loggrep {
 	return $proc->loggrep($pattern);
 }
 
-sub check_outgrep {
+sub check_out {
 	my ($r, %args) = @_;
 
 	foreach my $name (qw(file pipe)) {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or next;
 		my $pattern = $args{$name}{loggrep} || $testlog;
-		$pattern = [ $pattern ] unless ref($pattern) eq 'ARRAY';
-		foreach my $pat (@$pattern) {
-			if (ref($pat) eq 'HASH') {
-				while (my($re, $num) = each %$pat) {
-					my @matches = filegrep($file, $re);
-					@matches == $num
-					    or die "$name matches @matches: ",
-					    "$re => $num";
-				}
-			} else {
-				filegrep($file, $pat)
-				    or die "$name log missing pattern: $pat";
-			}
-		}
+		check_pattern($name, $file, $pattern, \&filegrep);
 	}
 }
 
@@ -158,20 +151,7 @@ sub check_kdump {
 		my $p = $name2proc{$name} or next;
 		my $file = $p->{ktracefile} or next;
 		my $pattern = $args{$name}{kdump} or next;
-		$pattern = [ $pattern ] unless ref($pattern) eq 'ARRAY';
-		foreach my $pat (@$pattern) {
-			if (ref($pat) eq 'HASH') {
-				while (my($re, $num) = each %$pat) {
-					my @matches = kdumpgrep($file, $re);
-					@matches == $num
-					    or die "$name matches @matches: ",
-					    "$re => $num";
-				}
-			} else {
-				kdumpgrep($file, $pat)
-				    or die "$name log missing pattern: $pat";
-			}
-		}
+		check_pattern($name, $file, $pattern, \&kdumpgrep);
 	}
 }
 
