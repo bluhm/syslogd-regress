@@ -9,7 +9,7 @@ use warnings;
 
 our %args = (
     syslogd => {
-        loghost => '@udp6://[::1]',
+	loghost => '@udp6://[::1]',
 	loggrep => {
 	    qr/syslogd: no udp6 "\@udp6:\/\/\[::1\]/ => 2,  # XXX 2?
 	    get_log() => 1,
