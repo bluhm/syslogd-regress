@@ -2,14 +2,13 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd -4 passes it via IPv4 UDP to localhost.
 # The server receives the message on its UDP socket.
-# Check that localhost gets resolved to 127.0.0.1 address.
+# Check that localhost gets resolved to the 127.0.0.1 address.
 
 use strict;
 use warnings;
 
 our %args = (
     syslogd => {
-	fstat => 1,
 	loghost => '@localhost.:$connectport',
 	options => ["-4"],
     },
