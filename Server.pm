@@ -34,7 +34,7 @@ sub new {
 	$args{up} ||= "Accepted";
 	my $self = Proc::new($class, %args);
 	$self->{listenprotocol} ||= "udp";
-	$self->{listendomain}
+	defined($self->{listendomain})
 	    or croak "$class listen domain not given";
 	$SSL_ERROR = "";
 	my $iosocket = $self->{listenprotocol} eq "tls" ?

@@ -36,7 +36,7 @@ sub new {
 sub child {
 	my $self = shift;
 
-	if ($self->{connectdomain}) {
+	if (defined($self->{connectdomain})) {
 		my $cs = IO::Socket::INET6->new(
 		    Proto               => "udp",
 		    Domain              => $self->{connectdomain},

@@ -34,7 +34,7 @@ my $downlog = "syslogd regress client shutdown";
 sub write_log {
 	my $self = shift;
 
-	if ($self->{connectdomain}) {
+	if (defined($self->{connectdomain})) {
 		print $testlog;
 		print STDERR $testlog, "\n";
 	} else {
