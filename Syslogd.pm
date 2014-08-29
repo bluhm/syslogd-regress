@@ -36,6 +36,11 @@ sub new {
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
 	$args{outpipe} ||= "pipe.log";
+	if ($args{memory}) {
+		$args{memory} = {} unless ref $args{memory};
+		$args{memory}{name} ||= "memory";
+		$args{memory}{size} //= 1;
+	}
 	my $self = Proc::new($class, %args);
 	$self->{connectaddr}
 	    or croak "$class connect addr not given";
@@ -52,6 +57,8 @@ sub new {
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	print $fh "*.*\t$self->{outfile}\n";
 	print $fh "*.*\t|dd of=$self->{outpipe} status=none\n";
+	my $memory = $self->{memory};
+	print $fh "*.*\t:$memory->{size}:$memory->{name}\n" if $memory;
 	my $loghost = $self->{loghost};
 	if ($loghost) {
 		$loghost =~ s/(\$[a-z]+)/$1/eeg;
