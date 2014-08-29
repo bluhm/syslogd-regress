@@ -73,7 +73,7 @@ ${REGRESS_TARGETS:M*ssl*} ${REGRESS_TARGETS:M*https*}: 127.0.0.1.crt
 
 # make perl syntax check for all args files
 
-.PHONY: syntax
+.PHONY: syntax libevent
 
 syntax: stamp-syntax
 
@@ -82,5 +82,11 @@ stamp-syntax: ${ARGS}
 	@perl -c ${PERLPATH}$a
 .endfor
 	@date >$@
+
+# run the tests with all variants of libevent backend
+libevent:
+	EVENT_NOKQUEUE=1 EVENT_NOPOLL=1 make regress
+	EVENT_NOKQUEUE=1 EVENT_NOSELECT=1 make regress
+	EVENT_NOPOLL=1 EVENT_NOSELECT=1 make regress
 
 .include <bsd.regress.mk>
