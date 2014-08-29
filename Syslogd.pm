@@ -90,10 +90,10 @@ sub child {
 	print STDERR "syslogd not running\n";
 
 	my @libevent;
-	foreach (qw(NOKQUEUE NOPOLL NOSELECT SHOW_METHOD)) {
-		my $name = "EVENT_$_";
-		push @libevent, "$name=$ENV{$name}" if $ENV{$name};
+	foreach (qw(EVENT_NOKQUEUE EVENT_NOPOLL EVENT_NOSELECT)) {
+		push @libevent, "$_=$ENV{$_}" if $ENV{$_};
 	}
+	push @libevent, "EVENT_SHOW_METHOD=1" if @libevent;
 	my @ktrace = $ENV{KTRACE} ? ($ENV{KTRACE}, "-i") : ();
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	my @cmd = (@sudo, @libevent, @ktrace, $syslogd, "-d",
