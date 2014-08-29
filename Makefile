@@ -85,8 +85,8 @@ stamp-syntax: ${ARGS}
 
 # run the tests with all variants of libevent backend
 libevent:
-	EVENT_NOKQUEUE=1 EVENT_NOPOLL=1 make regress
-	EVENT_NOKQUEUE=1 EVENT_NOSELECT=1 make regress
-	EVENT_NOPOLL=1 EVENT_NOSELECT=1 make regress
+	cd ${.CURDIR} && EVENT_NOKQUEUE=1 EVENT_NOPOLL=1 ${MAKE} regress
+	cd ${.CURDIR} && EVENT_NOKQUEUE=1 EVENT_NOSELECT=1 ${MAKE} regress
+	cd ${.CURDIR} && EVENT_NOPOLL=1 EVENT_NOSELECT=1 ${MAKE} regress
 
 .include <bsd.regress.mk>
