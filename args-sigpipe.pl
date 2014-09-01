@@ -17,10 +17,10 @@ our %args = (
 		${$self->{server}}->loggrep("signal");
 	    });
 	},
-	loggrep => get_between2loggrep(),
+	loggrep => { get_between2loggrep() },
     },
     syslogd => {
-	loggrep => get_between2loggrep(),
+	loggrep => { get_between2loggrep() },
     },
     server => {
 	func => sub {
@@ -32,10 +32,10 @@ our %args = (
 		print STDERR "signal\n";
 	    });
 	},
-	loggrep => get_between2loggrep(),
+	loggrep => { get_between2loggrep() },
     },
-    file => { loggrep => get_between2loggrep() },
-    pipe => { loggrep => get_between2loggrep() },
+    file => { loggrep => { get_between2loggrep() } },
+    pipe => { loggrep => { get_between2loggrep() } },
 
 );
 
