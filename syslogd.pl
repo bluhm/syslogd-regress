@@ -64,6 +64,9 @@ my $c = Client->new(
     %{$args{client}},
     testfile            => $testfile,
 ) unless $args{client}{noclient};
+$c->{server} = $r->{server} = $s;
+$c->{syslogd} = $s->{syslogd} = $r;
+$r->{client} = $s->{client} = $c;
 
 $s->run unless $args{server}{noserver};
 $r->run;
