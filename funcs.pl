@@ -25,7 +25,6 @@ use IO::Socket;
 use IO::Socket::INET6;
 
 my $firstlog = "syslogd regress test first message";
-my $secondlog = "syslogd regress test second message";
 my $testlog = "syslogd regress test log message";
 my $downlog = "syslogd regress client shutdown";
 
@@ -46,7 +45,7 @@ sub write_between2logs {
 
 	write_message($self, $firstlog);
 	$func->($self, @_);
-	write_message($self, $secondlog);
+	write_message($self, $testlog);
 	write_shutdown($self, @_);
 }
 
@@ -85,7 +84,7 @@ sub read_between2logs {
 
 	read_message($self, $firstlog, @_);
 	$func->($self, @_);
-	read_message($self, $secondlog, @_);
+	read_message($self, $testlog, @_);
 	read_message($self, $downlog, @_);
 }
 
@@ -115,7 +114,7 @@ sub get_log {
 sub get_between2loggrep {
 	return (
 	    qr/$firstlog/ => 1,
-	    qr/$secondlog/ => 1,
+	    qr/$testlog/ => 1,
 	);
 }
 

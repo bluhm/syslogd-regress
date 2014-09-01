@@ -39,8 +39,6 @@ our %args = (
 	},
 	loggrep => { get_between2loggrep() },
     },
-    file => { loggrep => { get_between2loggrep() } },
-    pipe => { loggrep => { get_between2loggrep() } },
 
 );
 
