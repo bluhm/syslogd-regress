@@ -197,7 +197,8 @@ sub kill_child {
 sub kill {
 	my $self = shift;
 	my $sig = shift // 'TERM';
-	my $pid = $self->{pid};
+	my $pid = shift // $self->{pid};
+
 	if (kill($sig => $pid) != 1) {
 		my $sudo = $ENV{SUDO};
 		$sudo && $!{EPERM}

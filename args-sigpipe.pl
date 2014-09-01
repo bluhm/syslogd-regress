@@ -27,7 +27,7 @@ our %args = (
 	    my $self = shift;
 
 	    read_between2logs($self, sub {
-		${$self->{syslogd}}->kill('PIPE');
+		${$self->{syslogd}}->kill_syslogd('PIPE');
 		sleep 1;  # schedule syslogd
 		print STDERR "signal\n";
 	    });

@@ -131,4 +131,38 @@ sub _make_abspath {
 	return $file;
 }
 
+sub kill_privsep {
+	return Proc::kill(@_);
+}
+
+sub kill_syslogd {
+	my $self = shift;
+	my $sig = shift // 'TERM';
+	my $ppid = shift // $self->{pid};
+
+	# find syslogd child of privsep parent
+	my @cmd = ("ps", "-ww", "-p", $ppid, "-U", "_syslogd",
+	    "-o", "pid,ppid,comm", );
+	open(my $ps, '-|', @cmd)
+	    or die ref($self), " open pipe from '@cmd' failed: $!";
+	my @pslist;
+	my @pshead = split(' ', scalar <$ps>);
+	while (<$ps>) {
+		s/\s+$//;
+		my %h;
+		@h{@pshead} = split(' ', $_, scalar @pshead);
+		push @pslist, \%h;
+	}
+	close($ps) or die ref($self), $! ?
+	    " close pipe from '@cmd' failed: $!" :
+	    " command '@cmd' failed: $?";
+	my @pschild =
+	    grep { $_->{PPID} == $ppid && $_->{COMMAND} eq "syslogd" } @pslist;
+	@pschild == 1
+	    or die ref($self), " not one privsep child: ",
+	    join(" ", map { $_->{PID} } @pschild);
+
+	return Proc::kill($self, $sig, $pschild[0]{PID});
+}
+
 1;
