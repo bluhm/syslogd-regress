@@ -180,7 +180,7 @@ sub rotate {
 		my $file = $self->{"out$name"};
 		for (my $i = $rotate_num; $i >= 0; $i--) {
 			my $new = $file. ".$i";
-			my $old = $file. ($i > 0 ? ".".$i-1 : "");
+			my $old = $file. ($i > 0 ? ".".($i-1) : "");
 
 			rename($old, $new) or die ref($self),
 			    " rename from '$old' to '$new' failed: $!";
