@@ -204,7 +204,7 @@ sub kill {
 		    or die ref($self), " kill $pid failed: $!";
 		my @cmd = ($sudo, '/bin/kill', "-$sig", $pid);
 		system(@cmd)
-		    or die ref($self), " sudo kill $pid failed: $?";
+		    and die ref($self), " sudo kill $pid failed: $?";
 	}
 	return $self;
 }
