@@ -61,7 +61,13 @@ sub new {
 	print $fh "*.*\t$loghost\n";
 	close $fh;
 
-	open($fh, '>', $self->{outfile})
+	return $self->create_out();
+}
+
+sub create_out {
+	my $self = shift;
+
+	open(my $fh, '>', $self->{outfile})
 	    or die ref($self), " create log file $self->{outfile} failed: $!";
 	close $fh;
 
@@ -120,6 +126,7 @@ sub up {
 		close($fh)
 		    or die ref($self), " close $self->{fstatfile} failed: $!";
 	}
+	return $self;
 }
 
 sub _make_abspath {
@@ -164,5 +171,23 @@ sub kill_syslogd {
 
 	return Proc::kill($self, $sig, $pschild[0]{PID});
 }
+
+my $rotate_num = 0;
+sub rotate {
+	my $self = shift;
+
+	foreach my $name (qw(file pipe)) {
+		my $file = $self->{"out$name"};
+		for (my $i = $rotate_num; $i >= 0; $i--) {
+			my $new = $file. ".$i";
+			my $old = $file. ($i > 0 ? ".".$i-1 : "");
+
+			rename($old, $new) or die ref($self),
+			    " rename from '$old' to '$new' failed: $!";
+		}
+	}
+	$rotate_num++;
+	return $self->create_out();
+};
 
 1;

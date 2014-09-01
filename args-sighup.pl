@@ -30,6 +30,7 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    read_between2logs($self, sub {
+		${$self->{syslogd}}->rotate();
 		${$self->{syslogd}}->kill_syslogd('HUP');
 		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
 		    or die ref($self), " no 'syslogd: restarted' between logs";
