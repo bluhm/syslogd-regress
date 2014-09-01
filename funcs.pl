@@ -91,7 +91,7 @@ sub read_between2logs {
 
 sub read_message {
 	my $self = shift;
-	my $regex = shift; 
+	my $regex = shift;
 
 	local $_;
 	for (;;) {
