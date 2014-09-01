@@ -194,4 +194,19 @@ sub kill_child {
 	return $self;
 }
 
+sub kill {
+	my $self = shift;
+	my $sig = shift // 'TERM';
+	my $pid = $self->{pid};
+	if (kill($sig => $pid) != 1) {
+		my $sudo = $ENV{SUDO};
+		$sudo && $!{EPERM}
+		    or die ref($self), " kill $pid failed: $!";
+		my @cmd = ($sudo, '/bin/kill', "-$sig", $pid);
+		system(@cmd)
+		    or die ref($self), " sudo kill $pid failed: $?";
+	}
+	return $self;
+}
+
 1;
