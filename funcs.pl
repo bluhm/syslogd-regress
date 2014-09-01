@@ -112,6 +112,13 @@ sub get_log {
 	return $testlog;
 }
 
+sub get_between2loggrep {
+	return {
+	    qr/$firstlog/ => 1,
+	    qr/$secondlog/ => 1,
+	};
+}
+
 sub check_logs {
 	my ($c, $r, $s, %args) = @_;
 
