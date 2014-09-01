@@ -3,7 +3,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that a SIGHUP reopens logfile and restarts pipe.
+# Check that a SIGHUP is propagated from privsep parent to syslog child.
 
 use strict;
 use warnings;
@@ -31,7 +31,8 @@ our %args = (
 	    my $self = shift;
 	    read_between2logs($self, sub {
 		${$self->{syslogd}}->rotate();
-		${$self->{syslogd}}->kill_syslogd('HUP');
+		${$self->{syslogd}}->rotate();
+		${$self->{syslogd}}->kill_privsep('HUP');
 		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
 		    or die ref($self), " no 'syslogd: restarted' between logs";
 		print STDERR "Signal\n";
@@ -44,7 +45,7 @@ our %args = (
 	my $r = $self->{syslogd};
 
 	foreach my $name (qw(file pipe)) {
-		my $file = $r->{"out$name"}.".0";
+		my $file = $r->{"out$name"}.".1";
 		my $pattern = (get_between2loggrep())[0];
 		check_pattern($name, $file, $pattern, \&filegrep);
 	}
