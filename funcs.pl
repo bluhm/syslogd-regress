@@ -24,6 +24,8 @@ use Sys::Syslog qw(:standard :extended :macros);
 use IO::Socket;
 use IO::Socket::INET6;
 
+my $firstlog = "syslogd regress test first message";
+my $secondlog = "syslogd regress test second message";
 my $testlog = "syslogd regress test log message";
 my $downlog = "syslogd regress client shutdown";
 
@@ -34,13 +36,29 @@ my $downlog = "syslogd regress client shutdown";
 sub write_log {
 	my $self = shift;
 
-	if (defined($self->{connectdomain})) {
-		print $testlog;
-		print STDERR $testlog, "\n";
-	} else {
-		syslog(LOG_INFO, $testlog);
-	}
+	write_message($self, $testlog);
 	write_shutdown($self, @_);
+}
+
+sub write_between2logs {
+	my $self = shift;
+	my $func = shift;
+
+	write_message($self, $firstlog);
+	$func->($self, @_);
+	write_message($self, $secondlog);
+	write_shutdown($self, @_);
+}
+
+sub write_message {
+	my $self = shift;
+
+	if (defined($self->{connectdomain})) {
+		print @_;
+		print STDERR @_, "\n";
+	} else {
+		syslog(LOG_INFO, @_);
+	}
 }
 
 sub write_shutdown {
@@ -58,12 +76,31 @@ sub write_shutdown {
 sub read_log {
 	my $self = shift;
 
+	read_message($self, $downlog, @_);
+}
+
+sub read_between2logs {
+	my $self = shift;
+	my $func = shift;
+
+	read_message($self, $firstlog, @_);
+	$func->($self, @_);
+	read_message($self, $secondlog, @_);
+	read_message($self, $downlog, @_);
+}
+
+sub read_message {
+	my $self = shift;
+	my $regex = shift; 
+
+	local $_;
 	for (;;) {
-		defined(sysread(STDIN, my $line, 8194))
+		# reading udp packets works only with sysread()
+		defined(sysread(STDIN, $_, 8194))
 		    or die ref($self), " read log line failed: $!";
-		chomp $line;
-		print STDERR ">>> $line\n";
-		last if $line =~ /$downlog/;
+		chomp;
+		print STDERR ">>> $_\n";
+		last if /$regex/;
 	}
 }
 
