@@ -3,7 +3,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that a SIGHUP reopens logfile and restarts pipe.
+# Check that a SIGTERM terminates the syslogd child process.
 
 use strict;
 use warnings;
@@ -21,34 +21,28 @@ our %args = (
 	loggrep => { get_between2loggrep() },
     },
     syslogd => {
-	loggrep => {
-	    qr/syslogd: restarted/ => 1,
-	    get_between2loggrep(),
-	}
+	loggrep => qr/\[unpriv\] syslogd child about to exit/,
     },
     server => {
 	func => sub {
 	    my $self = shift;
 	    read_between2logs($self, sub {
-		${$self->{syslogd}}->rotate();
-		${$self->{syslogd}}->kill_syslogd('HUP');
-		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
-		    or die ref($self), " no 'syslogd: restarted' between logs";
+		${$self->{syslogd}}->kill_syslogd('TERM');
+		my $pattern = "syslogd: exiting on signal 15";
+		${$self->{syslogd}}->loggrep("syslogd: exiting on signal 15",
+		    5) or die ref($self),
+		    " no 'syslogd: exiting on signal 15' between logs";
 		print STDERR "Signal\n";
 	    });
 	},
-	loggrep => { get_between2loggrep() },
+	down => qr/syslogd: exiting on signal 15/,
+	loggrep => {
+	    (get_between2loggrep())[0] => 1,
+	    (get_between2loggrep())[2] => 0,
+	},
     },
-    check => sub {
-	my $self = shift;
-	my $r = $self->{syslogd};
-
-	foreach my $name (qw(file pipe)) {
-		my $file = $r->{"out$name"}.".0";
-		my $pattern = (get_between2loggrep())[0];
-		check_pattern($name, $file, $pattern, \&filegrep);
-	}
-    },
+    file => { loggrep => (get_between2loggrep())[0] },
+    pipe => { loggrep => (get_between2loggrep())[0] },
 );
 
 1;
