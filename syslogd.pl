@@ -46,27 +46,31 @@ foreach my $name (qw(client syslogd server)) {
 		}
 	}
 }
-my $s = Server->new(
+my($s, $c, $r);
+$s = Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
     %{$args{server}},
     testfile            => $testfile,
+    client              => \$c,
+    syslogd             => \$r,
 ) unless $args{server}{noserver};
-my $r = Syslogd->new(
+$r = Syslogd->new(
     connectaddr         => "127.0.0.1",
     connectport         => $s && $s->{listenport},
     %{$args{syslogd}},
     testfile            => $testfile,
+    client              => \$c,
+    server              => \$s,
 );
-my $c = Client->new(
+$c = Client->new(
     func                => \&write_log,
     %{$args{client}},
     testfile            => $testfile,
+    syslogd             => \$r,
+    server              => \$s,
 ) unless $args{client}{noclient};
-$c->{server} = $r->{server} = $s;
-$c->{syslogd} = $s->{syslogd} = $r;
-$r->{client} = $s->{client} = $c;
 
 $s->run unless $args{server}{noserver};
 $r->run;
