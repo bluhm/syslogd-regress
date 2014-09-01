@@ -72,11 +72,10 @@ $c = Client->new(
     server              => \$s,
 ) unless $args{client}{noclient};
 
-$s->run unless $args{server}{noserver};
 $r->run;
+$s->run->up unless $args{server}{noserver};
 $r->up;
 $c->run->up unless $args{client}{noclient};
-$s->up unless $args{server}{noserver};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
