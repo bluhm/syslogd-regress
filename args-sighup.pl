@@ -39,7 +39,16 @@ our %args = (
 	},
 	loggrep => { get_between2loggrep() },
     },
+    check => sub {
+	my $self = shift;
+	my $r = $self->{syslogd};
 
+	foreach my $name (qw(file pipe)) {
+		my $file = $r->{"out$name"}.".0";
+		my $pattern = (get_between2loggrep())[0];
+		check_pattern($name, $file, $pattern, \&filegrep);
+	}
+    },
 );
 
 1;

@@ -83,3 +83,4 @@ $r->kill_child;
 $r->down;
 
 check_logs($c, $r, $s, %args);
+$args{check}->({client => $c, syslogd => $r, server => $s}) if $args{check};
