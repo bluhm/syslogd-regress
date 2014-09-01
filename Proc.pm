@@ -72,6 +72,7 @@ sub new {
 	    or die "$class log file $self->{logfile} create failed: $!";
 	$fh->autoflush;
 	$self->{log} = $fh;
+	$self->{ppid} = $$;
 	return bless $self, $class;
 }
 
@@ -124,6 +125,9 @@ sub run {
 sub wait {
 	my $self = shift;
 	my $flags = shift;
+
+	# if we a not the parent process, assume the child is still running
+	return 0 unless $self->{ppid} == $$;
 
 	my $pid = $self->{pid}
 	    or croak ref($self), " no child pid";

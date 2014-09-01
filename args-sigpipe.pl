@@ -14,7 +14,8 @@ our %args = (
 	    my $self = shift;
 
 	    write_between2logs($self, sub {
-		${$self->{server}}->loggrep("signal");
+		${$self->{server}}->loggrep("Signal", 8)
+		    or die ref($self), " no 'Signal' between logs";
 	    });
 	},
 	loggrep => { get_between2loggrep() },
@@ -29,7 +30,7 @@ our %args = (
 	    read_between2logs($self, sub {
 		${$self->{syslogd}}->kill_syslogd('PIPE');
 		sleep 1;  # schedule syslogd
-		print STDERR "signal\n";
+		print STDERR "Signal\n";
 	    });
 	},
 	loggrep => { get_between2loggrep() },

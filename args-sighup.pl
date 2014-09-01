@@ -3,7 +3,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that a SIGPIPE is ignored by syslogd.
+# Check that a SIGHUP reopens logfile and restarts pipe.
 
 use strict;
 use warnings;
@@ -14,28 +14,32 @@ our %args = (
 	    my $self = shift;
 
 	    write_between2logs($self, sub {
-		${$self->{server}}->loggrep("signal");
+		${$self->{server}}->loggrep("Signal", 8)
+		    or die ref($self), " no 'Signal' between logs";
 	    });
 	},
-	loggrep => get_between2loggrep(),
+	loggrep => { get_between2loggrep() },
     },
     syslogd => {
-	loggrep => get_between2loggrep(),
+	loggrep => {
+	    qr/syslogd: restarted/ => 1,
+	    get_between2loggrep(),
+	}
     },
     server => {
 	func => sub {
 	    my $self = shift;
-
 	    read_between2logs($self, sub {
-		${$self->{syslogd}}->kill_syslogd('PIPE');
-		sleep 1;  # schedule syslogd
-		print STDERR "signal\n";
+		${$self->{syslogd}}->kill_syslogd('HUP');
+		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
+		    or die ref($self), " no 'syslogd: restarted' between logs";
+		print STDERR "Signal\n";
 	    });
 	},
-	loggrep => get_between2loggrep(),
+	loggrep => { get_between2loggrep() },
     },
-    file => { loggrep => get_between2loggrep() },
-    pipe => { loggrep => get_between2loggrep() },
+    file => { loggrep => { get_between2loggrep() } },
+    pipe => { loggrep => { get_between2loggrep() } },
 
 );
 
