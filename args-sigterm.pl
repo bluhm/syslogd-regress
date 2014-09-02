@@ -12,7 +12,6 @@ our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-
 	    write_between2logs($self, sub {
 		${$self->{server}}->loggrep("Signal", 8)
 		    or die ref($self), " no 'Signal' between logs";

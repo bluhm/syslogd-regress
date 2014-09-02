@@ -12,7 +12,6 @@ our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-
 	    write_between2logs($self, sub {
 		${$self->{server}}->loggrep("Signal", 8)
 		    or die ref($self), " no 'Signal' between logs";
@@ -43,7 +42,6 @@ our %args = (
     check => sub {
 	my $self = shift;
 	my $r = $self->{syslogd};
-
 	foreach my $name (qw(file pipe)) {
 		my $file = $r->{"out$name"}.".1";
 		my $pattern = (get_between2loggrep())[0];

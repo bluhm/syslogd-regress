@@ -12,7 +12,6 @@ our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-
 	    write_between2logs($self, sub {
 		${$self->{server}}->loggrep("Signal", 8)
 		    or die ref($self), " no 'Signal' between logs";
@@ -26,7 +25,6 @@ our %args = (
     server => {
 	func => sub {
 	    my $self = shift;
-
 	    read_between2logs($self, sub {
 		${$self->{syslogd}}->kill_syslogd('PIPE');
 		sleep 1;  # schedule syslogd
@@ -37,7 +35,6 @@ our %args = (
     },
     file => { loggrep => { get_between2loggrep() } },
     pipe => { loggrep => { get_between2loggrep() } },
-
 );
 
 1;
