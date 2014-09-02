@@ -33,7 +33,7 @@ our %args = (
 	    read_between2logs($self, sub {
 		my $conffile = ${$self->{syslogd}}->{conffile};
 		open(my $fh, '>>', $conffile)
-		    or die ref($self), " touch conf file $conffile failed: $!";
+		    or die ref($self), " append conf file $conffile failed: $!";
 		print $fh "# modified\n";
 		close($fh);
 		${$self->{syslogd}}->kill_syslogd('HUP');
