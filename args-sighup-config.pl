@@ -3,7 +3,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that a SIGHUP reopens logfile and restarts pipe.
+# Check that a modified config file restarts syslogd child.
 
 use strict;
 use warnings;
@@ -22,7 +22,9 @@ our %args = (
     },
     syslogd => {
 	loggrep => {
-	    qr/syslogd: restarted/ => 1,
+	    qr/config file modified: restarting/ => 1,
+	    qr/config file changed: dying/ => 1,
+	    qr/syslogd: restarted/ => 0,
 	    get_between2loggrep(),
 	}
     },
@@ -30,10 +32,14 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    read_between2logs($self, sub {
-		${$self->{syslogd}}->rotate();
+		my $conffile = ${$self->{syslogd}}->{conffile};
+		open(my $fh, '>>', $conffile)
+		    or die ref($self), " touch conf file $conffile failed: $!";
+		print $fh "# modified\n";
+		close($fh);
 		${$self->{syslogd}}->kill_syslogd('HUP');
-		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
-		    or die ref($self), " no 'syslogd: restarted' between logs";
+		${$self->{syslogd}}->loggrep("syslogd: started", 5)
+		    or die ref($self), " no 'syslogd: started' between logs";
 		print STDERR "Signal\n";
 	    });
 	},
