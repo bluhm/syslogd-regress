@@ -23,6 +23,7 @@ use Socket6;
 use Client;
 use Syslogd;
 use Server;
+use Syslogc;
 require 'funcs.pl';
 
 sub usage {
@@ -46,7 +47,7 @@ foreach my $name (qw(client syslogd server)) {
 		}
 	}
 }
-my($s, $c, $r);
+my($s, $c, $r, $m);
 $s = Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
@@ -56,9 +57,14 @@ $s = Server->new(
     client              => \$c,
     syslogd             => \$r,
 ) unless $args{server}{noserver};
+$m = Syslogc->new(
+    %{$args{syslogc}},
+    testfile            => $testfile,
+) if $args{syslogc};
 $r = Syslogd->new(
     connectaddr         => "127.0.0.1",
     connectport         => $s && $s->{listenport},
+    ctlsock		=> $m && $m->{ctlsock},
     %{$args{syslogd}},
     testfile            => $testfile,
     client              => \$c,
@@ -75,10 +81,13 @@ $c = Client->new(
 $r->run;
 $s->run->up unless $args{server}{noserver};
 $r->up;
+$m->run if $args{syslogc};
+$m->up if $args{syslogc};
 $c->run->up unless $args{client}{noclient};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
+$m->down if $args{syslogc};
 $r->kill_child;
 $r->down;
 
