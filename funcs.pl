@@ -68,6 +68,19 @@ sub write_shutdown {
 	syslog(LOG_NOTICE, $downlog);
 }
 
+sub write_unix {
+	my $self = shift;
+	my $path = shift || "/dev/log";
+
+	my $u = IO::Socket::UNIX->new(
+	    Type  => SOCK_DGRAM,
+	    Peer => $path,
+	) or die ref($self), " connect to $path unix socket failed: $!";
+	my $msg = get_log(). " $path unix socket";
+	print $u $msg;
+	print STDERR $msg, "\n";
+}
+
 ########################################################################
 # Server funcs
 ########################################################################
