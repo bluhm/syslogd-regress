@@ -44,11 +44,4 @@ sub child {
 	die ref($self), " exec '@cmd' failed: $!";
 }
 
-sub down {
-	my $self = shift;
-	my $timeout = shift || 30;
-	$self->loggrep(qr/$self->{down}/, $timeout);
-	return $self;
-}
-
 1;
