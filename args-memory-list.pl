@@ -14,7 +14,7 @@ our %args = (
 	loggrep => {
 	    qr/Accepting control connection/ => 1,
 	    qr/ctlcmd 4/ => 1,
-	    get_log() => 1,
+	    get_testlog() => 1,
 	},
     },
     syslogc => {
