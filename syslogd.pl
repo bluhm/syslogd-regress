@@ -84,11 +84,12 @@ $c = Client->new(
 $r->run;
 $s->run->up unless $args{server}{noserver};
 $r->up;
+$_->{early} && $_->run->up foreach (@m);
 $c->run->up unless $args{client}{noclient};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
-$_->run->up->down foreach (@m);
+$_->{early} ? $_->down : $_->run->up->down foreach (@m);
 $r->kill_child;
 $r->down;
 
