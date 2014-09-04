@@ -32,10 +32,10 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    get_log()." /dev/log unix socket" => 1,
-	    (map { (get_log()." unix.$_ unix socket" => 1) } (1..(MAXUNIX-1))),
-
-	    get_log()." unix.".MAXUNIX." unix socket" => 0,
+	    get_testlog()." /dev/log unix socket" => 1,
+	    (map { (get_testlog()." unix.$_ unix socket" => 1) }
+		(1..(MAXUNIX-1))),
+	    get_testlog()." unix.".MAXUNIX." unix socket" => 0,
 	}
     },
 );

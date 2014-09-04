@@ -76,7 +76,7 @@ sub write_unix {
 	    Type  => SOCK_DGRAM,
 	    Peer => $path,
 	) or die ref($self), " connect to $path unix socket failed: $!";
-	my $msg = get_log(). " $path unix socket";
+	my $msg = get_testlog(). " $path unix socket";
 	print $u $msg;
 	print STDERR $msg, "\n";
 }
@@ -120,7 +120,7 @@ sub read_message {
 # Script funcs
 ########################################################################
 
-sub get_log {
+sub get_testlog {
 	return $testlog;
 }
 
