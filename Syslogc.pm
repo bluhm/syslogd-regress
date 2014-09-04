@@ -44,4 +44,11 @@ sub child {
 	die ref($self), " exec '@cmd' failed: $!";
 }
 
+sub down {
+	my $self = shift;
+	eval { Proc::down($self, @_) };
+	die $@ if $@ && $self->{down} ne "Shutdown";
+	return $self;
+}
+
 1;

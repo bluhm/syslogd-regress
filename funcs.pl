@@ -184,9 +184,12 @@ sub check_pattern {
 sub check_log {
 	my ($c, $r, $s, $m, %args) = @_;
 
-	my %name2proc = (client => $c, syslogd => $r, server => $s,
-	    syslogc => $m);
-	foreach my $name (qw(client syslogd server syslogc)) {
+	my %name2proc = (client => $c, syslogd => $r, server => $s);
+	for (my $i = 0; $i < @$m; $i++) {
+		$name2proc{"syslogc".$i} = $m->[$i];
+		$args{"syslogc".$i} = $args{syslogc}[$i];
+	}
+	foreach my $name (sort keys %name2proc) {
 		next if $args{$name}{nocheck};
 		my $p = $name2proc{$name} or next;
 		my $pattern = $args{$name}{loggrep} || $testlog;

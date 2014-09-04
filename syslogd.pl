@@ -47,7 +47,7 @@ foreach my $name (qw(client syslogd server)) {
 		}
 	}
 }
-my($s, $c, $r, $m);
+my($s, $c, $r, @m);
 $s = Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
@@ -57,14 +57,17 @@ $s = Server->new(
     client              => \$c,
     syslogd             => \$r,
 ) unless $args{server}{noserver};
-$m = Syslogc->new(
-    %{$args{syslogc}},
+$args{syslogc} = [ $args{syslogc} ] if ref $args{syslogc} eq 'HASH';
+my $i = 0;
+@m = map { Syslogc->new(
+    %{$_},
     testfile            => $testfile,
-) if $args{syslogc};
+    logfile             => "syslogc".$i++.".log",
+) } @{$args{syslogc}};
 $r = Syslogd->new(
     connectaddr         => "127.0.0.1",
     connectport         => $s && $s->{listenport},
-    ctlsock		=> $m && $m->{ctlsock},
+    ctlsock		=> @m && $m[0]->{ctlsock},
     %{$args{syslogd}},
     testfile            => $testfile,
     client              => \$c,
@@ -85,10 +88,9 @@ $c->run->up unless $args{client}{noclient};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
-$m->run->up if $args{syslogc};
-$m->down if $args{syslogc};
+$_->run->up->down foreach (@m);
 $r->kill_child;
 $r->down;
 
-check_logs($c, $r, $s, $m, %args);
+check_logs($c, $r, $s, \@m, %args);
 $args{check}->({client => $c, syslogd => $r, server => $s}) if $args{check};
