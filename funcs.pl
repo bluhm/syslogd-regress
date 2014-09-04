@@ -136,11 +136,11 @@ sub get_downlog {
 }
 
 sub check_logs {
-	my ($c, $r, $s, %args) = @_;
+	my ($c, $r, $s, $m, %args) = @_;
 
 	return if $args{nocheck};
 
-	check_log($c, $r, $s, %args);
+	check_log($c, $r, $s, $m, %args);
 	check_out($r, %args);
 	check_stat($r, %args);
 	check_kdump($c, $r, $s, %args);
@@ -182,10 +182,11 @@ sub check_pattern {
 }
 
 sub check_log {
-	my ($c, $r, $s, %args) = @_;
+	my ($c, $r, $s, $m, %args) = @_;
 
-	my %name2proc = (client => $c, syslogd => $r, server => $s);
-	foreach my $name (qw(client syslogd server)) {
+	my %name2proc = (client => $c, syslogd => $r, server => $s,
+	    syslogc => $m);
+	foreach my $name (qw(client syslogd server syslogc)) {
 		next if $args{$name}{nocheck};
 		my $p = $name2proc{$name} or next;
 		my $pattern = $args{$name}{loggrep} || $testlog;

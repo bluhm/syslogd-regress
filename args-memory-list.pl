@@ -20,6 +20,7 @@ our %args = (
     syslogc => {
 	options => ["-q"],
 	down => "memory",
+	loggrep => qr/memory/,
     },
 );
 
