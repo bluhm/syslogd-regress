@@ -81,12 +81,11 @@ $c = Client->new(
 $r->run;
 $s->run->up unless $args{server}{noserver};
 $r->up;
-$m->run if $args{syslogc};
-$m->up if $args{syslogc};
 $c->run->up unless $args{client}{noclient};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
+$m->run->up if $args{syslogc};
 $m->down if $args{syslogc};
 $r->kill_child;
 $r->down;
