@@ -20,7 +20,6 @@ our %args = (
     },
     syslogc => [ {
 	options => ["-C", "memory"],
-	down => "Log cleared",
 	loggrep => qr/Log cleared/,
     }, {
 	options => ["memory"],

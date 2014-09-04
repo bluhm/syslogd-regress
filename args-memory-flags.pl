@@ -13,14 +13,13 @@ our %args = (
 	memory => 1,
 	loggrep => {
 	    qr/Accepting control connection/ => 1,
-	    qr/ctlcmd 4/ => 1,
+	    qr/ctlcmd 5/ => 1,
 	    get_testlog() => 1,
 	},
     },
     syslogc => {
-	options => ["-q"],
-	down => "memory",
-	loggrep => qr/memory/,
+	options => ["-o", "memory"],
+	loggrep => {},
     },
 );
 
