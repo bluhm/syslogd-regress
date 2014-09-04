@@ -4,7 +4,7 @@
 # The server receives the message on its UDP socket.
 # Syslogc reads the memory logs.
 # Find the message in client, file, pipe, syslogd, server, syslogc log.
-# Check that memory buffer has not been cleared.
+# Check that memory buffer has overflow flag.
 
 use strict;
 use warnings;
