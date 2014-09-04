@@ -1,6 +1,6 @@
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# Syslogc queries the memory logs.
+# Syslogc lists the memory logs.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
@@ -19,6 +19,7 @@ our %args = (
     },
     syslogc => {
 	options => ["-q"],
+	down => "memory",
     },
 );
 

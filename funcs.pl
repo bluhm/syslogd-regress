@@ -131,6 +131,10 @@ sub get_between2loggrep {
 	);
 }
 
+sub get_downlog {
+	return $downlog;
+}
+
 sub check_logs {
 	my ($c, $r, $s, %args) = @_;
 

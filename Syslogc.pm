@@ -26,7 +26,7 @@ sub new {
 	my %args = @_;
 	$args{logfile} ||= "syslogc.log";
 	$args{ctlsock} ||= "ctlsock";
-	$args{up} ||= "memory";
+	$args{up} ||= "execute: ";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	my $self = Proc::new($class, %args);
 
