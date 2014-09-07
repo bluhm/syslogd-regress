@@ -62,7 +62,7 @@ my $i = 0;
 @m = map { Syslogc->new(
     %{$_},
     testfile            => $testfile,
-    logfile             => "syslogc".$i++.".log",
+    logfile             => "syslogc-".$i++.".log",
 ) } @{$args{syslogc}};
 $r = Syslogd->new(
     connectaddr         => "127.0.0.1",
