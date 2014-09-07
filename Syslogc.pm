@@ -25,7 +25,7 @@ sub new {
 	my $class = shift;
 	my %args = @_;
 	$args{logfile} ||= "syslogc.log";
-	$args{ctlsock} ||= "ctlsock";
+	$args{ctlsock} ||= "ctl.sock";
 	$args{up} ||= "execute: ";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	my $self = Proc::new($class, %args);

@@ -25,7 +25,7 @@ ARGS !=			cd ${.CURDIR} && ls args-*.pl
 TARGETS ?=		${ARGS}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 CLEANFILES +=		*.log *.log.? *.pem *.crt *.key syslogd.conf stamp-*
-CLEANFILES +=		unix.* ctlsock ktrace.out *.ktrace *.fstat
+CLEANFILES +=		*.sock ktrace.out *.ktrace *.fstat
 
 .MAIN: all
 
