@@ -20,6 +20,7 @@ our %args = (
     },
     syslogc => [ {
 	early => 1,
+	stop => 1,
 	options => ["-f", "memory"],
 	down => get_downlog(),
     }, {

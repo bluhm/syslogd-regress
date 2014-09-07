@@ -84,12 +84,24 @@ $c = Client->new(
 $r->run;
 $s->run->up unless $args{server}{noserver};
 $r->up;
-$_->{early} && $_->run->up foreach (@m);
+foreach (@m) {
+	if ($_->{early}) {
+		$_->run->up;
+		$_->kill('STOP') if $_->{stop};
+	}
+}
 $c->run->up unless $args{client}{noclient};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
-$_->{early} ? $_->down : $_->run->up->down foreach (@m);
+foreach (@m) {
+	if ($_->{early}) {
+		$_->kill('CONT') if $_->{stop};
+		$_->down;
+	} else {
+		$_->run->up->down;
+	}
+}
 $r->kill_child;
 $r->down;
 
