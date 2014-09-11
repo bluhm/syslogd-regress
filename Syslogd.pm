@@ -108,11 +108,9 @@ sub child {
 		push @libevent, "$_=$ENV{$_}" if $ENV{$_};
 	}
 	push @libevent, "EVENT_SHOW_METHOD=1" if @libevent;
-	my @ktrace = $ENV{KTRACE} ? ($ENV{KTRACE}, "-i") : ();
-	if ($self->{ktrace}) {
-		@ktrace = $ENV{KTRACE} || "ktrace";
-		push @ktrace, "-i", "-f", $self->{ktracefile};
-	}
+	my @ktrace = $ENV{KTRACE} || ();
+	@ktrace = "ktrace" if $self->{ktrace} && !@ktrace;
+	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	my @cmd = (@sudo, @libevent, @ktrace, $syslogd, "-d",
 	    "-f", $self->{conffile});

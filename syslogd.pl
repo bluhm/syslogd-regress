@@ -62,6 +62,7 @@ my $i = 0;
 @m = map { Syslogc->new(
     %{$_},
     testfile            => $testfile,
+    ktracefile          => "syslogc-$i.ktrace",
     logfile             => "syslogc-".$i++.".log",
 ) } @{$args{syslogc}};
 $r = Syslogd->new(

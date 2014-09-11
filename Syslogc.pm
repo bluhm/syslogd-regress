@@ -24,6 +24,7 @@ use Carp;
 sub new {
 	my $class = shift;
 	my %args = @_;
+	$args{ktracefile} ||= "syslogc.ktrace";
 	$args{logfile} ||= "syslogc.log";
 	$args{ctlsock} ||= "ctl.sock";
 	$args{up} ||= "execute: ";
@@ -37,7 +38,10 @@ sub child {
 	my $self = shift;
 	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
 
-	my @cmd = (@sudo, "syslogc", "-s", $self->{ctlsock});
+	my @ktrace = $ENV{KTRACE} || ();
+	@ktrace = "ktrace" if $self->{ktrace} && !@ktrace;
+	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
+	my @cmd = (@sudo, @ktrace, "syslogc", "-s", $self->{ctlsock});
 	push @cmd, @{$self->{options}} if $self->{options};
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
