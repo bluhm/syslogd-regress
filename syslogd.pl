@@ -99,7 +99,6 @@ foreach (@m) {
 	}
 }
 $c->run->up unless $args{client}{noclient};
-$r->loggrep("membuf_drop set");
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
