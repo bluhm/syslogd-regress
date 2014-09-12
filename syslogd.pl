@@ -85,19 +85,29 @@ $c = Client->new(
 $r->run;
 $s->run->up unless $args{server}{noserver};
 $r->up;
+my $control = 0;
 foreach (@m) {
-	if ($_->{early}) {
+	if ($_->{early} || $_->{stop}) {
 		$_->run->up;
-		$_->kill('STOP') if $_->{stop};
+		$control++;
+	}
+}
+$r->loggrep("Accepting control connection") if $control;
+foreach (@m) {
+	if ($_->{stop}) {
+		$_->kill('STOP');
 	}
 }
 $c->run->up unless $args{client}{noclient};
+$r->loggrep("membuf_drop set");
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
 foreach (@m) {
-	if ($_->{early}) {
-		$_->kill('CONT') if $_->{stop};
+	if ($_->{stop}) {
+		$_->kill('CONT');
+		$_->down;
+	} elsif ($_->{early}) {
 		$_->down;
 	} else {
 		$_->run->up->down;

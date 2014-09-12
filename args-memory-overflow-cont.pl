@@ -8,39 +8,33 @@
 
 use strict;
 use warnings;
+use Time::HiRes 'sleep';
 
 our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-	    foreach (1..4) {
+	    foreach (1..500) {
 		write_message($self, $_ x 1024);
+		sleep .01;
 	    }
-	    write_shutdown($self);
+	    write_log($self);
 	},
-	nocheck => 1,
     },
     syslogd => {
 	memory => 1,
 	loggrep => {
-	    qr/Accepting control connection/ => 2,
+	    qr/Accepting control connection/ => 1,
 	    qr/ctlcmd 6/ => 1,  # read cont
-	    qr/ctlcmd 4/ => 1,  # list
 	},
     },
-    server => { nocheck => 1 },
     syslogc => [ {
-	options => ["-q"],
-	loggrep => qr/^memory\* /,
-    }, {
 	early => 1,
 	stop => 1,
 	options => ["-f", "memory"],
-# XXX	down => qr/ENOBUFS/,
+	down => qr/Lines were dropped!/,
 	loggrep => {},
     } ],
-    file => { nocheck => 1 },
-    pipe => { nocheck => 1 },
 );
 
 1;
