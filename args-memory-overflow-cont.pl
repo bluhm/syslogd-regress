@@ -3,8 +3,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Syslogc reads the memory logs.
-# Check that memory buffer has overflow flag.  XXX Does not work yet XXX
+# Check that syslogc logs lost lines.
 
 use strict;
 use warnings;
@@ -16,6 +15,7 @@ our %args = (
 	    my $self = shift;
 	    foreach (1..500) {
 		write_message($self, $_ x 1024);
+		# if client sends too fast, syslogd will not see everything
 		sleep .01;
 	    }
 	    write_log($self);
