@@ -15,9 +15,8 @@ our %args = (
 	    foreach (1..4) {
 		write_message($self, $_ x 1024);
 	    }
-	    write_shutdown($self);
+	    write_log($self);
 	},
-	nocheck => 1,
     },
     syslogd => {
 	memory => 1,
@@ -28,7 +27,6 @@ our %args = (
 	    qr/ctlcmd 4/ => 3,  # list
 	},
     },
-    server => { nocheck => 1 },
     syslogc => [ {
 	options => ["-q"],
 	loggrep => qr/^memory\* /,
@@ -47,8 +45,6 @@ our %args = (
 	options => ["-q"],
 	loggrep => qr/^memory /,
     } ],
-    file => { nocheck => 1 },
-    pipe => { nocheck => 1 },
 );
 
 1;
