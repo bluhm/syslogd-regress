@@ -1,4 +1,4 @@
-#	$OpenBSD$
+#	$OpenBSD: Syslogc.pm,v 1.1 2014/09/13 23:38:24 bluhm Exp $
 
 # Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
