@@ -2,7 +2,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Syslogc reads the memory logs.
+# Syslogc checks the memory logs.
 # Check that memory buffer has overflow flag.
 
 use strict;
