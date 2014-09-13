@@ -29,6 +29,7 @@ our %args = (
     },
     syslogc => {
 	options => ["-o", "memory"],
+	exit => 1,
 	loggrep => {
 	    qr/^memory has overflowed/ => 1,
 	},
