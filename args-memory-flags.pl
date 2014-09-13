@@ -4,6 +4,7 @@
 # The server receives the message on its UDP socket.
 # Syslogc lists the memory logs.
 # Find the message in client, file, pipe, syslogd, server log.
+# Check that syslogc -o does not report overflow.
 
 use strict;
 use warnings;
@@ -19,7 +20,10 @@ our %args = (
     },
     syslogc => {
 	options => ["-o", "memory"],
-	loggrep => {},
+	loggrep => {
+	    qr/^memory/ => 0,
+	    qr/overflowed/ => 0,
+	},
     },
 );
 
