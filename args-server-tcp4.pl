@@ -13,7 +13,7 @@ our %args = (
     syslogd => {
 	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => {
-	    qr/Logging to FORWUDP \@tcp:\/\/127.0.0.1:\d+/ => '>=4',
+	    qr/Logging to FORWTCP \@tcp:\/\/127.0.0.1:\d+/ => '>=4',
 	    get_testlog() => 1,
 	},
     },
