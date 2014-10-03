@@ -3,7 +3,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that there are no bogous new lines in the client log.
+# Check that there are no bogous new lines in the client log and file.
 
 use strict;
 use warnings;
