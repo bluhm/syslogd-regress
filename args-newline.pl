@@ -1,4 +1,3 @@
-# Test with default values, that is:
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -11,6 +10,16 @@ use warnings;
 
 our %args = (
     client => {
+	func => sub {
+	    my $self = shift;
+	    write_message($self, "foo");
+	    write_message($self, "bar\n");
+	    write_message($self, "foobar\n\n");
+	    write_message($self, "");
+	    write_message($self, "\n");
+	    write_message($self, "\n\n");
+	    write_log($self);
+	},
 	loggrep => {
 	    qr/^\s*$/ => 0,
 	},
