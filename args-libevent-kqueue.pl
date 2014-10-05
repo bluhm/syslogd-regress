@@ -3,7 +3,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that kqueue has been used.
+# Check in log and ktrace that kqueue has been used.
 
 use strict;
 use warnings;
