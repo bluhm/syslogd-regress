@@ -3,20 +3,20 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check in log and ktrace that kqueue has been used.
+# Check in log and ktrace that select has been used.
 
 use strict;
 use warnings;
 
-$ENV{EVENT_NOKQUEUE} = 0;
+$ENV{EVENT_NOKQUEUE} = 1;
 $ENV{EVENT_NOPOLL} = 1;
-$ENV{EVENT_NOSELECT} = 1;
+$ENV{EVENT_NOSELECT} = 0;
 
 our %args = (
     syslogd => {
-	loggrep => qr/libevent using: kqueue/,
+	loggrep => qr/libevent using: select/,
 	ktrace => 1,
-	kdump => qr/CALL  kqueue/,
+	kdump => qr/CALL  select/,
     },
 );
 
