@@ -1,23 +1,21 @@
-# The TCP server writes a message back to the syslogd.
+# The TCP server closes the connection to syslogd.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via IPv4 TCP to an explicit loghost.
 # The server receives the message on its TCP socket.
-# Find the message in client, file, pipe, syslogd, server log.
-# Check that syslogd writes a debug message about the message sent back.
+# Find the message in client, pipe, syslogd, server log.
+# Check that syslogd writes a log message about the close.
 
 use strict;
 use warnings;
 use Socket;
 
-my $sendback = "syslogd tcp server send back message";
-
 our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-	    ${$self->{syslogd}}->loggrep("loghost .* did send .* back", 2)
-		or die "no send back in syslogd.log";
+	    ${$self->{syslogd}}->loggrep("loghost .* connection close", 2)
+		or die "connection close in syslogd.log";
 	    write_log($self, @_);
 	},
     },
@@ -26,19 +24,17 @@ our %args = (
 	loggrep => {
 	    qr/Logging to FORWTCP \@tcp:\/\/127.0.0.1:\d+/ => '>=4',
 	    get_testlog() => 1,
-	    qr/did send /.length($sendback).qr/ bytes back/ => 1,
+	    qr/syslogd: loghost .* connection close/ => 2,
 	},
     },
     server => {
 	listen => { domain => AF_INET, protocol => "tcp", addr => "127.0.0.1" },
-	func => sub {
-	    print($sendback);
-	    read_log(@_);
-	}
+	func => sub {},
+	loggrep => {},
     },
     file => {
 	loggrep => {
-	    qr/$sendback/ => 0,
+	    qr/syslogd: loghost .* connection close/ => 1,
 	}
     }
 );
