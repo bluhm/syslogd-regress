@@ -3,7 +3,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via IPv4 TCP to an explicit loghost.
 # The server receives the message on its TCP socket.
-# Find the message in client, file, pipe, syslogd, server log.
+# Find the message in client, pipe, syslogd, server log.
 # Check that syslogd writes a debug message about the message sent back.
 
 use strict;
