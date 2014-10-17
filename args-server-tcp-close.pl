@@ -4,7 +4,7 @@
 # The syslogd passes it via IPv4 TCP to an explicit loghost.
 # The server receives the message on its TCP socket.
 # Find the message in client, pipe, syslogd, server log.
-# Check that syslogd writes a log message about the close.
+# Check that syslogd writes a log message about the server close.
 
 use strict;
 use warnings;
