@@ -34,13 +34,13 @@ our %args = (
 	func => sub {
 	    print($sendback);
 	    read_log(@_);
-	}
+	},
     },
     file => {
 	loggrep => {
 	    qr/$sendback/ => 0,
-	}
-    }
+	},
+    },
 );
 
 1;
