@@ -11,19 +11,23 @@ use Cwd;
 
 my $foolog = getcwd()."/foo.log";
 my $barlog = getcwd()."/bar.log";
+my $foobarlog = getcwd()."/foobar.log";
 {
     my $fh;
     open($fh, '>', $foolog) or die "Create $foolog failed: $!";
     open($fh, '>', $barlog) or die "Create $barlog failed: $!";
+    open($fh, '>', $foobarlog) or die "Create $foobarlog failed: $!";
 }
 
 our %args = (
     syslogd => {
 	conf => <<"EOF",
-!myprog
-*.*	foo.log
-!!myprog
-*.*	bar.log
+!!syslogd-regress
+*.*	$foolog
+!syslogd
+*.*	$barlog
+!*
+*.*	$foobarlog
 EOF
     },
 );
