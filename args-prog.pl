@@ -9,26 +9,34 @@ use strict;
 use warnings;
 use Cwd;
 
-my $foolog = getcwd()."/foo.log";
-my $barlog = getcwd()."/bar.log";
-my $foobarlog = getcwd()."/foobar.log";
-{
-    my $fh;
-    open($fh, '>', $foolog) or die "Create $foolog failed: $!";
-    open($fh, '>', $barlog) or die "Create $barlog failed: $!";
-    open($fh, '>', $foobarlog) or die "Create $foobarlog failed: $!";
+my %log;
+@log{qw(foo bar foobar)} = ();
+foreach my $name (keys %log) {
+    $log{$name} = getcwd()."/$name.log";
+    open(my $fh, '>', $log{$name})
+	or die "Create $log{$name} failed: $!";
+}
+
+sub check_file {
+    my ($name, $pattern) = @_;
+    check_pattern($name, $log{$name}, $pattern, \&filegrep);
 }
 
 our %args = (
     syslogd => {
 	conf => <<"EOF",
 !!syslogd-regress
-*.*	$foolog
+*.*	$log{foo}
 !syslogd
-*.*	$barlog
+*.*	$log{bar}
 !*
-*.*	$foobarlog
+*.*	$log{foobar}
 EOF
+    },
+    check => sub {
+	check_file("foo", { get_testlog() => 1, qr/syslogd: start/ => 0 });
+	check_file("bar", { get_testlog() => 0, qr/syslogd: start/ => 1 });
+	check_file("foobar", { get_testlog() => 0, qr/syslogd: start/ => 1 });
     },
 );
 
