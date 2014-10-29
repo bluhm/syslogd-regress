@@ -7,6 +7,15 @@
 
 use strict;
 use warnings;
+use Cwd;
+
+my $foolog = getcwd()."/foo.log";
+my $barlog = getcwd()."/bar.log";
+{
+    my $fh;
+    open($fh, '>', $foolog) or die "Create $foolog failed: $!";
+    open($fh, '>', $barlog) or die "Create $barlog failed: $!";
+}
 
 our %args = (
     syslogd => {
