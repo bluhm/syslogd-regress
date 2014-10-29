@@ -67,6 +67,7 @@ sub new {
 		$loghost .= ":$connectport" if $connectport;
 	}
 	print $fh "*.*\t$loghost\n";
+	print $fh $self->{conf} if $self->{conf};
 	close $fh;
 
 	return $self->create_out();

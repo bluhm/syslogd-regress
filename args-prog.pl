@@ -9,6 +9,14 @@ use strict;
 use warnings;
 
 our %args = (
+    syslogd => {
+	conf => <<"EOF",
+!myprog
+*.*	foo.log
+!!myprog
+*.*	bar.log
+EOF
+    },
 );
 
 1;
