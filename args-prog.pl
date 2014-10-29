@@ -25,17 +25,17 @@ sub check_file {
 our %args = (
     syslogd => {
 	conf => <<"EOF",
-!!syslogd-regress
-*.*	$log{foo}
 !syslogd
+*.*	$log{foo}
+!!syslogd-regress
 *.*	$log{bar}
 !*
 *.*	$log{foobar}
 EOF
     },
     check => sub {
-	check_file("foo", { get_testlog() => 1, qr/syslogd: start/ => 0 });
-	check_file("bar", { get_testlog() => 0, qr/syslogd: start/ => 1 });
+	check_file("foo",    { get_testlog() => 0, qr/syslogd: start/ => 1 });
+	check_file("bar",    { get_testlog() => 1, qr/syslogd: start/ => 0 });
 	check_file("foobar", { get_testlog() => 0, qr/syslogd: start/ => 1 });
     },
 );
