@@ -28,7 +28,7 @@ sub new {
 	$args{up} ||= "rsyslogd: started";
 	$args{down} ||= "rsyslogd: exiting";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
-	$args{conffile} ||= "rsyslog.conf";
+	$args{conffile} ||= "rsyslogd.conf";
 	my $self = Proc::new($class, %args);
 
 	# substitute variables in config file
