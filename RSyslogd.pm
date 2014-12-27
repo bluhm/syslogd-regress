@@ -26,14 +26,15 @@ sub new {
 	my $class = shift;
 	my %args = @_;
 	$args{logfile} ||= "rsyslogd.log";
-	$args{up} ||= "rsyslogd: started";
-	$args{down} ||= "rsyslogd: exiting";
+	$args{up} ||= "worker IDLE, waiting for work";
+	$args{down} ||= "Clean shutdown completed, bye";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "rsyslogd.conf";
 	$args{pidfile} ||= "rsyslogd.pid";
+	$args{outfile} ||= "rsyslogd.out";
 	my $self = Proc::new($class, %args);
 
-	_make_abspath(\$self->{$_}) foreach (qw(conffile pidfile));
+	_make_abspath(\$self->{$_}) foreach (qw(conffile pidfile outfile));
 
 	# substitute variables in config file
 	my $listendomain = $self->{listendomain}
@@ -47,6 +48,11 @@ sub new {
 
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
+	if ($listenproto eq "udp") {
+		print $fh "\$ModLoad imudp\n";
+	    	print $fh "\$UDPServerRun $listenport\n";
+	}
+	print $fh "*.*	$self->{outfile}\n";
 	print $fh $self->{conf} if $self->{conf};
 	close $fh;
 
@@ -56,7 +62,7 @@ sub new {
 sub child {
 	my $self = shift;
 
-	my @cmd = ("rsyslogd", "-n", "-f", $self->{conffile},
+	my @cmd = ("rsyslogd", "-dn", "-c4", "-f", $self->{conffile},
 	    "-i", $self->{pidfile});
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
