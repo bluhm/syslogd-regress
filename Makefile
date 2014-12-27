@@ -5,6 +5,9 @@
 # p5-Socket6		Perl defines relating to AF_INET6 sockets
 # p5-IO-Socket-SSL	perl interface to SSL sockets
 #
+# This package enables additional interoperability tests
+# rsyslog		syslog daemon supporting databases, TCP, SSL, RELP
+#
 # Check wether all required perl packages are installed.  If some
 # are missing print a warning and skip the tests, but do not fail.
 
@@ -22,7 +25,11 @@ regress:
 # Automatically generate regress targets from test cases in directory.
 
 ARGS !=			cd ${.CURDIR} && ls args-*.pl
+.if exists (/usr/local/sbin/rsyslogd)
 TARGETS ?=		${ARGS}
+.else
+TARGETS ?=		${ARGS:Nargs-rsyslog*}
+.endif
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 CLEANFILES +=		*.log *.log.? *.pem *.crt *.key syslogd.conf stamp-*
 CLEANFILES +=		*.sock ktrace.out *.ktrace *.fstat
