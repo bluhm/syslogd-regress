@@ -26,7 +26,7 @@ sub new {
 	my $class = shift;
 	my %args = @_;
 	$args{logfile} ||= "rsyslogd.log";
-	$args{up} ||= "initialization completed";
+	$args{up} ||= "calling select";
 	$args{down} ||= "Clean shutdown completed";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "rsyslogd.conf";
@@ -51,6 +51,10 @@ sub new {
 	if ($listenproto eq "udp") {
 		print $fh "\$ModLoad imudp\n";
 		print $fh "\$UDPServerRun $listenport\n";
+	}
+	if ($listenproto eq "tcp") {
+		print $fh "\$ModLoad imtcp\n";
+		print $fh "\$InputTCPServerRun $listenport\n";
 	}
 	print $fh "*.*	$self->{outfile}\n";
 	print $fh $self->{conf} if $self->{conf};

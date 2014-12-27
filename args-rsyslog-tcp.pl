@@ -10,6 +10,9 @@ use strict;
 use warnings;
 
 our %args = (
+    syslogd => {
+	loghost => '@tcp://127.0.0.1:$connectport',
+    },
     rsyslogd => {
 	listen => { proto => "tcp" },
     },
