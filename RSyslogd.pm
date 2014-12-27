@@ -36,13 +36,10 @@ sub new {
 	    or croak "$class listen domain not given";
 	my $listenaddr = $self->{listenaddr}
 	    or croak "$class listen address not given";
-	my $listenproto = $self->{listenproto} || "udp";
-	my $listenport = $self->{listenport} ||= find_ports(
-	    num    => 1,
-	    domain => $listendomain,
-	    addr   => $listenaddr,
-	    proto  => $listenproto,
-	);
+	my $listenproto = $self->{listenproto}
+	    or croak "$class listen protocol not given";
+	my $listenport = $self->{listenport}
+	    or croak "$class listen port not given";
 
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";

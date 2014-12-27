@@ -40,24 +40,23 @@ if (@ARGV and -f $ARGV[-1]) {
 }
 @ARGV == 0 or usage();
 
-foreach my $name (qw(client syslogd server)) {
+if ($args{rsyslogd}) {
+	$args{rsyslogd}{listen}{domain} ||= AF_INET;
+	$args{rsyslogd}{listen}{addr}   ||= "127.0.0.1";
+	$args{rsyslogd}{listen}{proto}  ||= "udp";
+}
+foreach my $name (qw(client syslogd server rsyslogd)) {
 	foreach my $action (qw(connect listen)) {
 		my $h = $args{$name}{$action} or next;
-		foreach my $k (qw(proto domain addr port)) {
+		foreach my $k (qw(domain addr proto port)) {
 			$args{$name}{"$action$k"} = $h->{$k};
 		}
 	}
 }
 my($s, $c, $sd, @m);
 $s = RSyslogd->new(
-    listendomain        => AF_INET,
-    listenaddr          => "127.0.0.1",
-    listenport          => scalar find_ports(
-	domain => $args{rsyslogd}{listendomain} || AF_INET,
-	addr   => $args{rsyslogd}{listenaddr} || "127.0.0.1",
-	proto  => $args{rsyslogd}{listenproto} || "udp",
-    ),
     %{$args{rsyslogd}},
+    listenport          => scalar find_ports(%{$args{rsyslogd}{listen}}),
     testfile            => $testfile,
 ) if $args{rsyslogd};
 $s ||= Server->new(
