@@ -53,7 +53,7 @@ foreach my $name (qw(client syslogd server rsyslogd)) {
 		}
 	}
 }
-my($s, $c, $sd, @m);
+my($s, $c, $r, @m);
 $s = RSyslogd->new(
     %{$args{rsyslogd}},
     listenport          => scalar find_ports(%{$args{rsyslogd}{listen}}),
@@ -66,7 +66,7 @@ $s ||= Server->new(
     %{$args{server}},
     testfile            => $testfile,
     client              => \$c,
-    syslogd             => \$sd,
+    syslogd             => \$r,
 ) unless $args{server}{noserver};
 $args{syslogc} = [ $args{syslogc} ] if ref $args{syslogc} eq 'HASH';
 my $i = 0;
@@ -76,7 +76,7 @@ my $i = 0;
     ktracefile          => "syslogc-$i.ktrace",
     logfile             => "syslogc-".$i++.".log",
 ) } @{$args{syslogc}};
-$sd = Syslogd->new(
+$r = Syslogd->new(
     connectaddr         => "127.0.0.1",
     connectport         => $s && $s->{listenport},
     ctlsock		=> @m && $m[0]->{ctlsock},
@@ -89,13 +89,13 @@ $c = Client->new(
     func                => \&write_log,
     %{$args{client}},
     testfile            => $testfile,
-    syslogd             => \$sd,
+    syslogd             => \$r,
     server              => \$s,
 ) unless $args{client}{noclient};
 
-$sd->run;
+$r->run;
 $s->run->up unless $args{server}{noserver};
-$sd->up;
+$r->up;
 my $control = 0;
 foreach (@m) {
 	if ($_->{early} || $_->{stop}) {
@@ -103,7 +103,7 @@ foreach (@m) {
 		$control++;
 	}
 }
-$sd->loggrep("Accepting control connection") if $control;
+$r->loggrep("Accepting control connection") if $control;
 foreach (@m) {
 	if ($_->{stop}) {
 		$_->kill('STOP');
@@ -123,8 +123,8 @@ foreach (@m) {
 		$_->run->up->down;
 	}
 }
-$sd->kill_child;
-$sd->down;
+$r->kill_child;
+$r->down;
 
-check_logs($c, $sd, $s, \@m, %args);
-$args{check}->({client => $c, syslogd => $sd, server => $s}) if $args{check};
+check_logs($c, $r, $s, \@m, %args);
+$args{check}->({client => $c, syslogd => $r, server => $s}) if $args{check};
