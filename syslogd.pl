@@ -94,8 +94,9 @@ $c = Client->new(
     server              => \$s,
 ) unless $args{client}{noclient};
 
-$r->run;
+$r->run unless $r->{late};
 $s->run->up unless $args{server}{noserver};
+$r->run if $r->{late};
 $r->up;
 my $control = 0;
 foreach (@m) {

@@ -12,6 +12,7 @@ use warnings;
 our %args = (
     syslogd => {
 	loghost => '@tcp://127.0.0.1:$connectport',
+	late => 1,  # connect after the listen socket has been created
     },
     rsyslogd => {
 	listen => { proto => "tcp" },
