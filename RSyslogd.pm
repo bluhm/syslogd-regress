@@ -26,8 +26,8 @@ sub new {
 	my $class = shift;
 	my %args = @_;
 	$args{logfile} ||= "rsyslogd.log";
-	$args{up} ||= "worker IDLE, waiting for work";
-	$args{down} ||= "Clean shutdown completed, bye";
+	$args{up} ||= "initialization completed";
+	$args{down} ||= "Clean shutdown completed";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "rsyslogd.conf";
 	$args{pidfile} ||= "rsyslogd.pid";
@@ -50,7 +50,7 @@ sub new {
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	if ($listenproto eq "udp") {
 		print $fh "\$ModLoad imudp\n";
-	    	print $fh "\$UDPServerRun $listenport\n";
+		print $fh "\$UDPServerRun $listenport\n";
 	}
 	print $fh "*.*	$self->{outfile}\n";
 	print $fh $self->{conf} if $self->{conf};
@@ -76,6 +76,13 @@ sub _make_abspath {
 		${$_[0]} = $file if ref($_[0]);
 	}
 	return $file;
+}
+
+sub down {
+	my $self = shift;
+
+	$self->kill();
+	return Proc::down($self);
 }
 
 1;
