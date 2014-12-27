@@ -17,7 +17,7 @@
 use strict;
 use warnings;
 
-package Syslogd;
+package RSyslogd;
 use parent 'Proc';
 use Carp;
 
@@ -32,15 +32,24 @@ sub new {
 	my $self = Proc::new($class, %args);
 
 	# substitute variables in config file
-	my $listenprotocol = $self->{connectprotocol};
-	my $listendomain = $self->{connectdomain};
-	my $listenaddr = $self->{connectaddr};
-	my $listenport = $self->{connectport};
+	my $listendomain = $self->{listendomain}
+	    or croak "$class listen domain not given";
+	my $listenaddr = $self->{listenaddr}
+	    or croak "$class listen address not given";
+	my $listenprotocol = $self->{listenprotocol} || "udp";
+	my $listenport = $self->{listenport} ||= find_ports(
+	    num    => 1,
+	    domain => $listendomain,
+	    addr   => $listenaddr,
+	    proto  => $listenprotocol,
+	);
 
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	print $fh $self->{conf} if $self->{conf};
 	close $fh;
+
+	return $self;
 }
 
 sub child {

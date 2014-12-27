@@ -24,6 +24,7 @@ use Client;
 use Syslogd;
 use Server;
 use Syslogc;
+use RSyslogd;
 require 'funcs.pl';
 
 sub usage {
@@ -48,7 +49,18 @@ foreach my $name (qw(client syslogd server)) {
 	}
 }
 my($s, $c, $sd, @m);
-$s = Server->new(
+$s = RSyslogd->new(
+    listendomain        => AF_INET,
+    listenaddr          => "127.0.0.1",
+    listenport          => scalar find_ports(
+	domain => $args{rsyslogd}{listendomain} || AF_INET,
+	addr   => $args{rsyslogd}{listenaddr} || "127.0.0.1",
+	proto  => $args{rsyslogd}{listenprotocol} || "udp",
+    ),
+    %{$args{rsyslogd}},
+    testfile            => $testfile,
+) if $args{rsyslogd};
+$s ||= Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
     listenaddr          => "127.0.0.1",
