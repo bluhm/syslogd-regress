@@ -20,6 +20,7 @@ use warnings;
 package RSyslogd;
 use parent 'Proc';
 use Carp;
+use Cwd;
 
 sub new {
 	my $class = shift;
@@ -29,7 +30,10 @@ sub new {
 	$args{down} ||= "rsyslogd: exiting";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "rsyslogd.conf";
+	$args{pidfile} ||= "rsyslogd.pid";
 	my $self = Proc::new($class, %args);
+
+	_make_abspath(\$self->{$_}) foreach (qw(conffile pidfile));
 
 	# substitute variables in config file
 	my $listendomain = $self->{listendomain}
@@ -52,10 +56,20 @@ sub new {
 sub child {
 	my $self = shift;
 
-	my @cmd = ("rsyslogd", "-n", "-f", $self->{conffile});
+	my @cmd = ("rsyslogd", "-n", "-f", $self->{conffile},
+	    "-i", $self->{pidfile});
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
 	die ref($self), " exec '@cmd' failed: $!";
+}
+
+sub _make_abspath {
+	my $file = ref($_[0]) ? ${$_[0]} : $_[0];
+	if (substr($file, 0, 1) ne "/") {
+		$file = getcwd(). "/". $file;
+		${$_[0]} = $file if ref($_[0]);
+	}
+	return $file;
 }
 
 1;
