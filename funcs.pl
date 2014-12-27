@@ -28,6 +28,26 @@ my $firstlog = "syslogd regress test first message";
 my $testlog = "syslogd regress test log message";
 my $downlog = "syslogd regress client shutdown";
 
+sub find_ports {
+	my %args = @_;
+	my $num    = delete $args{num}    // 1;
+	my $domain = delete $args{domain} // AF_INET;
+	my $addr   = delete $args{addr}   // "127.0.0.1";
+	my $proto  = delete $args{proto}  // "udp";
+
+	my @sockets = (1..$num);
+	foreach my $s (@sockets) {
+		$s = IO::Socket::INET6->new(
+		    Domain    => $domain,
+		    LocalAddr => $addr,
+		    Proto     => $proto,
+		) or die "find_ports: create and bind socket failed: $!";
+	}
+	my @ports = map { $_->sockport() } @sockets;
+
+	return wantarray ? @ports : $ports[0];
+}
+
 ########################################################################
 # Client funcs
 ########################################################################
