@@ -48,9 +48,9 @@ sub new {
 	_make_abspath(\$self->{$_}) foreach (qw(conffile outfile outpipe));
 
 	# substitute variables in config file
-	my $connectprotocol = $self->{connectprotocol};
 	my $connectdomain = $self->{connectdomain};
 	my $connectaddr = $self->{connectaddr};
+	my $connectproto = $self->{connectproto};
 	my $connectport = $self->{connectport};
 
 	open(my $fh, '>', $self->{conffile})

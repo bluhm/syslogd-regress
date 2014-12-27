@@ -36,12 +36,12 @@ sub new {
 	    or croak "$class listen domain not given";
 	my $listenaddr = $self->{listenaddr}
 	    or croak "$class listen address not given";
-	my $listenprotocol = $self->{listenprotocol} || "udp";
+	my $listenproto = $self->{listenproto} || "udp";
 	my $listenport = $self->{listenport} ||= find_ports(
 	    num    => 1,
 	    domain => $listendomain,
 	    addr   => $listenaddr,
-	    proto  => $listenprotocol,
+	    proto  => $listenproto,
 	);
 
 	open(my $fh, '>', $self->{conffile})
