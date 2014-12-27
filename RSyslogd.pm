@@ -56,6 +56,7 @@ sub new {
 	print $fh $self->{conf} if $self->{conf};
 	close $fh;
 
+	unlink($self->{outfile});
 	return $self;
 }
 

@@ -31,8 +31,8 @@ TARGETS ?=		${ARGS}
 TARGETS ?=		${ARGS:Nargs-rsyslog*}
 .endif
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
-CLEANFILES +=		*.log *.log.? *.pem *.crt *.key syslogd.conf stamp-*
-CLEANFILES +=		*.sock ktrace.out *.ktrace *.fstat
+CLEANFILES +=		*.log *.log.? *.pem *.crt *.key *.conf stamp-*
+CLEANFILES +=		*.out *.sock ktrace.out *.ktrace *.fstat
 
 .MAIN: all
 
