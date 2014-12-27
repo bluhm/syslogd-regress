@@ -46,6 +46,7 @@ if ($args{rsyslogd}) {
 	$args{rsyslogd}{listen}{proto}  ||= "udp";
 }
 foreach my $name (qw(client syslogd server rsyslogd)) {
+	$args{$name} or next;
 	foreach my $action (qw(connect listen)) {
 		my $h = $args{$name}{$action} or next;
 		foreach my $k (qw(domain addr proto port)) {
