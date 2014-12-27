@@ -164,6 +164,10 @@ sub check_logs {
 	check_out($r, %args);
 	check_stat($r, %args);
 	check_kdump($c, $r, $s);
+	if (my $file = $s->{"outfile"}) {
+		my $pattern = $s->{loggrep} || $testlog;
+		check_pattern(ref $s, $file, $pattern, \&filegrep);
+	}
 }
 
 sub compare($$) {
