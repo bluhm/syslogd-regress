@@ -18,7 +18,7 @@ our %args = (
 	},
     },
     server => {
-	listen => { domain => AF_INET, protocol => "tcp", addr => "127.0.0.1" },
+	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
 	loggrep => {
 	    qr/listen sock: 127.0.0.1 \d+/ => 1,
 	    get_testlog() => 1,
