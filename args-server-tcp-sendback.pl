@@ -30,7 +30,7 @@ our %args = (
 	},
     },
     server => {
-	listen => { domain => AF_INET, protocol => "tcp", addr => "127.0.0.1" },
+	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
 	func => sub {
 	    print($sendback);
 	    read_log(@_);

@@ -28,7 +28,7 @@ our %args = (
 	},
     },
     server => {
-	listen => { domain => AF_INET, protocol => "tcp", addr => "127.0.0.1" },
+	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
 	func => sub {
 	    my $self = shift;
 	    setsockopt(STDOUT, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0))
