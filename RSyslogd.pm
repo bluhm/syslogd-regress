@@ -50,9 +50,15 @@ sub new {
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	if ($self->{tls}) {
 		print $fh "\$DefaultNetstreamDriver gtls\n";
-		print $fh "\$DefaultNetstreamDriverCAFile ca.pem\n";
-		print $fh "\$DefaultNetstreamDriverCertFile cert.pem\n";
-		print $fh "\$DefaultNetstreamDriverKeyFile key.pem\n";
+		my %cert = (
+		    CA   => "ca-cert.pem",
+		    Cert => "server-cert.pem",
+		    Key  => "server-key.pem",
+		);
+		while(my ($k, $v) = each %cert) {
+			_make_abspath(\$v);
+			print $fh "\$DefaultNetstreamDriver${k}File $v\n";
+		}
 	}
 	if ($listenproto eq "udp") {
 		print $fh "\$ModLoad imudp\n";
