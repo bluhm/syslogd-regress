@@ -51,7 +51,7 @@ sub new {
 	    SSL_cert_file	=> "server.crt",
 	    SSL_verify_mode	=> SSL_VERIFY_NONE,
 	) or die ref($self), " $iosocket socket listen failed: $!,$SSL_ERROR";
-	if ($self->{listenproto} eq "tcp") {
+	if ($self->{listenproto} ne "udp") {
 		listen($ls, 1)
 		    or die ref($self), " socket failed: $!";
 	}
