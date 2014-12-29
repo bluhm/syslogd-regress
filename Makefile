@@ -31,7 +31,7 @@ TARGETS ?=		${ARGS}
 TARGETS ?=		${ARGS:Nargs-rsyslog*}
 .endif
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
-CLEANFILES +=		*.log *.log.? *.pem *.crt *.key *.conf stamp-*
+CLEANFILES +=		*.log *.log.? *.pem *.key *.ser *.conf stamp-*
 CLEANFILES +=		*.out *.sock ktrace.out *.ktrace *.fstat
 
 .MAIN: all
@@ -65,18 +65,18 @@ run-regress-$a: $a
 	time SUDO=${SUDO} KTRACE=${KTRACE} SYSLOGD=${SYSLOGD} perl ${PERLINC} ${PERLPATH}syslogd.pl ${PERLPATH}$a
 .endfor
 
-# create the certificates for SSL
+# create the certificates for TLS
 
-127.0.0.1.crt:
-	openssl req -batch -new -nodes -newkey rsa -keyout 127.0.0.1.key -subj /CN=127.0.0.1/ -x509 -out $@
-	${SUDO} cp 127.0.0.1.crt /etc/ssl/
-	${SUDO} cp 127.0.0.1.key /etc/ssl/private/
+ca-cert.pem:
+	openssl req -batch -new -nodes -newkey rsa -keyout ca-key.pem -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -x509 -out ca-cert.pem
 
-server-cert.pem:
-	openssl req -batch -new -nodes -newkey rsa -keyout server-key.pem -subj /CN=localhost/ -x509 -out $@
+server-req.pem:
+	openssl req -batch -new -nodes -newkey rsa -keyout server-key.pem -subj /L=OpenBSD/O=syslogd-regress/OU=server/CN=localhost/ -out server-req.pem
 
-${REGRESS_TARGETS:M*ssl*} ${REGRESS_TARGETS:M*https*}: server-cert.pem
-${REGRESS_TARGETS:M*ssl*} ${REGRESS_TARGETS:M*https*}: 127.0.0.1.crt
+server-cert.pem: ca-cert.pem server-req.pem
+	openssl x509 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -req -in server-req.pem -out server-cert.pem
+
+${REGRESS_TARGETS:M*tls*}: server-cert.pem
 
 # make perl syntax check for all args files
 
