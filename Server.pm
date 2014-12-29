@@ -66,11 +66,11 @@ sub new {
 sub child {
 	my $self = shift;
 
-	my $iosocket = $self->{ssl} ? "IO::Socket::SSL" : "IO::Socket::INET6";
 	my $as = $self->{ls};
 	if ($self->{listenproto} ne "udp") {
 		$as = $self->{ls}->accept()
-		    or die ref($self), " $iosocket socket accept failed: $!";
+		    or die ref($self)," ",ref($self->{ls}),
+		    " socket accept failed: $!,$SSL_ERROR";
 		print STDERR "accept sock: ",$as->sockhost()," ",
 		    $as->sockport(),"\n";
 		print STDERR "accept peer: ",$as->peerhost()," ",
