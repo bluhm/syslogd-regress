@@ -34,6 +34,7 @@ sub find_ports {
 	my $domain = delete $args{domain} // AF_INET;
 	my $addr   = delete $args{addr}   // "127.0.0.1";
 	my $proto  = delete $args{proto}  // "udp";
+	$proto = "tcp" if $proto eq "tls";
 
 	my @sockets = (1..$num);
 	foreach my $s (@sockets) {
