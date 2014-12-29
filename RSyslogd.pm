@@ -48,6 +48,12 @@ sub new {
 
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
+	if ($self->{tls}) {
+		print $fh "\$DefaultNetstreamDriver gtls\n";
+		print $fh "\$DefaultNetstreamDriverCAFile ca.pem\n";
+		print $fh "\$DefaultNetstreamDriverCertFile cert.pem\n";
+		print $fh "\$DefaultNetstreamDriverKeyFile key.pem\n";
+	}
 	if ($listenproto eq "udp") {
 		print $fh "\$ModLoad imudp\n";
 		print $fh "\$UDPServerRun $listenport\n";
@@ -55,6 +61,10 @@ sub new {
 	if ($listenproto eq "tcp") {
 		print $fh "\$ModLoad imtcp\n";
 		print $fh "\$InputTCPServerRun $listenport\n";
+	}
+	if ($self->{tls}) {
+		print $fh "\$InputTCPServerStreamDriverMode 1\n";
+		print $fh "\$InputTCPServerStreamDriverAuthMode anon\n";
 	}
 	print $fh "*.*	$self->{outfile}\n";
 	print $fh $self->{conf} if $self->{conf};
