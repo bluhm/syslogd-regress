@@ -48,7 +48,15 @@ sub new {
 
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
-	if ($self->{tls}) {
+	if ($listenproto eq "udp") {
+		print $fh "\$ModLoad imudp\n";
+		print $fh "\$UDPServerRun $listenport\n";
+	}
+	if ($listenproto eq "tcp") {
+		print $fh "\$ModLoad imtcp\n";
+		print $fh "\$InputTCPServerRun $listenport\n";
+	}
+	if ($listenproto eq "tls") {
 		print $fh "\$DefaultNetstreamDriver gtls\n";
 		my %cert = (
 		    CA   => "ca-cert.pem",
@@ -59,18 +67,10 @@ sub new {
 			_make_abspath(\$v);
 			print $fh "\$DefaultNetstreamDriver${k}File $v\n";
 		}
-	}
-	if ($listenproto eq "udp") {
-		print $fh "\$ModLoad imudp\n";
-		print $fh "\$UDPServerRun $listenport\n";
-	}
-	if ($listenproto eq "tcp") {
 		print $fh "\$ModLoad imtcp\n";
-		print $fh "\$InputTCPServerRun $listenport\n";
-	}
-	if ($self->{tls}) {
 		print $fh "\$InputTCPServerStreamDriverMode 1\n";
 		print $fh "\$InputTCPServerStreamDriverAuthMode anon\n";
+		print $fh "\$InputTCPServerRun $listenport\n";
 	}
 	print $fh "*.*	$self->{outfile}\n";
 	print $fh $self->{conf} if $self->{conf};

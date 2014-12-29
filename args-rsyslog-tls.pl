@@ -15,8 +15,7 @@ our %args = (
 	late => 1,  # connect after the listen socket has been created
     },
     rsyslogd => {
-	tls => 1,
-	listen => { proto => "tcp" },
+	listen => { proto => "tls" },
     },
 );
 
