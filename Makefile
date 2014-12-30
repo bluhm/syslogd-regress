@@ -31,8 +31,8 @@ TARGETS ?=		${ARGS}
 TARGETS ?=		${ARGS:Nargs-rsyslog*}
 .endif
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
-CLEANFILES +=		*.log *.log.? *.pem *.key *.ser *.conf stamp-*
-CLEANFILES +=		*.out *.sock ktrace.out *.ktrace *.fstat
+CLEANFILES +=		*.log *.log.? *.pem *.req *.crt *.key *.srl *.conf
+CLEANFILES +=		stamp-* *.out *.sock ktrace.out *.ktrace *.fstat
 
 .MAIN: all
 
@@ -67,16 +67,16 @@ run-regress-$a: $a
 
 # create the certificates for TLS
 
-ca-cert.pem:
-	openssl req -batch -new -nodes -newkey rsa -keyout ca-key.pem -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -x509 -out ca-cert.pem
+ca.crt:
+	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -nodes -newkey rsa -keyout ca.key -x509 -out ca.crt
 
-server-req.pem:
-	openssl req -batch -new -nodes -newkey rsa -keyout server-key.pem -subj /L=OpenBSD/O=syslogd-regress/OU=server/CN=localhost/ -out server-req.pem
+server.req:
+	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=server/CN=localhost/ -nodes -newkey rsa -keyout server.key -out server.req
 
-server-cert.pem: ca-cert.pem server-req.pem
-	openssl x509 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -req -in server-req.pem -out server-cert.pem
+server.crt: ca.crt server.req
+	openssl x509 -CAcreateserial -CAkey ca.key -CA ca.crt -req -in server.req -out server.crt
 
-${REGRESS_TARGETS:M*tls*}: server-cert.pem
+${REGRESS_TARGETS:M*tls*}: server.crt
 
 # make perl syntax check for all args files
 
