@@ -47,8 +47,8 @@ sub new {
 	    Domain		=> $self->{listendomain},
 	    $self->{listenaddr} ? (LocalAddr => $self->{listenaddr}) : (),
 	    $self->{listenport} ? (LocalPort => $self->{listenport}) : (),
-	    SSL_key_file	=> "server-key.pem",
-	    SSL_cert_file	=> "server-cert.pem",
+	    SSL_key_file	=> "server.key",
+	    SSL_cert_file	=> "server.crt",
 	    SSL_verify_mode	=> SSL_VERIFY_NONE,
 	) or die ref($self), " $iosocket socket listen failed: $!,$SSL_ERROR";
 	if ($self->{listenproto} eq "tcp") {

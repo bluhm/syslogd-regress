@@ -31,8 +31,9 @@ TARGETS ?=		${ARGS}
 TARGETS ?=		${ARGS:Nargs-rsyslog*}
 .endif
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
-CLEANFILES +=		*.log *.log.? *.pem *.req *.crt *.key *.srl *.conf
-CLEANFILES +=		stamp-* *.out *.sock ktrace.out *.ktrace *.fstat
+CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
+CLEANFILES +=		*.out *.sock *.ktrace *.fstat
+CLEANFILES +=		*.pem *.req *.crt *.key *.srl
 
 .MAIN: all
 
@@ -65,7 +66,7 @@ run-regress-$a: $a
 	time SUDO=${SUDO} KTRACE=${KTRACE} SYSLOGD=${SYSLOGD} perl ${PERLINC} ${PERLPATH}syslogd.pl ${PERLPATH}$a
 .endfor
 
-# create the certificates for TLS
+# create certificates for TLS
 
 ca.crt:
 	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -nodes -newkey rsa -keyout ca.key -x509 -out ca.crt
