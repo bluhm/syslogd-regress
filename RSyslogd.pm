@@ -59,9 +59,9 @@ sub new {
 	if ($listenproto eq "tls") {
 		print $fh "\$DefaultNetstreamDriver gtls\n";
 		my %cert = (
-		    CA   => "ca-cert.pem",
-		    Cert => "server-cert.pem",
-		    Key  => "server-key.pem",
+		    CA   => "ca.crt",
+		    Cert => "server.crt",
+		    Key  => "server.key",
 		);
 		while(my ($k, $v) = each %cert) {
 			_make_abspath(\$v);
