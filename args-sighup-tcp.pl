@@ -3,7 +3,7 @@
 # The syslogd passes it via TCP to the loghost.
 # The server receives the message on its TCP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that a SIGHUP reconnects the TCP stream.
+# Check that a SIGHUP reconnects the TCP stream and closes the socket.
 
 use strict;
 use warnings;
@@ -21,6 +21,7 @@ our %args = (
     },
     syslogd => {
 	ktrace => 1,
+	fstat => 1,
 	kdump => {
 	    qr/syslogd  PSIG  SIGHUP caught handler/ => 1,
 	    qr/syslogd  RET   execve 0/ => 1,
@@ -48,6 +49,8 @@ our %args = (
 		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
 		    or die ref($self), " no 'syslogd: restarted' between logs";
 		print STDERR "Signal\n";
+		# regeneate fstat file
+		${$self->{syslogd}}->fstat();
 		$self->{redo}++;
 	    });
 	},
@@ -57,14 +60,11 @@ our %args = (
 	    qr/Accepted/ => 2,
 	},
     },
-    check => sub {
-	my $self = shift;
-	my $r = $self->{syslogd};
-	foreach my $name (qw(file pipe)) {
-		my $file = $r->{"out$name"}.".0";
-		my $pattern = (get_between2loggrep())[0];
-		check_pattern($name, $file, $pattern, \&filegrep);
-	}
+    fstat => {
+	loggrep => {
+	    # sighup must not leak a TCP socket
+	    qr/internet stream tcp/ => 1,
+	},
     },
 );
 
