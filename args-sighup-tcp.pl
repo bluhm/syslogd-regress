@@ -35,14 +35,20 @@ our %args = (
     },
     server => {
 	listen => { domain => AF_INET, addr => "127.0.0.1", proto => "tcp" },
+	redo => 0,
 	func => sub {
 	    my $self = shift;
 	    read_between2logs($self, sub {
+		if ($self->{redo}) {
+			$self->{redo}--;
+			return;
+		}
 		${$self->{syslogd}}->rotate();
 		${$self->{syslogd}}->kill_syslogd('HUP');
 		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
 		    or die ref($self), " no 'syslogd: restarted' between logs";
 		print STDERR "Signal\n";
+		$self->{redo}++;
 	    });
 	},
 	loggrep => { get_between2loggrep() },

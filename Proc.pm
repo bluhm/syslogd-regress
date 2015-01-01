@@ -112,9 +112,11 @@ sub run {
 		system(@cmd)
 		    and die ref($self), " system '@cmd' failed: $?";
 	}
-	$self->child();
-	print STDERR $self->{up}, "\n";
-	$self->{func}->($self);
+	do {
+		$self->child();
+		print STDERR $self->{up}, "\n";
+		$self->{func}->($self);
+	} while ($self->{redo});
 	print STDERR "Shutdown", "\n";
 
 	IO::Handle::flush(\*STDOUT);
