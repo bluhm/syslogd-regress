@@ -134,7 +134,7 @@ sub read_message {
 		# reading udp packets works only with sysread()
 		defined(my $n = sysread(STDIN, $_, 8194))
 		    or die ref($self), " read log line failed: $!";
-		last unless $n;
+		last if $n == 0;
 		chomp;
 		print STDERR ">>> $_\n";
 		last if /$regex/;
