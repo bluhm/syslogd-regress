@@ -51,7 +51,11 @@ our %args = (
 		$self->{redo}++;
 	    });
 	},
-	loggrep => { get_between2loggrep() },
+	loggrep => {
+	    get_between2loggrep(),
+	    qr/Signal/ => 1,
+	    qr/Accepted/ => 2,
+	},
     },
     check => sub {
 	my $self = shift;
