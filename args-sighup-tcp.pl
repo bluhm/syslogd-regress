@@ -1,9 +1,9 @@
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
+# The syslogd passes it via TCP to the loghost.
+# The server receives the message on its TCP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that a SIGHUP reopens logfile and restarts pipe.
+# Check that a SIGHUP reconnects the TCP stream.
 
 use strict;
 use warnings;
@@ -25,6 +25,7 @@ our %args = (
 	    qr/syslogd  PSIG  SIGHUP caught handler/ => 1,
 	    qr/syslogd  RET   execve 0/ => 1,
 	},
+	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => {
 	    qr/config file changed: dying/ => 0,
 	    qr/config file modified: restarting/ => 0,
@@ -33,6 +34,7 @@ our %args = (
 	},
     },
     server => {
+	listen => { domain => AF_INET, addr => "127.0.0.1", proto => "tcp" },
 	func => sub {
 	    my $self = shift;
 	    read_between2logs($self, sub {
