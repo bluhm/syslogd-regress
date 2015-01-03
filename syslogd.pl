@@ -100,6 +100,7 @@ $c = Client->new(
 ) unless $args{client}{noclient};
 ($rc, $c) = ($c, $rc) if $rc;  # chain client -> rsyslogd -> syslogd
 
+$c->run->up if !$args{client}{noclient} && $c->{early};
 $r->run unless $r->{late};
 $s->run->up unless $args{server}{noserver};
 $r->run if $r->{late};
@@ -117,7 +118,7 @@ foreach (@m) {
 		$_->kill('STOP');
 	}
 }
-$c->run->up unless $args{client}{noclient};
+$c->run->up if !$args{client}{noclient} && !$c->{early};
 $rc->run->up if $args{rsyslogd}{connect};
 
 $c->down unless $args{client}{noclient};
