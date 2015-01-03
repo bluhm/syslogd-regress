@@ -94,6 +94,7 @@ $c = Client->new(
     server              => \$s,
 ) unless $args{client}{noclient};
 
+$c->run->up if !$args{client}{noclient} && $c->{early};
 $r->run unless $r->{late};
 $s->run->up unless $args{server}{noserver};
 $r->run if $r->{late};
@@ -111,7 +112,7 @@ foreach (@m) {
 		$_->kill('STOP');
 	}
 }
-$c->run->up unless $args{client}{noclient};
+$c->run->up if !$args{client}{noclient} && !$c->{early};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};
