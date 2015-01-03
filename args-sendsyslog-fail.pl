@@ -1,7 +1,8 @@
 # Run client before starting syslogd.
 # The client writes a message to Sys::Syslog native method.
-# The kernel write an sendsyslog(2) error message to its dmesg log buffer.
+# The kernel writes a sendsyslog(2) error message to its dmesg log buffer.
 # Start syslogd, it reads the message from klog device.
+# Client writes messages until the kernel rate limit is exceeded.
 # Find the kernel error message in file, pipe, syslogd, server log.
 # Create a ktrace dump of the client and check that sendsyslog(2) has failed.
 
@@ -14,9 +15,16 @@ our %args = (
     client => {
 	early => 1,
 	ktrace => 1,
+	func => sub {
+	    my $self = shift;
+	    write_log($self, @_);
+	    until (${$self->{syslogd}}->loggrep($kernlog, 1)) {
+		write_message($self, "syslogd regress sendsyslog rate limit");
+	    }
+	},
 	kdump => {
-	    qr/CALL  sendsyslog/ => 2,
-	    qr/RET   sendsyslog -1 errno 57 Socket is not connected/ => 2,
+	    qr/CALL  sendsyslog/ => '>=2',
+	    qr/RET   sendsyslog -1 errno 57 Socket is not connected/ => '>=2',
 	},
     },
     syslogd => {
