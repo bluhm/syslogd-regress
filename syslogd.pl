@@ -121,7 +121,7 @@ foreach (@m) {
 $c->run->up if !$args{client}{noclient} && !$c->{early};
 $rc->run->up if $args{rsyslogd}{connect};
 
-$c->down unless $args{client}{noclient};
+$c->down if !$args{client}{noclient} && !$c->{early};
 $s->down unless $args{server}{noserver};
 foreach (@m) {
 	if ($_->{stop}) {
@@ -135,6 +135,7 @@ foreach (@m) {
 }
 $r->kill_child;
 $r->down;
+$c->down if !$args{client}{noclient} && $c->{early};
 
 $args{check}->({client => $c, syslogd => $r, server => $s}) if $args{check};
 check_logs($c, $r, $s, \@m, %args);
