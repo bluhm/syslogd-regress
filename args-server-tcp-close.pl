@@ -15,7 +15,7 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    ${$self->{syslogd}}->loggrep("loghost .* connection close", 2)
-		or die "connection close in syslogd.log";
+		or die "no connection close in syslogd.log";
 	    write_log($self, @_);
 	},
     },
@@ -29,7 +29,13 @@ our %args = (
     },
     server => {
 	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
-	func => sub {},
+	func => sub {
+	    my $self = shift;
+	    shutdown(\*STDOUT, 1)
+		or die "shutdown write failed: $!";
+	    ${$self->{syslogd}}->loggrep("loghost .* connection close", 2)
+		or die "no connection close in syslogd.log";
+	},
 	loggrep => {},
     },
     file => {
