@@ -9,6 +9,10 @@
 use strict;
 use warnings;
 use Socket;
+use Errno ':POSIX';
+
+my @errors = (EPIPE,ECONNRESET);
+my $errors = "(". join("|", map { $! = $_ } @errors). ")";
 
 our %args = (
     client => {
@@ -38,7 +42,7 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    qr/syslogd: loghost .* connection error: Connection reset by peer/
+	    qr/syslogd: loghost .* connection error: $errors/
 		=> 1,
 	},
     },
