@@ -19,7 +19,7 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    ${$self->{syslogd}}->loggrep("loghost .* connection error", 5)
-		or die "connection error in syslogd.log";
+		or die "no connection error in syslogd.log";
 	    write_log($self, @_);
 	},
     },
