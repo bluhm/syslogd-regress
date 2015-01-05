@@ -15,20 +15,16 @@ our %args = (
     client => {
 	early => 1,
 	ktrace => 1,
-	func => sub {
-	    my $self = shift;
-	    write_log($self, @_);
-	    until (${$self->{syslogd}}->loggrep($kernlog, 1)) {
-		write_message($self, "syslogd regress sendsyslog rate limit");
-	    }
-	},
 	kdump => {
 	    qr/CALL  sendsyslog/ => '>=2',
 	    qr/RET   sendsyslog -1 errno 57 Socket is not connected/ => '>=2',
 	},
     },
     syslogd => {
-	loggrep => $kernlog,
+	loggrep => {
+	    $kernlog => 2,
+	    qr/$kernlog \d+ more times/ => 1,
+	},
     },
     server => {
 	func => sub {
