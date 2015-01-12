@@ -68,6 +68,15 @@ sub listen {
 	return $self;
 }
 
+sub close {
+	my $self = shift;
+	$self->{ls}->close()
+	    or die ref($self)," ",ref($self->{ls}),
+	    " socket close failed: $!,$SSL_ERROR";
+	delete $self->{ls};
+	return $self;
+}
+
 sub child {
 	my $self = shift;
 
