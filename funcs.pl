@@ -131,10 +131,15 @@ sub read_message {
 
 	local $_;
 	for (;;) {
-		# reading udp packets works only with sysread()
-		defined(my $n = sysread(STDIN, $_, 8194))
-		    or die ref($self), " read log line failed: $!";
-		last if $n == 0;
+		if ($self->{listenproto} eq "udp") {
+			# reading udp packets works only with sysread()
+			defined(my $n = sysread(STDIN, $_, 8194))
+			    or die ref($self), " read log line failed: $!";
+			last if $n == 0;
+		} else {
+			defined($_ = <STDIN>)
+			    or last;
+		}
 		chomp;
 		print STDERR ">>> $_\n";
 		last if /$regex/;
