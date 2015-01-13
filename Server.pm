@@ -77,6 +77,12 @@ sub close {
 	return $self;
 }
 
+sub run {
+	my $self = shift;
+	Proc::run($self, @_);
+	return $self->close();
+}
+
 sub child {
 	my $self = shift;
 
