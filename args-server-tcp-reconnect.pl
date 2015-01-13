@@ -14,33 +14,50 @@ our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-	    ${$self->{syslogd}}->loggrep("loghost .* connection close", 5)
-		or die "no connection close in syslogd.log";
-	    write_log($self, @_);
+	    write_between2logs($self, sub {
+		${$self->{syslogd}}->loggrep("Connection refused", 5)
+		    or die "no connection refused in syslogd.log";
+	    });
 	},
     },
     syslogd => {
 	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => {
-	    qr/Logging to FORWTCP \@tcp:\/\/127.0.0.1:\d+/ => '>=4',
-	    get_testlog() => 1,
-	    qr/syslogd: loghost .* connection close/ => 2,
+	    qr/Logging to FORWTCP \@tcp:\/\/127.0.0.1:\d+/ => '>=6',
+	    qr/syslogd: connect .* Connection refused/ => '>=3',
+	    get_between2loggrep(),
 	},
     },
     server => {
 	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
+	redo => 0,
 	func => sub {
 	    my $self = shift;
-	    shutdown(\*STDOUT, 1)
-		or die "shutdown write failed: $!";
-	    ${$self->{syslogd}}->loggrep("loghost .* connection close", 5)
-		or die "no connection close in syslogd.log";
+	    read_between2logs($self, sub {
+		if ($self->{redo}) {
+		    $self->{redo}--;
+		    return;
+		}
+		$self->close();
+		shutdown(\*STDOUT, 1)
+		    or die "shutdown write failed: $!";
+		${$self->{syslogd}}->loggrep("Connection refused", 5)
+		    or die "no connection refused in syslogd.log";
+		$self->listen();
+		$self->{redo}++;
+	    });
 	},
-	loggrep => {},
+	loggrep => {
+	    qr/Accepted/ => 2,
+	    qr/syslogd: loghost .* connection close/ => 1,
+	    qr/syslogd: connect .* Connection refused/ => 1,
+	    get_between2loggrep(),
+	},
     },
     file => {
 	loggrep => {
-	    qr/syslogd: loghost .* connection close/ => 1,
+	    qr/syslogd: connect .* Connection refused/ => '>=1',
+	    get_between2loggrep(),
 	},
     },
 );
