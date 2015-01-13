@@ -1,10 +1,10 @@
 # The TCP server closes the connection to syslogd.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via IPv4 TCP to an explicit loghost.
-# The server receives the message on its TCP socket.
-# Find the message in client, pipe, syslogd log.
-# Check that syslogd writes a log message about the server close.
+# The syslogd does a TCP reconnect and passes it to loghost.
+# The server receives the message on its new accepted TCP socket.
+# Find the message in client, pipe, syslogd, server log.
+# Check that syslogd and server close and reopen the connection.
 
 use strict;
 use warnings;
