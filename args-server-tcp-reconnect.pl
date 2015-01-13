@@ -24,7 +24,7 @@ our %args = (
 	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => {
 	    qr/Logging to FORWTCP \@tcp:\/\/127.0.0.1:\d+/ => '>=6',
-	    qr/syslogd: connect .* Connection refused/ => '>=3',
+	    qr/syslogd: connect .* Connection refused/ => '>=2',
 	    get_between2loggrep(),
 	},
     },
