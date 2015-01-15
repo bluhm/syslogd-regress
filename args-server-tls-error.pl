@@ -38,8 +38,7 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    qr/syslogd: loghost .* connection error: read failed \(5\)/
-		=> 1,
+	    qr/syslogd: loghost .* connection error: read failed \(5\)/ => 1,
 	},
     },
 );
