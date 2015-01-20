@@ -13,7 +13,7 @@ our %args = (
     syslogd => {
 	loghost => '@tls://localhost:$connectport',
 	loggrep => {
-	    qr/Logging to FORWTLS \@tls:localhost:\d+/ => '>=4',
+	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
 	    get_testlog() => 1,
 	},
     },
