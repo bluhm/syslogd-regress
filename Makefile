@@ -68,24 +68,25 @@ run-regress-$a: $a
 
 # create certificates for TLS
 
-ca.crt:
-	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -nodes -newkey rsa -keyout ca.key -x509 -out ca.crt
+ca.crt fake-ca.crt:
+	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -nodes -newkey rsa -keyout ${@:R}.key -x509 -out $@
 
 server.req:
-	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=server/CN=localhost/ -nodes -newkey rsa -keyout server.key -out server.req
+	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=server/CN=localhost/ -nodes -newkey rsa -keyout ${@:R}.key -out $@
 
 server.crt: ca.crt server.req
-	openssl x509 -CAcreateserial -CAkey ca.key -CA ca.crt -req -in server.req -out server.crt
+	openssl x509 -CAcreateserial -CAkey ca.key -CA ca.crt -req -in ${@:R}.req -out $@
 
 empty:
-	true >empty
+	true >$@
 
 toobig:
-	dd if=/dev/zero of=toobig bs=1 count=1 seek=1G
+	dd if=/dev/zero of=$@ bs=1 count=1 seek=1G
 
 ${REGRESS_TARGETS:M*tls*}: server.crt
 ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
+${REGRESS_TARGETS:M*fake*}: fake-ca.crt
 
 # make perl syntax check for all args files
 
