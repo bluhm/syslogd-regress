@@ -1,9 +1,9 @@
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via TLS to 127.0.0.1 loghost.
-# Server certificate is issued for localhost.
+# The syslogd passes it via TLS to localhost loghost.
+# The cafile does not exist.
 # Find the message in client, file, pipe, syslogd log.
-# Check that syslogd denies host `127.0.0.1' and server has no message.
+# Check that syslogd has verify failure and server has no message.
 
 use strict;
 use warnings;
@@ -11,18 +11,22 @@ use Socket;
 
 our %args = (
     syslogd => {
-	loghost => '@tls://127.0.0.1:$connectport',
+	loghost => '@tls://localhost:$connectport',
 	loggrep => {
-	    qr/Logging to FORWTLS \@tls:\/\/127.0.0.1:\d+/ => '>=4',
-	    qr/error: host `127.0.0.1' not present in server/ => '>=1',
+	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
+	    qr/error: ssl verify setup failure/ => 2,
 	    get_testlog() => 1,
 	},
-	cacrt => "ca.crt",
+	cacrt => "noexist",
     },
     server => {
-	listen => { domain => AF_INET, proto => "tls", addr => "127.0.0.1" },
+	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
+	up => "IO::Socket::SSL socket accept failed",
+	down => "Server",
+	exit => 255,
 	loggrep => {
-	    qr/listen sock: 127.0.0.1 \d+/ => 1,
+	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
+	    qr/SSL accept attempt failed because of handshake problems/ => 1,
 	    get_testlog() => 0,
 	},
     },
