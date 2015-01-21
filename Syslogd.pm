@@ -56,7 +56,7 @@ sub new {
 	open(my $fh, '>', $self->{conffile})
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	print $fh "*.*\t$self->{outfile}\n";
-	print $fh "*.*\t|dd of=$self->{outpipe} status=none\n";
+	print $fh "*.*\t|dd of=$self->{outpipe}\n";
 	my $memory = $self->{memory};
 	print $fh "*.*\t:$memory->{size}:$memory->{name}\n" if $memory;
 	my $loghost = $self->{loghost};
