@@ -18,7 +18,7 @@ our %args = (
 	    qr/error: ssl verify setup failure/ => 2,
 	    get_testlog() => 1,
 	},
-	cacrt => "big",
+	cacrt => "toobig",
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },

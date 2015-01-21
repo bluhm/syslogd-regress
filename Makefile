@@ -33,7 +33,7 @@ TARGETS ?=		${ARGS:Nargs-rsyslog*}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat
-CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty big
+CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty toobig
 
 .MAIN: all
 
@@ -80,12 +80,12 @@ server.crt: ca.crt server.req
 empty:
 	true >empty
 
-big:
-	dd if=/dev/zero of=big bs=1 count=1 seek=1G
+toobig:
+	dd if=/dev/zero of=toobig bs=1 count=1 seek=1G
 
 ${REGRESS_TARGETS:M*tls*}: server.crt
 ${REGRESS_TARGETS:M*empty*}: empty
-${REGRESS_TARGETS:M*big*}: big
+${REGRESS_TARGETS:M*toobig*}: toobig
 
 # make perl syntax check for all args files
 
