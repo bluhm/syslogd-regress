@@ -33,7 +33,7 @@ TARGETS ?=		${ARGS:Nargs-rsyslog*}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat
-CLEANFILES +=		*.pem *.req *.crt *.key *.srl
+CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty big
 
 .MAIN: all
 
@@ -77,7 +77,15 @@ server.req:
 server.crt: ca.crt server.req
 	openssl x509 -CAcreateserial -CAkey ca.key -CA ca.crt -req -in server.req -out server.crt
 
+empty:
+	true >empty
+
+big:
+	dd if=/dev/zero of=big bs=1 count=1 seek=1G
+
 ${REGRESS_TARGETS:M*tls*}: server.crt
+${REGRESS_TARGETS:M*empty*}: empty
+${REGRESS_TARGETS:M*big*}: big
 
 # make perl syntax check for all args files
 
