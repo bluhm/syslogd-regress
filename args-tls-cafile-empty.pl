@@ -1,7 +1,7 @@
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via TLS to localhost loghost.
-# The cafile does not exist.
+# The cafile is empty.
 # Find the message in client, file, pipe, syslogd log.
 # Check that syslogd has verify failure and server has no message.
 
@@ -13,12 +13,12 @@ our %args = (
     syslogd => {
 	loghost => '@tls://localhost:$connectport',
 	loggrep => {
-	    qr/open CAfile: No such file or directory/ => 2,
+	    qr/CAfile empty, size 0/ => 1,
 	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
-	    qr/error: ssl verify setup failure/ => 2,
+	    qr/error: ssl verify memory setup failure/ => 2,
 	    get_testlog() => 1,
 	},
-	cacrt => "noexist",
+	cacrt => "empty",
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
