@@ -116,7 +116,8 @@ sub child {
 	my @cmd = (@sudo, @libevent, @ktrace, $syslogd, "-d",
 	    "-f", $self->{conffile});
 	push @cmd, "-V", unless $self->{cacrt};
-	push @cmd, "-C", $self->{cacrt} if $self->{cacrt};
+	push @cmd, "-C", $self->{cacrt}
+	    if $self->{cacrt} && $self->{cacrt} ne "default";
 	push @cmd, "-s", $self->{ctlsock} if $self->{ctlsock};
 	push @cmd, @{$self->{options}} if $self->{options};
 	print STDERR "execute: @cmd\n";
