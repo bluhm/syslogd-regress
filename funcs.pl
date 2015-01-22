@@ -233,6 +233,10 @@ sub loggrep {
 sub check_out {
 	my ($r, %args) = @_;
 
+	unless ($args{pipe}{nocheck}) {
+		$r->loggrep("bytes transferred", 1) or sleep 1;
+	}
+
 	foreach my $name (qw(file pipe)) {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or die;
