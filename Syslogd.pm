@@ -115,8 +115,9 @@ sub child {
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	my @cmd = (@sudo, @libevent, @ktrace, $syslogd, "-d",
 	    "-f", $self->{conffile});
-	push @cmd, "-V", unless $self->{cacrt};
-	push @cmd, "-C", $self->{cacrt}
+	push @cmd, "-S", "dont"
+	    unless $self->{cacrt};
+	push @cmd, "-S", "cafile=$self->{cacrt}"
 	    if $self->{cacrt} && $self->{cacrt} ne "default";
 	push @cmd, "-s", $self->{ctlsock} if $self->{ctlsock};
 	push @cmd, @{$self->{options}} if $self->{options};
