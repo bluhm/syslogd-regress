@@ -119,6 +119,8 @@ sub child {
 	    unless $self->{cacrt};
 	push @cmd, "-S", "cafile=$self->{cacrt}"
 	    if $self->{cacrt} && $self->{cacrt} ne "default";
+	push @cmd, "-S", "ciphers=$self->{ciphers}"
+	    if defined $self->{ciphers};
 	push @cmd, "-s", $self->{ctlsock} if $self->{ctlsock};
 	push @cmd, @{$self->{options}} if $self->{options};
 	print STDERR "execute: @cmd\n";
