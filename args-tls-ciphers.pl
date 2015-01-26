@@ -3,7 +3,7 @@
 # The syslogd passes it via TLS to localhost loghost.
 # The server receives the message on its TLS socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that syslogd and server log contain localhost address.
+# Check that syslogd and server log contains specified cipher.
 
 use strict;
 use warnings;
@@ -17,11 +17,13 @@ our %args = (
 	    get_testlog() => 1,
 	},
 	cacrt => "ca.crt",
+	ciphers => "AES128-SHA",
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	loggrep => {
 	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
+	    qr/cipher: AES128-SHA/ => 1,
 	    get_testlog() => 1,
 	},
     },
