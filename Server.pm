@@ -96,6 +96,10 @@ sub child {
 		print STDERR "accept peer: ",$as->peerhost()," ",
 		    $as->peerport(),"\n";
 	}
+	if ($self->{listenproto} eq "tls") {
+		print STDERR "sslversion: ",$as->get_sslversion(),"\n";
+		print STDERR "cipher: ",$as->get_cipher(),"\n";
+	}
 
 	*STDIN = *STDOUT = $self->{as} = $as;
 }
