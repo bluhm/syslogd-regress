@@ -55,6 +55,8 @@ sub listen {
 	    SSL_key_file	=> "server.key",
 	    SSL_cert_file	=> "server.crt",
 	    SSL_verify_mode	=> SSL_VERIFY_NONE,
+	    $self->{sslversion} ? (SSL_version => $self->{sslversion}) : (),
+	    $self->{sslciphers} ? (SSL_cipher_list => $self->{sslciphers}) : (),
 	) or die ref($self), " $iosocket socket listen failed: $!,$SSL_ERROR";
 	if ($self->{listenproto} ne "udp") {
 		listen($ls, 1)
@@ -98,7 +100,7 @@ sub child {
 	}
 	if ($self->{listenproto} eq "tls") {
 		print STDERR "sslversion: ",$as->get_sslversion(),"\n";
-		print STDERR "cipher: ",$as->get_cipher(),"\n";
+		print STDERR "sslcipher: ",$as->get_cipher(),"\n";
 	}
 
 	*STDIN = *STDOUT = $self->{as} = $as;
