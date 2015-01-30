@@ -109,6 +109,11 @@ sub write_char {
 	write_message($self, $msg);
 }
 
+sub write_length {
+	write_char(@_);
+	write_log(@_);
+}
+
 sub write_unix {
 	my $self = shift;
 	my $path = shift || "/dev/log";
