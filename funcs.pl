@@ -93,20 +93,22 @@ sub write_shutdown {
 
 sub write_char {
 	my $self = shift;
-	my $len = shift // $self->{len} // 251;
+	my @lenghts = @_ || @{$self->{lengths}};
 
-	my $msg = "";
-	my $char = '0';
-	for (my $i = 1; $i < $len; $i++) {
-		$msg .= $char;
-		given ($char) {
-			when(/9/)       { $char = 'A' }
-			when(/Z/)       { $char = 'a' }
-			when(/z/)       { $char = '0' }
-			default         { $char++ }
+	foreach my $len (@lenghts) {
+		my $msg = "";
+		my $char = '0';
+		for (my $i = 0; $i < $len; $i++) {
+			$msg .= $char;
+			given ($char) {
+				when(/9/)       { $char = 'A' }
+				when(/Z/)       { $char = 'a' }
+				when(/z/)       { $char = '0' }
+				default         { $char++ }
+			}
 		}
+		write_message($self, $msg);
 	}
-	write_message($self, $msg);
 }
 
 sub write_length {
