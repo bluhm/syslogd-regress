@@ -16,18 +16,18 @@ our %args = (
     client => {
 	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
 	func => \&write_length,
-	lengths => [ 8190..8193 ],
+	lengths => [ 8190..8193,9000 ],
     },
     syslogd => {
 	options => ["-u"],
 	loggrep => {
-	    $msg => 4,
+	    $msg => 5,
 	}
     },
     server => {
 	# >>> <13>Jan 31 00:10:11 0123456789ABC...lmn
 	loggrep => {
-	    qr/^>>> .{8192}$/ => 4,
+	    qr/^>>> .{8192}$/ => 5,
 	},
     },
     file => {
@@ -35,7 +35,7 @@ our %args = (
 	loggrep => {
 	    qr/^.{8216}$/ => 1,
 	    qr/^.{8217}$/ => 1,
-	    qr/^.{8218}$/ => 2,
+	    qr/^.{8218}$/ => 3,
 	},
     },
 );
