@@ -30,6 +30,7 @@ sub new {
 	$args{logfile} ||= "client.log";
 	$args{up} ||= "Openlog";
 	my $self = Proc::new($class, %args);
+	$self->{connectproto} ||= "udp";
 	return $self;
 }
 
@@ -38,7 +39,7 @@ sub child {
 
 	if (defined($self->{connectdomain})) {
 		my $cs = IO::Socket::INET6->new(
-		    Proto               => "udp",
+		    Proto               => $self->{connectproto},
 		    Domain              => $self->{connectdomain},
 		    PeerAddr            => $self->{connectaddr},
 		    PeerPort            => $self->{connectport},
