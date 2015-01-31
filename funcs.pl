@@ -106,9 +106,12 @@ sub write_char {
 	my @lenghts = @_ || @{$self->{lengths}};
 
 	foreach my $len (@lenghts) {
+		my $tail = $self->{tail};
+		substr($tail, 0, length($tail) - $len, "")
+		    if length($tail) && length($tail) > $len;
 		my $msg = "";
 		my $char = '0';
-		for (my $i = 0; $i < $len; $i++) {
+		for (my $i = 0; $i < $len - length($tail); $i++) {
 			$msg .= $char;
 			given ($char) {
 				when(/9/)       { $char = 'A' }
@@ -117,6 +120,7 @@ sub write_char {
 				default         { $char++ }
 			}
 		}
+		$msg .= $tail if length($tail);
 		write_message($self, $msg);
 	}
 }
