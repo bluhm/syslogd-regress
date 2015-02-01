@@ -3,8 +3,8 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
+# Check that lines in server have 1180 bytes line length.
 # Check that lines in file have 8192 bytes message length after the header.
-# Check that lines in server have 8192 bytes line length.
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our %args = (
 	# >>> <13>Jan 31 00:10:11 0123456789ABC...lmn
 	loggrep => {
 	    $msg => 5,
-	    qr/^>>> .{8192}$/ => 5,
+	    qr/^>>> .{1180}$/ => 5,
 	},
     },
     file => {

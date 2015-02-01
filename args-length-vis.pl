@@ -2,7 +2,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, server log.
+# Find the message in client, file, pipe, syslogd log.
 # Check that lines with visual encoding at the end are truncated.
 
 use strict;
@@ -23,13 +23,6 @@ our %args = (
 	loggrep => {
 	    $msg => 11,
 	}
-    },
-    server => {
-	# >>> <13>Jan 31 00:10:11 0123456789ABC...lmn
-	loggrep => {
-	    $msg => 11,
-	    qr/^>>> .{8192}$/ => 11,
-	},
     },
     file => {
 	# Jan 31 00:12:39 localhost 0123456789ABC...567
