@@ -29,6 +29,7 @@ our %args = (
 	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
 	# >>> <13>Jan 31 00:10:11 0123456789ABC...567
 	loggrep => {
+	    $msg => 5,
 	    qr/^>>> .{19} .{8190}$/ => 1,
 	    qr/^>>> .{19} .{8191}$/ => 1,
 	    qr/^>>> .{19} .{8192}$/ => 3,
@@ -37,6 +38,7 @@ our %args = (
     file => {
 	# Jan 31 00:12:39 localhost 0123456789ABC...567
 	loggrep => {
+	    $msg => 5,
 	    qr/^.{8216}$/ => 1,
 	    qr/^.{8217}$/ => 1,
 	    qr/^.{8218}$/ => 3,
