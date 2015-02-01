@@ -13,7 +13,7 @@ my $msg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 our %args = (
     client => {
-	logsock => { type => "unix" },
+	connect => { domain => AF_UNIX },
 	func => \&write_length,
 	lengths => [ 8190..8193,9000 ],
     },
@@ -23,12 +23,12 @@ our %args = (
 	}
     },
     file => {
-	# Jan 31 00:12:39 localhost 0123456789ABC...567
+	# Feb  2 00:43:36 hostname 0123456789ABC...567
 	loggrep => {
 	    $msg => 5,
-	    qr/^.{25} .{8190}$/ => 1,
-	    qr/^.{25} .{8191}$/ => 1,
-	    qr/^.{25} .{8192}$/ => 3,
+	    qr/^.{15} \S{1,256} .{8190}$/ => 1,
+	    qr/^.{15} \S{1,256} .{8191}$/ => 1,
+	    qr/^.{15} \S{1,256} .{8192}$/ => 3,
 	},
     },
 );

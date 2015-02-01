@@ -38,16 +38,26 @@ sub child {
 	my $self = shift;
 
 	if (defined($self->{connectdomain})) {
-		my $cs = IO::Socket::INET6->new(
-		    Proto               => $self->{connectproto},
-		    Domain              => $self->{connectdomain},
-		    PeerAddr            => $self->{connectaddr},
-		    PeerPort            => $self->{connectport},
-		) or die ref($self), " socket connect failed: $!";
-		print STDERR "connect sock: ",$cs->sockhost()," ",
-		    $cs->sockport(),"\n";
-		print STDERR "connect peer: ",$cs->peerhost()," ",
-		    $cs->peerport(),"\n";
+		my $cs;
+		if ($self->{connectdomain} == AF_UNIX) {
+			$cs = IO::Socket::UNIX->new(
+			    Type => SOCK_DGRAM,
+			    Peer => $self->{connectpath} || "/dev/log",
+			) or die ref($self), " socket unix failed: $!";
+			$cs->setsockopt(SOL_SOCKET, SO_SNDBUF, 10000)
+			    or die ref($self), " setsockopt failed: $!";
+		} else {
+			$cs = IO::Socket::INET6->new(
+			    Proto               => $self->{connectproto},
+			    Domain              => $self->{connectdomain},
+			    PeerAddr            => $self->{connectaddr},
+			    PeerPort            => $self->{connectport},
+			) or die ref($self), " socket connect failed: $!";
+			print STDERR "connect sock: ",$cs->sockhost()," ",
+			    $cs->sockport(),"\n";
+			print STDERR "connect peer: ",$cs->peerhost()," ",
+			    $cs->peerport(),"\n";
+		}
 
 		*STDIN = *STDOUT = $self->{cs} = $cs;
 	}
