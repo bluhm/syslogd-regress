@@ -1,4 +1,4 @@
-# The client writes a message to Sys::Syslog unix method.
+# The client writes long messages to unix domain socket /dev/log.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
