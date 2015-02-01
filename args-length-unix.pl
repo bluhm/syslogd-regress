@@ -1,9 +1,8 @@
-# The client writes long messages to UDP socket.
+# The client writes a message to Sys::Syslog unix method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that lines in server have 1180 bytes line length.
 # Check that lines in file have 8192 bytes message length after the header.
 
 use strict;
@@ -14,22 +13,14 @@ my $msg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 our %args = (
     client => {
-	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
+	logsock => { type => "unix" },
 	func => \&write_length,
 	lengths => [ 8190..8193,9000 ],
     },
     syslogd => {
-	options => ["-u"],
 	loggrep => {
 	    $msg => 5,
 	}
-    },
-    server => {
-	# >>> <13>Jan 31 00:10:11 0123456789ABC...lmn
-	loggrep => {
-	    $msg => 5,
-	    qr/^>>> .{1180}$/ => 5,
-	},
     },
     file => {
 	# Jan 31 00:12:39 localhost 0123456789ABC...567
