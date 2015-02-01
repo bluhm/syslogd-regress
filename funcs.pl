@@ -106,7 +106,7 @@ sub write_char {
 	my @lenghts = @_ || @{$self->{lengths}};
 
 	foreach my $len (@lenghts) {
-		my $tail = $self->{tail};
+		my $tail = $self->{tail} // "";
 		substr($tail, 0, length($tail) - $len, "")
 		    if length($tail) && length($tail) > $len;
 		my $msg = "";
