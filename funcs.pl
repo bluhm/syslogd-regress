@@ -103,15 +103,16 @@ sub write_shutdown {
 
 sub write_char {
 	my $self = shift;
-	my @lenghts = @_ || @{$self->{lengths}};
+	my @lenghts = @{shift || $self->{lengths}};
+	my $tail = shift // $self->{tail};
 
 	foreach my $len (@lenghts) {
-		my $tail = $self->{tail} // "";
-		substr($tail, 0, length($tail) - $len, "")
-		    if length($tail) && length($tail) > $len;
+		my $t = $tail // "";
+		substr($t, 0, length($t) - $len, "")
+		    if length($t) && length($t) > $len;
 		my $msg = "";
 		my $char = '0';
-		for (my $i = 0; $i < $len - length($tail); $i++) {
+		for (my $i = 0; $i < $len - length($t); $i++) {
 			$msg .= $char;
 			given ($char) {
 				when(/9/)       { $char = 'A' }
@@ -120,7 +121,7 @@ sub write_char {
 				default         { $char++ }
 			}
 		}
-		$msg .= $tail if length($tail);
+		$msg .= $t if length($t);
 		write_message($self, $msg);
 	}
 }
