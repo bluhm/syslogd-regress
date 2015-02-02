@@ -17,9 +17,8 @@ my $msg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 our %args = (
     client => {
-	func => sub {
+	func => sub { write_between2logs(shift, sub {
 	    my $self = shift;
-	    write_message($self, get_firstlog());
 	    write_message($self, get_secondlog());
 	    foreach (1..300) {
 		write_char($self, [1024], $_);
@@ -27,40 +26,35 @@ our %args = (
 		sleep .01;
 	    }
 	    write_message($self, get_thirdlog());
-	    ${$self->{server}}->loggrep(get_secondlog(), 5)
+	    ${$self->{server}}->loggrep(get_secondlog(), 8)
 		or die ref($self), " server did not receive second log";
-	    write_message($self, get_testlog());
-	    write_shutdown($self);
-	},
+	})},
     },
     syslogd => {
 	loghost => '@tcp://localhost:$connectport',
 	loggrep => {
+	    get_between2loggrep(),
 	    $msg => 300,
-	    get_firstlog() => 1,
-	    get_testlog() => 1,
 	},
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
 	redo => 0,
-	func => sub {
+	func => sub { read_between2logs(shift, sub {
 	    my $self = shift;
-	    read_between2logs($self, sub {
-		if ($self->{redo}) {
-			$self->{redo}--;
-			return;
-		}
-		${$self->{client}}->loggrep(get_thirdlog(), 5)
-		    or die ref($self), " client did not send third log";
-		${$self->{syslogd}}->kill_syslogd('HUP');
-		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
-		    or die ref($self), " no 'syslogd: restarted' between logs";
-		# syslogd has shut down, read from kernel socket buffer
-		read_log($self);
-		$self->{redo}++;
-	    });
-	},
+	    if ($self->{redo}) {
+		    $self->{redo}--;
+		    return;
+	    }
+	    ${$self->{client}}->loggrep(get_thirdlog(), 5)
+		or die ref($self), " client did not send third log";
+	    ${$self->{syslogd}}->kill_syslogd('HUP');
+	    ${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
+		or die ref($self), " no 'syslogd: restarted' between logs";
+	    # syslogd has shut down, read from kernel socket buffer
+	    read_log($self);
+	    $self->{redo}++;
+	})},
 	loggrep => {
 	    get_between2loggrep(),
 	    get_secondlog() => 1,
