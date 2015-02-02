@@ -153,7 +153,7 @@ sub write_unix {
 sub read_log {
 	my $self = shift;
 
-	read_message($self, $downlog, @_);
+	read_message($self, $downlog);
 }
 
 sub read_between2logs {
@@ -161,12 +161,12 @@ sub read_between2logs {
 	my $func = shift;
 
 	unless ($self->{redo}) {
-		read_message($self, $firstlog, @_);
+		read_message($self, $firstlog);
 	}
 	$func->($self, @_);
 	unless ($self->{redo}) {
-		read_message($self, $testlog, @_);
-		read_message($self, $downlog, @_);
+		read_message($self, $testlog);
+		read_message($self, $downlog);
 	}
 }
 
