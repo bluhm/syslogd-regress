@@ -53,10 +53,12 @@ our %args = (
 	},
     },
     file => {
-	$msg => 300,
-	get_firstlog() => 1,
-	get_testlog() => 1,
-	qr/syslogd: loghost "\@tls:.*" dropped \d+ messages/ => 1,
+	loggrep => {
+	    $msg => 300,
+	    get_firstlog() => 1,
+	    get_testlog() => 1,
+	    qr/syslogd: loghost "\@tls:.*" dropped \d+ messages/ => 1,
+	},
     },
 );
 
