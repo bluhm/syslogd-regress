@@ -1,9 +1,9 @@
 # The client writes 300 messages to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via TCP to the loghost.
-# The server blocks the message on its TCP socket.
+# The syslogd passes it via TLS to the loghost.
+# The server blocks the message on its TLS socket.
 # The server waits until the client as written all messages.
-# The server receives the message on its TCP socket.
+# The server receives the message on its TLS socket.
 # The client waits until the server as read the first message.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check that the 300 messages are in syslogd and file log.
@@ -31,7 +31,7 @@ our %args = (
 	},
     },
     syslogd => {
-	loghost => '@tcp://localhost:$connectport',
+	loghost => '@tls://localhost:$connectport',
 	loggrep => {
 	    $msg => 300,
 	    get_firstlog() => 1,
@@ -39,7 +39,7 @@ our %args = (
 	},
     },
     server => {
-	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
+	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	func => sub {
 	    my $self = shift;
 	    ${$self->{client}}->loggrep(get_testlog(), 5)
@@ -48,14 +48,14 @@ our %args = (
 	},
 	loggrep => {
 	    get_firstlog() => 1,
-	    qr/syslogd: loghost "\@tcp:.*" dropped \d+ messages/ => 1,
+	    qr/syslogd: loghost "\@tls:.*" dropped \d+ messages/ => 1,
 	},
     },
     file => {
 	$msg => 300,
 	get_firstlog() => 1,
 	get_testlog() => 1,
-	qr/syslogd: loghost "\@tcp:.*" dropped \d+ messages/ => 1,
+	qr/syslogd: loghost "\@tls:.*" dropped \d+ messages/ => 1,
     },
 );
 
