@@ -197,6 +197,10 @@ sub get_testlog {
 	return $testlog;
 }
 
+sub get_firstlog {
+	return $firstlog;
+}
+
 sub get_between2loggrep {
 	return (
 	    qr/$firstlog/ => 1,
