@@ -50,7 +50,7 @@ our %args = (
 		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
 		    or die ref($self), " no 'syslogd: restarted' between logs";
 		print STDERR "Signal\n";
-		# regeneate fstat file
+		# regenerate fstat file
 		${$self->{syslogd}}->fstat();
 		$self->{redo}++;
 	    });
