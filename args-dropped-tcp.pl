@@ -11,6 +11,7 @@
 
 use strict;
 use warnings;
+use Socket;
 
 my $msg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
