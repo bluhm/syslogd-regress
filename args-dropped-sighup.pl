@@ -3,14 +3,15 @@
 # The syslogd passes it via TCP to the loghost.
 # The server blocks the message on its TCP socket.
 # The server waits until the client as written all messages.
-# The server receives the message on its TCP socket.
-# The client waits until the server as read the first message.
+# The server sends a SIGHUP to syslogd and reads messages from kernel.
+# The client waits until the server has read the first message.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check that the 300 messages are in syslogd and file log.
 # Check that the dropped message is in server and file log.
 
 use strict;
 use warnings;
+use Socket;
 
 my $msg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -19,14 +20,16 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    write_message($self, get_firstlog());
+	    write_message($self, get_secondlog());
 	    foreach (1..300) {
 		write_char($self, [1024], $_);
 		# if client sends too fast, syslogd will not see everything
 		sleep .01;
 	    }
+	    write_message($self, get_thirdlog());
+	    ${$self->{server}}->loggrep(get_secondlog(), 5)
+		or die ref($self), " server did not receive second log";
 	    write_message($self, get_testlog());
-	    ${$self->{server}}->loggrep(get_firstlog(), 5)
-		or die ref($self), " server did not receive firstlog";
 	    write_shutdown($self);
 	},
     },
@@ -40,22 +43,44 @@ our %args = (
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
+	redo => 0,
 	func => sub {
 	    my $self = shift;
-	    ${$self->{client}}->loggrep(get_testlog(), 5)
-		or die ref($self), " client did not send testlog";
-	    read_log($self, @_);
+	    read_between2logs($self, sub {
+		if ($self->{redo}) {
+			$self->{redo}--;
+			return;
+		}
+		${$self->{client}}->loggrep(get_thirdlog(), 5)
+		    or die ref($self), " client did not send third log";
+		${$self->{syslogd}}->kill_syslogd('HUP');
+		${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
+		    or die ref($self), " no 'syslogd: restarted' between logs";
+		# syslogd has shut down, read from kernel socket buffer
+		read_log($self);
+		$self->{redo}++;
+	    });
 	},
 	loggrep => {
-	    get_firstlog() => 1,
-	    qr/syslogd: loghost "\@tcp:.*" dropped \d+ messages/ => 1,
+	    get_between2loggrep(),
+	    get_secondlog() => 1,
+	    get_thirdlog() => 0,
+	    qr/syslogd: start/ => 1,
+	    qr/syslogd: restart/ => 1,
+	    $msg => 43,
+	    qr/syslogd: dropped 259 TCP or TLS messages/ => 1,
 	},
     },
     file => {
-	$msg => 300,
-	get_firstlog() => 1,
-	get_testlog() => 1,
-	qr/syslogd: loghost "\@tcp:.*" dropped \d+ messages/ => 1,
+	loggrep => {
+	    get_between2loggrep(),
+	    get_secondlog() => 1,
+	    get_thirdlog() => 1,
+	    qr/syslogd: start/ => 1,
+	    qr/syslogd: restart/ => 1,
+	    $msg => 300,
+	    qr/syslogd: dropped 259 TCP or TLS messages/ => 1,
+	},
     },
 );
 

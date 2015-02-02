@@ -27,6 +27,8 @@ use IO::Socket;
 use IO::Socket::INET6;
 
 my $firstlog = "syslogd regress test first message";
+my $secondlog = "syslogd regress test second message";
+my $thirdlog = "syslogd regress test third message";
 my $testlog = "syslogd regress test log message";
 my $downlog = "syslogd regress client shutdown";
 
@@ -199,6 +201,14 @@ sub get_testlog {
 
 sub get_firstlog {
 	return $firstlog;
+}
+
+sub get_secondlog {
+	return $secondlog;
+}
+
+sub get_thirdlog {
+	return $thirdlog;
 }
 
 sub get_between2loggrep {
