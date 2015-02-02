@@ -13,8 +13,6 @@ use strict;
 use warnings;
 use Socket;
 
-my $msg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 our %args = (
     client => {
 	func => sub { write_between2logs(shift, sub {
@@ -34,7 +32,7 @@ our %args = (
 	loghost => '@tls://localhost:$connectport',
 	loggrep => {
 	    get_between2loggrep(),
-	    $msg => 300,
+	    get_charlog() => 300,
 	},
     },
     server => {
@@ -61,7 +59,7 @@ our %args = (
 	    get_thirdlog() => 0,
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
-	    $msg => 42,
+	    get_charlog() => 42,
 	    qr/syslogd: dropped 260 TCP or TLS messages/ => 1,
 	},
     },
@@ -72,7 +70,7 @@ our %args = (
 	    get_thirdlog() => 1,
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
-	    $msg => 300,
+	    get_charlog() => 300,
 	    qr/syslogd: dropped 260 TCP or TLS messages/ => 1,
 	},
     },

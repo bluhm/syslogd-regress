@@ -31,6 +31,7 @@ my $secondlog = "syslogd regress test second message";
 my $thirdlog = "syslogd regress test third message";
 my $testlog = "syslogd regress test log message";
 my $downlog = "syslogd regress client shutdown";
+my $charlog = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 sub find_ports {
 	my %args = @_;
@@ -210,6 +211,10 @@ sub get_secondlog {
 
 sub get_thirdlog {
 	return $thirdlog;
+}
+
+sub get_charlog {
+	return $charlog;
 }
 
 sub get_between2loggrep {
