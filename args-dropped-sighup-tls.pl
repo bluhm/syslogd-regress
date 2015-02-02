@@ -1,7 +1,7 @@
 # The client writes 300 messages to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via TCP to the loghost.
-# The server blocks the message on its TCP socket.
+# The syslogd passes it via TLS to the loghost.
+# The server blocks the message on its TLS socket.
 # The server waits until the client as written all messages.
 # The server sends a SIGHUP to syslogd and reads messages from kernel.
 # The client waits until the server has read the first message.
@@ -31,14 +31,14 @@ our %args = (
 	})},
     },
     syslogd => {
-	loghost => '@tcp://localhost:$connectport',
+	loghost => '@tls://localhost:$connectport',
 	loggrep => {
 	    get_between2loggrep(),
 	    $msg => 300,
 	},
     },
     server => {
-	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
+	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	redo => 0,
 	func => sub { read_between2logs(shift, sub {
 	    my $self = shift;
@@ -61,8 +61,8 @@ our %args = (
 	    get_thirdlog() => 0,
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
-	    $msg => 43,
-	    qr/syslogd: dropped 259 TCP or TLS messages/ => 1,
+	    $msg => 42,
+	    qr/syslogd: dropped 260 TCP or TLS messages/ => 1,
 	},
     },
     file => {
@@ -73,7 +73,7 @@ our %args = (
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
 	    $msg => 300,
-	    qr/syslogd: dropped 259 TCP or TLS messages/ => 1,
+	    qr/syslogd: dropped 260 TCP or TLS messages/ => 1,
 	},
     },
 );
