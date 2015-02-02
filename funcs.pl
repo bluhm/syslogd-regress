@@ -61,7 +61,7 @@ sub write_log {
 	my $self = shift;
 
 	write_message($self, $testlog);
-	write_shutdown($self, @_);
+	write_shutdown($self);
 }
 
 sub write_between2logs {
@@ -71,7 +71,7 @@ sub write_between2logs {
 	write_message($self, $firstlog);
 	$func->($self, @_);
 	write_message($self, $testlog);
-	write_shutdown($self, @_);
+	write_shutdown($self);
 }
 
 sub write_message {
