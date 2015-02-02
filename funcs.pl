@@ -129,8 +129,9 @@ sub write_char {
 }
 
 sub write_length {
-	write_char(@_);
-	write_log(@_);
+	my $self = shift;
+	write_char($self, @_);
+	write_log($self);
 }
 
 sub write_unix {
