@@ -48,6 +48,7 @@ our %args = (
 	},
 	loggrep => {
 	    get_firstlog() => 1,
+	    get_testlog() => 0,
 	    qr/syslogd: loghost "\@tls:.*" dropped \d+ messages/ => 1,
 	},
     },
