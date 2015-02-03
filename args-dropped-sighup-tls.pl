@@ -60,7 +60,7 @@ our %args = (
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
 	    get_charlog() => 42,
-	    qr/syslogd: dropped 260 TCP or TLS messages/ => 1,
+	    qr/syslogd: dropped 260 messages to remote loghost/ => 1,
 	},
     },
     file => {
@@ -71,7 +71,7 @@ our %args = (
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
 	    get_charlog() => 300,
-	    qr/syslogd: dropped 260 TCP or TLS messages/ => 1,
+	    qr/syslogd: dropped 260 messages to remote loghost/ => 1,
 	},
     },
 );
