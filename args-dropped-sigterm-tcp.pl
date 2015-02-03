@@ -3,11 +3,11 @@
 # The syslogd passes it via TCP to the loghost.
 # The server blocks the message on its TCP socket.
 # The server waits until the client as written all messages.
-# The server sends a SIGHUP to syslogd and reads messages from kernel.
+# The server sends a SIGTERM to syslogd and reads messages from kernel.
 # The client waits until the server has read the first message.
-# Find the message in client, file, pipe, syslogd, server log.
+# Find the message in client, file, pipe, syslogd log.
 # Check that the 300 messages are in syslogd and file log.
-# Check that the dropped message is in server and file log.
+# Check that the dropped message is in file log.
 
 use strict;
 use warnings;
@@ -31,45 +31,41 @@ our %args = (
     syslogd => {
 	loghost => '@tcp://localhost:$connectport',
 	loggrep => {
-	    get_between2loggrep(),
 	    get_charlog() => 300,
 	},
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
 	redo => 0,
-	func => sub { read_between2logs(shift, sub {
+	func => sub {
 	    my $self = shift;
-	    if ($self->{redo}) {
-		    $self->{redo}--;
-		    return;
-	    }
 	    ${$self->{client}}->loggrep(get_thirdlog(), 5)
 		or die ref($self), " client did not send third log";
-	    ${$self->{syslogd}}->kill_syslogd('HUP');
-	    ${$self->{syslogd}}->loggrep("syslogd: restarted", 5)
-		or die ref($self), " no 'syslogd: restarted' between logs";
+	    ${$self->{syslogd}}->kill_syslogd('TERM');
+	    ${$self->{syslogd}}->loggrep("syslogd: exiting", 5)
+		or die ref($self), " no 'syslogd: exiting' between logs";
 	    # syslogd has shut down, read from kernel socket buffer
 	    read_log($self);
-	    $self->{redo}++;
-	})},
+	},
 	loggrep => {
-	    get_between2loggrep(),
+	    get_firstlog() => 1,
 	    get_secondlog() => 1,
 	    get_thirdlog() => 0,
+	    get_testlog() => 0,
 	    qr/syslogd: start/ => 1,
-	    qr/syslogd: restart/ => 1,
 	    get_charlog() => 43,
-	    qr/syslogd: dropped 259 messages to remote loghost/ => 1,
 	},
+    },
+    pipe => {
+	loggrep => {},
     },
     file => {
 	loggrep => {
-	    get_between2loggrep(),
+	    get_firstlog() => 1,
 	    get_secondlog() => 1,
 	    get_thirdlog() => 1,
+	    get_testlog() => 0,
 	    qr/syslogd: start/ => 1,
-	    qr/syslogd: restart/ => 1,
 	    get_charlog() => 300,
 	    qr/syslogd: dropped 259 messages to remote loghost/ => 1,
 	},
