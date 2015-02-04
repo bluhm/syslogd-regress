@@ -14,16 +14,22 @@ our %args = (
     client => {
 	func => sub { write_between2logs(shift, sub {
 	    my $self = shift;
-	    ${$self->{syslogd}}->loggrep("Connection refused", 5)
-		or die "no connection refused in syslogd.log";
+	    write_message($self, get_secondlog());
+	    foreach (1..300) {
+		write_char($self, [1024], $_);
+		# if client sends too fast, syslogd will not see everything
+		sleep .01;
+	    }
+	    write_message($self, get_thirdlog());
+	    ${$self->{server}}->loggrep("Accepted", 5, 2)
+		or die ref($self), " server did not receive second log";
 	})},
     },
     syslogd => {
 	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => {
-	    qr/Logging to FORWTCP \@tcp:\/\/127.0.0.1:\d+/ => '>=6',
-	    qr/syslogd: connect .* Connection refused/ => '>=2',
 	    get_between2loggrep(),
+	    get_charlog() => 300,
 	},
     },
     server => {
@@ -35,18 +41,16 @@ our %args = (
 		$self->{redo}--;
 		return;
 	    }
+	    ${$self->{client}}->loggrep(get_thirdlog(), 5)
+		or die ref($self), " client did not send third log";
 	    $self->close();
 	    shutdown(\*STDOUT, 1)
 		or die "shutdown write failed: $!";
-	    ${$self->{syslogd}}->loggrep("Connection refused", 5)
-		or die "no connection refused in syslogd.log";
 	    $self->listen();
 	    $self->{redo}++;
 	})},
 	loggrep => {
 	    qr/Accepted/ => 2,
-	    qr/syslogd: loghost .* connection close/ => 1,
-	    qr/syslogd: connect .* Connection refused/ => 1,
 	    get_between2loggrep(),
 	},
     },
