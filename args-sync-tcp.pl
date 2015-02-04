@@ -43,21 +43,23 @@ our %args = (
 	    }
 	    ${$self->{client}}->loggrep(get_thirdlog(), 5)
 		or die ref($self), " client did not send third log";
-	    $self->close();
 	    shutdown(\*STDOUT, 1)
 		or die "shutdown write failed: $!";
-	    $self->listen();
 	    $self->{redo}++;
 	})},
 	loggrep => {
 	    qr/Accepted/ => 2,
 	    get_between2loggrep(),
+	    get_secondlog() => 0,
+	    get_thirdlog() => 0,
 	},
     },
     file => {
 	loggrep => {
-	    qr/syslogd: connect .* Connection refused/ => '>=1',
 	    get_between2loggrep(),
+	    get_secondlog() => 1,
+	    get_thirdlog() => 1,
+	    get_charlog() => 300,
 	},
     },
 );
