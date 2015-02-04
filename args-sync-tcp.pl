@@ -1,10 +1,14 @@
-# The TCP server closes the connection to syslogd.
-# The client writes a message to Sys::Syslog native method.
+# The client writes 300 long messages to UDP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd does a TCP reconnect and passes it to loghost.
-# The server receives the message on its new accepted TCP socket.
-# Find the message in client, pipe, syslogd, server log.
-# Check that syslogd and server close and reopen the connection.
+# The server blocks the message on its TCP socket.
+# The server waits until the client has written all messages.
+# The server closes the TCP connection and accepts a new one.
+# The server receives the messages on its new accepted TCP socket.
+# This way the server receives a block of messages that is truncated
+# at the beginning and at the end.
+# Find the message in client, file, pipe, syslogd, server log.
+# Check that the server does not get lines that are cut in the middle.
 
 use strict;
 use warnings;
@@ -12,11 +16,12 @@ use Socket;
 
 our %args = (
     client => {
+	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
 	func => sub { write_between2logs(shift, sub {
 	    my $self = shift;
 	    write_message($self, get_secondlog());
 	    foreach (1..300) {
-		write_char($self, [1024], $_);
+		write_char($self, [3000], $_);
 		# if client sends too fast, syslogd will not see everything
 		sleep .01;
 	    }
@@ -26,6 +31,7 @@ our %args = (
 	})},
     },
     syslogd => {
+	options => ["-u"],
 	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => {
 	    get_between2loggrep(),
@@ -52,6 +58,7 @@ our %args = (
 	    get_between2loggrep(),
 	    get_secondlog() => 0,
 	    get_thirdlog() => 0,
+	    qr/>>> [0-9A-Za-z]{10}/ => 0,
 	},
     },
     file => {
