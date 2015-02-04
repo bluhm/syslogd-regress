@@ -104,9 +104,20 @@ sub write_shutdown {
 	syslog(LOG_NOTICE, $downlog);
 }
 
-sub write_char {
+sub write_lines {
 	my $self = shift;
-	my @lenghts = @{shift || $self->{lengths}};
+	my ($lines, $lenght) = @_;
+
+	foreach (1..$lines) {
+		write_chars($self, $lenght, " $_");
+		# if client is sending too fast, syslogd will not see everything
+		sleep .01;
+	}
+}
+
+sub write_chars {
+	my $self = shift;
+	my @lenghts = shift || @{$self->{lengths}};
 	my $tail = shift // $self->{tail};
 
 	foreach my $len (@lenghts) {
@@ -131,7 +142,7 @@ sub write_char {
 
 sub write_length {
 	my $self = shift;
-	write_char($self, @_);
+	write_chars($self, @_);
 	write_log($self);
 }
 
