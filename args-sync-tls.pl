@@ -1,10 +1,10 @@
 # The client writes 300 long messages to UDP socket.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd does a TCP reconnect and passes it to loghost.
-# The server blocks the message on its TCP socket.
+# The syslogd does a TLS reconnect and passes it to loghost.
+# The server blocks the message on its TLS socket.
 # The server waits until the client has written all messages.
-# The server closes the TCP connection and accepts a new one.
-# The server receives the messages on its new accepted TCP socket.
+# The server closes the TLS connection and accepts a new one.
+# The server receives the messages on its new accepted TLS socket.
 # This way the server receives a block of messages that is truncated
 # at the beginning and at the end.
 # Find the message in client, file, pipe, syslogd, server log.
@@ -28,14 +28,14 @@ our %args = (
     },
     syslogd => {
 	options => ["-u"],
-	loghost => '@tcp://127.0.0.1:$connectport',
+	loghost => '@tls://127.0.0.1:$connectport',
 	loggrep => {
 	    get_between2loggrep(),
 	    get_charlog() => 300,
 	},
     },
     server => {
-	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
+	listen => { domain => AF_INET, proto => "tls", addr => "127.0.0.1" },
 	redo => 0,
 	func => sub { read_between2logs(shift, sub {
 	    my $self = shift;
