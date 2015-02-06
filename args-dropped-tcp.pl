@@ -43,8 +43,8 @@ our %args = (
 	    get_between2loggrep(),
 	    get_secondlog() => 1,
 	    get_thirdlog() => 0,
-	    get_charlog() => 289,
-	    qr/syslogd: dropped 12 messages to loghost "\@tcp:.*"/ => 1,
+	    get_charlog() => 287,
+	    qr/syslogd: dropped 14 messages to loghost "\@tcp:.*"/ => 1,
 	},
     },
     file => {
@@ -53,7 +53,7 @@ our %args = (
 	    get_secondlog() => 1,
 	    get_thirdlog() => 1,
 	    get_charlog() => 300,
-	    qr/syslogd: dropped 12 messages to loghost "\@tcp:.*"/ => 1,
+	    qr/syslogd: dropped 14 messages to loghost "\@tcp:.*"/ => 1,
 	},
     },
 );

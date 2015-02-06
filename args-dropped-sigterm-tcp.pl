@@ -49,7 +49,7 @@ our %args = (
 	    get_thirdlog() => 0,
 	    get_testlog() => 0,
 	    qr/syslogd: start/ => 1,
-	    get_charlog() => 43,
+	    get_charlog() => 42,
 	},
     },
     pipe => {
@@ -63,7 +63,7 @@ our %args = (
 	    get_testlog() => 0,
 	    qr/syslogd: start/ => 1,
 	    get_charlog() => 300,
-	    qr/syslogd: dropped 259 messages to remote loghost/ => 1,
+	    qr/syslogd: dropped 260 messages to remote loghost/ => 1,
 	},
     },
 );

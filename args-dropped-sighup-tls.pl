@@ -55,8 +55,8 @@ our %args = (
 	    get_thirdlog() => 0,
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
-	    get_charlog() => 42,
-	    qr/syslogd: dropped 260 messages to remote loghost/ => 1,
+	    get_charlog() => 41,
+	    qr/syslogd: dropped 261 messages to remote loghost/ => 1,
 	},
     },
     file => {
@@ -67,7 +67,7 @@ our %args = (
 	    qr/syslogd: start/ => 1,
 	    qr/syslogd: restart/ => 1,
 	    get_charlog() => 300,
-	    qr/syslogd: dropped 260 messages to remote loghost/ => 1,
+	    qr/syslogd: dropped 261 messages to remote loghost/ => 1,
 	},
     },
 );
