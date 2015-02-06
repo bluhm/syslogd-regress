@@ -225,7 +225,8 @@ sub get_thirdlog {
 }
 
 sub get_charlog {
-	return $charlog;
+	# add a space so that we match at the beginning of the message
+	return " $charlog";
 }
 
 sub get_between2loggrep {
