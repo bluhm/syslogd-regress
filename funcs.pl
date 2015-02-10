@@ -23,6 +23,7 @@ use List::Util qw(first);
 use Socket;
 use Socket6;
 use Sys::Syslog qw(:standard :extended :macros);
+use Time::HiRes 'sleep';
 use IO::Socket;
 use IO::Socket::INET6;
 
