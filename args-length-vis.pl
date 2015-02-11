@@ -14,10 +14,9 @@ our %args = (
 	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
 	func => sub {
 	    my $self = shift;
-	    write_lengths($self, 8186..8195,9000);
+	    write_lengths($self, [8186..8195,9000], "foo\200"),
 	    write_log($self);
 	},
-	tail => "foo\200",
     },
     syslogd => {
 	options => ["-u"],

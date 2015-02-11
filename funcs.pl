@@ -116,15 +116,14 @@ sub write_lines {
 
 sub write_lengths {
 	my $self = shift;
-	my @lenghts = @_;
+	my ($lenghts, $tail) = ref $_[0] ? @_ : [@_];
 
-	write_chars($self, [@lenghts]);
+	write_chars($self, $lenghts, $tail);
 }
 
 sub write_chars {
 	my $self = shift;
-	my $length = shift;
-	my $tail = shift // $self->{tail};
+	my ($length, $tail) = @_;
 
 	foreach my $len (ref $length ? @$length : $length) {
 		my $t = $tail // "";
