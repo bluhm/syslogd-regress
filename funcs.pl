@@ -111,8 +111,6 @@ sub write_lines {
 
 	foreach (1..$lines) {
 		write_chars($self, $lenght, " $_");
-		# if client is sending too fast, syslogd will not see everything
-		sleep .01;
 	}
 }
 
@@ -138,6 +136,8 @@ sub write_chars {
 		}
 		$msg .= $t if length($t);
 		write_message($self, $msg);
+		# if client is sending too fast, syslogd will not see everything
+		sleep .01;
 	}
 }
 
