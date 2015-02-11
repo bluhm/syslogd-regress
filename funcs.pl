@@ -280,7 +280,8 @@ sub check_pattern {
 	$pattern = [ $pattern ] unless ref($pattern) eq 'ARRAY';
 	foreach my $pat (@$pattern) {
 		if (ref($pat) eq 'HASH') {
-			while (my($re, $num) = each %$pat) {
+			foreach my $re (sort keys %$pat) {
+				my $num = $pat->{$re};
 				my @matches = $func->($proc, $re);
 				compare(@matches, $num)
 				    or die "$name matches '@matches': ",
