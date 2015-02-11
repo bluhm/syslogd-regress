@@ -114,12 +114,19 @@ sub write_lines {
 	}
 }
 
+sub write_lengths {
+	my $self = shift;
+	my @lenghts = @_;
+
+	write_chars($self, [@lenghts]);
+}
+
 sub write_chars {
 	my $self = shift;
-	my @lenghts = shift || @{$self->{lengths}};
+	my $length = shift;
 	my $tail = shift // $self->{tail};
 
-	foreach my $len (@lenghts) {
+	foreach my $len (ref $length ? @$length : $length) {
 		my $t = $tail // "";
 		substr($t, 0, length($t) - $len, "")
 		    if length($t) && length($t) > $len;
@@ -139,12 +146,6 @@ sub write_chars {
 		# if client is sending too fast, syslogd will not see everything
 		sleep .01;
 	}
-}
-
-sub write_length {
-	my $self = shift;
-	write_chars($self, @_);
-	write_log($self);
 }
 
 sub write_unix {
