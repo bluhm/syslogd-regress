@@ -268,6 +268,8 @@ sub compare($$) {
 		return $_[0] >= $1;
 	} elsif (/^<=(\d+)/) {
 		return $_[0] <= $1;
+	} elsif (/^~(\d+)/) {
+		return $1 * 0.9 <= $_[0] && $_[0] <= $1 * 1.1;
 	}
 	die "bad compare operator: $_";
 }
