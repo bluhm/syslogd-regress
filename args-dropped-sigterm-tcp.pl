@@ -50,7 +50,7 @@ our %args = (
 	    get_thirdlog() => 0,
 	    get_testlog() => 0,
 	    qr/syslogd: start/ => 1,
-	    get_charlog() => 42,
+	    get_charlog() => '~42',
 	},
     },
     pipe => {
