@@ -29,6 +29,7 @@ our %args = (
 	loggrep => {
 	    get_charlog() => 300,
 	    qr/ \(dropped.*\)/ => '~42',
+	    qr/SSL3_WRITE_PENDING/ => 0,
 	},
     },
     server => {

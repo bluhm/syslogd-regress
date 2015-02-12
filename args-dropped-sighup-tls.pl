@@ -30,6 +30,7 @@ our %args = (
 	    get_between2loggrep(),
 	    get_charlog() => 300,
 	    qr/ \(dropped.*\)/ => '~38',
+	    qr/SSL3_WRITE_PENDING/ => 0,
 	},
     },
     server => {
