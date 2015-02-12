@@ -22,6 +22,8 @@ our %args = (
 	    write_message($self, get_thirdlog());
 	    ${$self->{server}}->loggrep(get_secondlog(), 5)
 		or die ref($self), " server did not receive second log";
+	    ${$self->{syslogd}}->loggrep(qr/dropped \d+ messages/, 5)
+		or die ref($self), " syslogd did not write dropped message";
 	})},
     },
     syslogd => {
@@ -36,8 +38,8 @@ our %args = (
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	func => sub {
 	    my $self = shift;
-	    ${$self->{client}}->loggrep(get_thirdlog(), 20)
-		or die ref($self), " client did not send third log";
+	    ${$self->{syslogd}}->loggrep(get_thirdlog(), 20)
+		or die ref($self), " syslogd did not receive third log";
 	    read_log($self);
 	},
 	loggrep => {
