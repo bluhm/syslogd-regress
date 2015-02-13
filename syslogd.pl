@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#	$OpenBSD: syslogd.pl,v 1.4 2014/12/28 14:08:01 bluhm Exp $
+#	$OpenBSD: syslogd.pl,v 1.5 2015/02/13 21:40:50 bluhm Exp $
 
 # Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
