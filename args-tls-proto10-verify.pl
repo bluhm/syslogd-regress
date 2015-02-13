@@ -1,9 +1,9 @@
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via TLS to localhost loghost.
-# The server receives the message on its TLS socket.
+# The server receives the message on its TLS version 1.0 socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that syslogd and server log contain localhost address.
+# Check that server log contains ssl version 1.
 
 use strict;
 use warnings;
@@ -24,7 +24,9 @@ our %args = (
 	loggrep => {
 	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
 	    get_testlog() => 1,
+	    qr/ssl version: TLSv1$/ => 1,
 	},
+	sslversion => "TLSv1",
     },
 );
 
