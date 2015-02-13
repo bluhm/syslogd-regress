@@ -189,7 +189,7 @@ sub up {
 
 sub down {
 	my $self = shift;
-	my $timeout = shift || 30;
+	my $timeout = shift || 60;
 	$self->loggrep(qr/$self->{down}/, $timeout)
 	    or croak ref($self), " no '$self->{down}' in $self->{logfile} ".
 		"after $timeout seconds";
