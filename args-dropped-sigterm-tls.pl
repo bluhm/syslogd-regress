@@ -65,7 +65,7 @@ our %args = (
 	    get_testlog() => 0,
 	    qr/syslogd: start/ => 1,
 	    get_charlog() => 600,
-	    qr/syslogd: dropped 3[34][0-9] messages to remote loghost/ => 1,
+	    qr/syslogd: dropped 5[56][0-9] messages to remote loghost/ => 1,
 	},
     },
 );
