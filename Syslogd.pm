@@ -197,6 +197,7 @@ my $rotate_num = 0;
 sub rotate {
 	my $self = shift;
 
+	$self->loggrep("bytes transferred", 1) or sleep 1;
 	foreach my $name (qw(file pipe)) {
 		my $file = $self->{"out$name"};
 		for (my $i = $rotate_num; $i >= 0; $i--) {
