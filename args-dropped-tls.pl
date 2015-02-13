@@ -1,4 +1,4 @@
-# The client writes 300 messages to Sys::Syslog native method.
+# The client writes 600 messages to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via TLS to the loghost.
 # The server blocks the message on its TLS socket.
@@ -6,7 +6,7 @@
 # The server receives the message on its TLS socket.
 # The client waits until the server as read the first message.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the 300 messages are in syslogd and file log.
+# Check that the 600 messages are in syslogd and file log.
 # Check that the dropped message is in server and file log.
 
 use strict;
@@ -18,7 +18,7 @@ our %args = (
 	func => sub { write_between2logs(shift, sub {
 	    my $self = shift;
 	    write_message($self, get_secondlog());
-	    write_lines($self, 300, 1024);
+	    write_lines($self, 600, 1024);
 	    write_message($self, get_thirdlog());
 	    ${$self->{server}}->loggrep(get_secondlog(), 5)
 		or die ref($self), " server did not receive second log";
@@ -30,8 +30,8 @@ our %args = (
 	loghost => '@tls://localhost:$connectport',
 	loggrep => {
 	    get_between2loggrep(),
-	    get_charlog() => 300,
-	    qr/ \(dropped\)/ => '~16',
+	    get_charlog() => 600,
+	    qr/ \(dropped\)/ => '~93',
 	    qr/SSL3_WRITE_PENDING/ => 0,
 	},
     },
@@ -39,7 +39,7 @@ our %args = (
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	func => sub {
 	    my $self = shift;
-	    ${$self->{syslogd}}->loggrep(get_thirdlog(), 20)
+	    ${$self->{syslogd}}->loggrep(get_thirdlog(), 30)
 		or die ref($self), " syslogd did not receive third log";
 	    read_log($self);
 	},
@@ -47,8 +47,8 @@ our %args = (
 	    get_between2loggrep(),
 	    get_secondlog() => 1,
 	    get_thirdlog() => 0,
-	    get_charlog() => '~285',
-	    qr/syslogd: dropped 1[0-9] messages to loghost "\@tls:.*"/ => 1,
+	    get_charlog() => '~508',
+	    qr/syslogd: dropped [89][0-9] messages to loghost "\@tls:.*"/ => 1,
 	},
     },
     file => {
@@ -56,8 +56,8 @@ our %args = (
 	    get_between2loggrep(),
 	    get_secondlog() => 1,
 	    get_thirdlog() => 1,
-	    get_charlog() => 300,
-	    qr/syslogd: dropped 1[0-9] messages to loghost "\@tls:.*"/ => 1,
+	    get_charlog() => 600,
+	    qr/syslogd: dropped [89][0-9] messages to loghost "\@tls:.*"/ => 1,
 	},
     },
 );

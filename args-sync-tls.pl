@@ -1,4 +1,4 @@
-# The client writes 300 long messages to UDP socket.
+# The client writes 600 long messages to UDP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd does a TLS reconnect and passes it to loghost.
 # The server blocks the message on its TLS socket.
@@ -20,7 +20,7 @@ our %args = (
 	func => sub { write_between2logs(shift, sub {
 	    my $self = shift;
 	    write_message($self, get_secondlog());
-	    write_lines($self, 300, 3000);
+	    write_lines($self, 600, 3000);
 	    write_message($self, get_thirdlog());
 	    ${$self->{server}}->loggrep("Accepted", 5, 2)
 		or die ref($self), " server did not receive second log";
@@ -31,8 +31,9 @@ our %args = (
 	loghost => '@tls://127.0.0.1:$connectport',
 	loggrep => {
 	    get_between2loggrep(),
-	    get_charlog() => 300,
+	    get_charlog() => 600,
 	    qr/dropped partial message/ => 1,
+	    qr/SSL3_WRITE_PENDING/ => 0,
 	},
     },
     server => {
@@ -44,7 +45,7 @@ our %args = (
 		$self->{redo}--;
 		return;
 	    }
-	    ${$self->{syslogd}}->loggrep(get_thirdlog(), 20)
+	    ${$self->{syslogd}}->loggrep(get_thirdlog(), 30)
 		or die ref($self), " syslogd did not receive third log";
 	    shutdown(\*STDOUT, 1)
 		or die "shutdown write failed: $!";
@@ -63,7 +64,7 @@ our %args = (
 	    get_between2loggrep(),
 	    get_secondlog() => 1,
 	    get_thirdlog() => 1,
-	    get_charlog() => 300,
+	    get_charlog() => 600,
 	},
     },
 );
