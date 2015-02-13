@@ -128,5 +128,5 @@ foreach (@m) {
 $r->kill_child;
 $r->down;
 
-check_logs($c, $r, $s, \@m, %args);
 $args{check}->({client => $c, syslogd => $r, server => $s}) if $args{check};
+check_logs($c, $r, $s, \@m, %args);
