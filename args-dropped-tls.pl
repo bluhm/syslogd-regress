@@ -31,7 +31,7 @@ our %args = (
 	loggrep => {
 	    get_between2loggrep(),
 	    get_charlog() => 300,
-	    qr/ \(dropped.*\)/ => '~40',
+	    qr/ \(dropped.*\)/ => '>=10',
 	    qr/SSL3_WRITE_PENDING/ => 0,
 	},
     },
@@ -48,7 +48,7 @@ our %args = (
 	    get_secondlog() => 1,
 	    get_thirdlog() => 0,
 	    get_charlog() => '~263',
-	    qr/syslogd: dropped [34][0-9] messages to loghost "\@tls:.*"/ => 1,
+	    qr/syslogd: dropped [1-4][0-9] messages to loghost "\@tls:.*"/ => 1,
 	},
     },
     file => {
@@ -57,7 +57,7 @@ our %args = (
 	    get_secondlog() => 1,
 	    get_thirdlog() => 1,
 	    get_charlog() => 300,
-	    qr/syslogd: dropped [34][0-9] messages to loghost "\@tls:.*"/ => 1,
+	    qr/syslogd: dropped [1-4][0-9] messages to loghost "\@tls:.*"/ => 1,
 	},
     },
 );
