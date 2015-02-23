@@ -28,7 +28,6 @@ our %args = (
 	loghost => '@tcp://localhost:$connectport',
 	loggrep => {
 	    get_charlog() => 300,
-	    qr/ \(dropped\)/ => '~17',
 	},
     },
     server => {
