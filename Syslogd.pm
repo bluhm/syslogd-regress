@@ -113,7 +113,8 @@ sub child {
 	@ktrace = "ktrace" if $self->{ktrace} && !@ktrace;
 	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
-	my @cmd = (@sudo, @libevent, @ktrace, $syslogd, "-d",
+	my @cmd = (@sudo, @libevent, @ktrace, $syslogd,
+	    $self->{foreground} ? "-F" : "-d",
 	    "-f", $self->{conffile});
 	push @cmd, "-V", unless $self->{cacrt};
 	push @cmd, "-C", $self->{cacrt}

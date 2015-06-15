@@ -1,4 +1,4 @@
-# Test with default values, that is:
+# Start syslogd in foreground mode.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -9,6 +9,9 @@ use strict;
 use warnings;
 
 our %args = (
+    syslogd => {
+	foreground => 1,
+    }
 );
 
 1;
