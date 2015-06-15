@@ -11,6 +11,10 @@ use warnings;
 
 our %args = (
     syslogd => {
+	loggrep => {
+	    qr/ -F / => 0,
+	    qr/ -d / => 1,
+	},
 	fstat => {
 	    qr/^root .* wd / => 1,
 	    qr/^root .* root / => 0,
@@ -24,9 +28,9 @@ our %args = (
 	ktrace => {
 	    qr/CALL  setresuid(.*"_syslogd".*){3}/ => 2,
 	    qr/CALL  setresgid(.*"_syslogd".*){3}/ => 2,
-	    qr/CALL  setsid => 0,
+	    qr/CALL  setsid/ => 0,
 	},
-    }
+    },
 );
 
 1;

@@ -14,25 +14,31 @@ use warnings;
 our %args = (
     syslogd => {
 	foreground => 1,
-	loggrep => qr/syslogd -F /,
-        fstat => {
-            qr/^root .* wd / => 1,
-            qr/^root .* root / => 0,
-            qr/^root .* [012] .* null$/ => 3,
-            qr/^root .* kqueue / => 0,
-            qr/^root .* internet/ => 0,
-            qr/^_syslogd .* wd / => 1,
-            qr/^_syslogd .* root / => 1,
-            qr/^_syslogd .* [012] .* null$/ => 3,
-            qr/^_syslogd .* kqueue / => 1,
-            qr/^_syslogd .* internet/ => 2,
-        },
-        ktrace => {
-            qr/CALL  setresuid(.*"_syslogd".*){3}/ => 2,
-            qr/CALL  setresgid(.*"_syslogd".*){3}/ => 2,
-            qr/CALL  setsid => 0,
-        },
-    }
+	loggrep => {
+	    qr/ -F / => 1,
+	    qr/ -d / => 0,
+	},
+	fstat => {
+	    qr/^root .* wd / => 1,
+	    qr/^root .* root / => 0,
+	    qr/^root .* [012] .* null$/ => 3,
+	    qr/^root .* kqueue / => 0,
+	    qr/^root .* internet/ => 0,
+	    qr/^_syslogd .* wd / => 1,
+	    qr/^_syslogd .* root / => 1,
+	    qr/^_syslogd .* [012] .* null$/ => 3,
+	    qr/^_syslogd .* kqueue / => 1,
+	    qr/^_syslogd .* internet/ => 2,
+	},
+	ktrace => {
+	    qr/CALL  setresuid(.*"_syslogd".*){3}/ => 2,
+	    qr/CALL  setresgid(.*"_syslogd".*){3}/ => 2,
+	    qr/CALL  setsid/ => 0,
+	},
+    },
+    pipe => {
+	nocheck => 1,
+    },
 );
 
 1;
