@@ -19,9 +19,8 @@ our %args = (
 	loggrep => { get_between2loggrep() },
     },
     syslogd => {
-	ktrace => 1,
 	fstat => 1,
-	kdump => {
+	ktrace => {
 	    qr/syslogd  PSIG  SIGHUP caught handler/ => 1,
 	    qr/syslogd  RET   execve 0/ => 1,
 	},
