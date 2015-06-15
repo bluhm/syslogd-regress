@@ -41,6 +41,7 @@ CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty toobig
 .BEGIN:
 	@echo
 	[ -z "${SUDO}" ] || ${SUDO} true
+	${SUDO} /etc/rc.d/syslogd stop
 .END:
 	@echo
 	${SUDO} /etc/rc.d/syslogd restart
