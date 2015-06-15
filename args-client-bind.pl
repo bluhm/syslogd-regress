@@ -16,13 +16,10 @@ our %args = (
     },
     syslogd => {
 	options => ["-U", "127.0.0.1"],
-	fstat => 1,
+	fstat => qr/ internet dgram udp 127.0.0.1:514$/,
     },
     file => {
 	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_testlog(),
-    },
-    fstat => {
-	loggrep => qr/ internet dgram udp 127.0.0.1:514$/,
     },
 );
 
