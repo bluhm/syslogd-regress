@@ -16,13 +16,10 @@ our %args = (
     },
     syslogd => {
 	options => ["-U", "::1"],
-	fstat => 1,
+	fstat => qr/ internet6 dgram udp \[::1\]:514$/,
     },
     file => {
 	loggrep => qr/ localhost /. get_testlog(),
-    },
-    fstat => {
-	loggrep => qr/ internet6 dgram udp \[::1\]:514$/,
     },
 );
 
