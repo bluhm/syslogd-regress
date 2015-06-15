@@ -23,6 +23,7 @@ use parent 'Proc';
 use Carp;
 use Cwd;
 use File::Basename;
+use Time::HiRes qw(time alarm sleep);
 
 sub new {
 	my $class = shift;
@@ -32,6 +33,7 @@ sub new {
 	$args{logfile} ||= "syslogd.log";
 	$args{up} ||= "syslogd: started";
 	$args{down} ||= "syslogd: exiting";
+	$args{up} = $args{down} = "execute:" if $args{foreground};
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
@@ -128,9 +130,23 @@ sub child {
 
 sub up {
 	my $self = Proc::up(shift, @_);
+	my $timeout = shift || 10;
 
-	if ($self->{fstat}) {
-		$self->fstat;
+	my $end = time() + $timeout;
+
+	while ($self->{fstat}) {
+		$self->fstat();
+		last unless $self->{foreground};
+
+		# in foreground mode we have no debug output
+		# check fstat kqueue entry to detect statup 
+		open(my $fh, '<', $self->{fstatfile}) or die ref($self),
+		    " open $self->{fstatfile} for reading failed: $!";
+		last if grep { /kqueue/ } <$fh>;
+		time() < $end
+		    or croak ref($self), " no 'kqueue' in $self->{fstatfile} ".
+		    "after $timeout seconds";
+		sleep .1;
 	}
 	return $self;
 }

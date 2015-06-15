@@ -14,6 +14,7 @@ use warnings;
 our %args = (
     syslogd => {
 	foreground => 1,
+	loggrep => qr/syslogd -F /,
         fstat => {
             qr/^root .* wd / => 1,
             qr/^root .* root / => 0,
