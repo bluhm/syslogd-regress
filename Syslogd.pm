@@ -34,9 +34,9 @@ sub new {
 	$args{up} ||= "syslogd: started";
 	$args{down} ||= "syslogd: exiting";
 	$args{up} = $args{down} = "execute:"
-	    if $args{foreground} || $args{background};
-	$args{foreground} && $args{background}
-	    and croak "$class cannot run in foreground and background";
+	    if $args{foreground} || $args{daemon};
+	$args{foreground} && $args{daemon}
+	    and croak "$class cannot run in foreground and as daemon";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
@@ -120,7 +120,7 @@ sub child {
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	my @cmd = (@sudo, @libevent, @ktrace, $syslogd,
 	    "-f", $self->{conffile});
-	push @cmd, "-d" if !$self->{foreground} && !$self->{background};
+	push @cmd, "-d" if !$self->{foreground} && !$self->{daemon};
 	push @cmd, "-F" if $self->{foreground};
 	push @cmd, "-V" unless $self->{cacrt};
 	push @cmd, "-C", $self->{cacrt}
@@ -140,9 +140,9 @@ sub up {
 
 	while ($self->{fstat}) {
 		$self->fstat();
-		last unless $self->{foreground} || $self->{background};
+		last unless $self->{foreground} || $self->{daemon};
 
-		# in foreground and background mode we have no debug output
+		# in foreground mode and as daemon we have no debug output
 		# check fstat kqueue entry to detect statup
 		open(my $fh, '<', $self->{fstatfile}) or die ref($self),
 		    " open $self->{fstatfile} for reading failed: $!";
