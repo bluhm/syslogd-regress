@@ -4,8 +4,9 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
+# Check fstat for the parent and child process.
 # Check ktrace for setting the correct uid and gid.
-# Check fstat that the parent process has no inet sockets.
+# Check that stdio is dupped to /dev/null.
 
 use strict;
 use warnings;
@@ -13,8 +14,22 @@ use warnings;
 our %args = (
     syslogd => {
 	foreground => 1,
-	ktrace => 1,
-	fstat => 1,
+        fstat => {
+            qr/^root .* wd / => 1,
+            qr/^root .* root / => 0,
+            qr/^root .* [012] .* null$/ => 3,
+            qr/^root .* kqueue / => 0,
+            qr/^root .* internet/ => 0,
+            qr/^_syslogd .* wd / => 1,
+            qr/^_syslogd .* root / => 1,
+            qr/^_syslogd .* [012] .* null$/ => 3,
+            qr/^_syslogd .* kqueue / => 1,
+            qr/^_syslogd .* internet/ => 2,
+        },
+        ktrace => {
+            qr/CALL  setresuid(.*"_syslogd".*){3}/ => 2,
+            qr/CALL  setresgid(.*"_syslogd".*){3}/ => 2,
+        },
     }
 );
 
