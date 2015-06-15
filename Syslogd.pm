@@ -33,7 +33,10 @@ sub new {
 	$args{logfile} ||= "syslogd.log";
 	$args{up} ||= "syslogd: started";
 	$args{down} ||= "syslogd: exiting";
-	$args{up} = $args{down} = "execute:" if $args{foreground};
+	$args{up} = $args{down} = "execute:"
+	    if $args{foreground} || $args{background};
+	$args{foreground} && $args{background}
+	    and croak "$class cannot run in foreground and background";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
@@ -116,9 +119,10 @@ sub child {
 	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
 	my $syslogd = $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	my @cmd = (@sudo, @libevent, @ktrace, $syslogd,
-	    $self->{foreground} ? "-F" : "-d",
 	    "-f", $self->{conffile});
-	push @cmd, "-V", unless $self->{cacrt};
+	push @cmd, "-d" if !$self->{foreground} && !$self->{background};
+	push @cmd, "-F" if $self->{foreground};
+	push @cmd, "-V" unless $self->{cacrt};
 	push @cmd, "-C", $self->{cacrt}
 	    if $self->{cacrt} && $self->{cacrt} ne "default";
 	push @cmd, "-s", $self->{ctlsock} if $self->{ctlsock};
@@ -136,10 +140,10 @@ sub up {
 
 	while ($self->{fstat}) {
 		$self->fstat();
-		last unless $self->{foreground};
+		last unless $self->{foreground} || $self->{background};
 
-		# in foreground mode we have no debug output
-		# check fstat kqueue entry to detect statup 
+		# in foreground and background mode we have no debug output
+		# check fstat kqueue entry to detect statup
 		open(my $fh, '<', $self->{fstatfile}) or die ref($self),
 		    " open $self->{fstatfile} for reading failed: $!";
 		last if grep { /kqueue/ } <$fh>;
