@@ -34,6 +34,7 @@ our %args = (
 	    qr/CALL  setresuid(.*"_syslogd".*){3}/ => 2,
 	    qr/CALL  setresgid(.*"_syslogd".*){3}/ => 2,
 	    qr/CALL  setsid/ => 1,
+	    qr/RET   setsid.* errno / => 0,
 	},
     },
     pipe => {
