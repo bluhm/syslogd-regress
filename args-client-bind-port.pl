@@ -1,5 +1,5 @@
 # Syslog binds UDP socket to localhost and port.
-# The client writes a message to Sys::Syslog UDP method.
+# The client writes a message to a localhost UDP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -11,8 +11,7 @@ use strict;
 use warnings;
 require 'funcs.pl';
 
-
-my $port = find_ports();
+my $port = find_ports(domain => AF_UNSPEC, addr => "localhost");
 
 our %args = (
     client => {
@@ -25,6 +24,9 @@ our %args = (
     syslogd => {
 	options => ["-U", "localhost:$port"],
 	fstat => qr/ internet6? dgram udp (127.0.0.1|\[::1\]):$port$/,
+    },
+    file => {
+	loggrep => qr/ localhost /. get_testlog(),
     },
 );
 
