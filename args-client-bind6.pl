@@ -15,7 +15,7 @@ our %args = (
 	connect => { domain => AF_INET6, addr => "::1", port => 514 },
     },
     syslogd => {
-	options => ["-U", "::1"],
+	options => ["-U", "[::1]"],
 	fstat => qr/ internet6 dgram udp \[::1\]:514$/,
     },
     file => {
