@@ -1,4 +1,4 @@
-# Syslog binds UDP socket to 127.0.0.1.
+# Syslog binds UDP socket to localhost.
 # The client writes a message to Sys::Syslog UDP method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -12,14 +12,15 @@ use warnings;
 
 our %args = (
     client => {
-	logsock => { type => "udp", host => "127.0.0.1", port => 514 },
+	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
+	loggrep => {
+	    qr/connect sock: (127.0.0.1|::1) \d+/ => 1,
+	    get_testlog() => 1,
+	},
     },
     syslogd => {
-	options => ["-U", "127.0.0.1"],
-	fstat => qr/ internet dgram udp 127.0.0.1:514$/,
-    },
-    file => {
-	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_testlog(),
+	options => ["-U", "localhost"],
+	fstat => qr/ internet6? dgram udp (127.0.0.1|\[::1\]):514$/,
     },
 );
 
