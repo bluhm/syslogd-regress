@@ -1,5 +1,5 @@
 # The client writes a message to Sys::Syslog native method.
-# The syslogd writes into multiple files depending on program name.
+# The syslogd writes into multiple files depending on program and hostname.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -9,25 +9,38 @@
 use strict;
 use warnings;
 use Cwd;
+use Sys::Hostname;
 
 my $objdir = getcwd();
+(my $hostname = hostname()) =~ s/\..*//;
 
 our %args = (
     syslogd => {
 	conf => <<"EOF",
 !nonexist
++nonexist
 *.*	$objdir/file-0.log
 !syslogd-regress
 *.*	$objdir/file-1.log
++$hostname
 *.*	$objdir/file-2.log
-!*
+!nonexist
 *.*	$objdir/file-3.log
++nonexist
+*.*	$objdir/file-4.log
+!*
+*.*	$objdir/file-5.log
++*
+*.*	$objdir/file-6.log
 EOF
     },
     multifile => [
 	{ loggrep => { get_testlog() => 0 } },
+	{ loggrep => { get_testlog() => 0 } },
 	{ loggrep => { get_testlog() => 1 } },
-	{ loggrep => { get_testlog() => 1 } },
+	{ loggrep => { get_testlog() => 0 } },
+	{ loggrep => { get_testlog() => 0 } },
+	{ loggrep => { get_testlog() => 0 } },
 	{ loggrep => { get_testlog() => 1 } },
     ],
 );
