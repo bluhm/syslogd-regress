@@ -12,7 +12,11 @@ use Cwd;
 my $objdir = getcwd();
 
 our %args = (
+    client => {
+	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
+    },
     syslogd => {
+	options => ["-u"],
 	conf => <<"EOF",
 *.*	$objdir/prog.log
 EOF
