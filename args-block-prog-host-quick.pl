@@ -4,7 +4,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the message appears in the correct log files.
+# Check that the quick message appears only in in log files.
 
 use strict;
 use warnings;
@@ -20,18 +20,14 @@ our %args = (
 !nonexist
 +nonexist
 *.*	$objdir/file-0.log
-!syslogd-regress
+!!syslogd-regress
 *.*	$objdir/file-1.log
 +$hostname
 *.*	$objdir/file-2.log
-!nonexist
 *.*	$objdir/file-3.log
-+nonexist
-*.*	$objdir/file-4.log
 !*
-*.*	$objdir/file-5.log
 +*
-*.*	$objdir/file-6.log
+*.*	$objdir/file-4.log
 EOF
     },
     multifile => [
@@ -40,8 +36,6 @@ EOF
 	{ loggrep => { get_testlog() => 1 } },
 	{ loggrep => { get_testlog() => 0 } },
 	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 1 } },
     ],
 );
 
