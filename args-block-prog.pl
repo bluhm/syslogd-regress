@@ -10,6 +10,9 @@ use warnings;
 use Cwd;
 
 my $objdir = getcwd();
+foreach (1..4) {
+    open(my $fh, '>', "prog$_.log") or die;
+}
 
 our %args = (
     client => {
@@ -18,7 +21,13 @@ our %args = (
     syslogd => {
 	options => ["-u"],
 	conf => <<"EOF",
-*.*	$objdir/prog.log
+!nonexist
+*.*	$objdir/prog1.log
+!syslogd-regress
+*.*	$objdir/prog2.log
+*.*	$objdir/prog4.log
+!*
+*.*	$objdir/prog4.log
 EOF
     },
 );
