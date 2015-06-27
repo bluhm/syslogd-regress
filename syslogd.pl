@@ -40,6 +40,7 @@ if (@ARGV and -f $ARGV[-1]) {
 }
 @ARGV == 0 or usage();
 
+create_multifile(@{$args{multifile} || []});
 if ($args{rsyslogd}) {
 	$args{rsyslogd}{listen}{domain} ||= AF_INET;
 	$args{rsyslogd}{listen}{addr}   ||= "127.0.0.1";

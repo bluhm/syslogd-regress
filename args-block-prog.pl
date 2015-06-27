@@ -10,9 +10,6 @@ use warnings;
 use Cwd;
 
 my $objdir = getcwd();
-foreach (1..4) {
-    open(my $fh, '>', "prog$_.log") or die;
-}
 
 our %args = (
     client => {
@@ -22,14 +19,20 @@ our %args = (
 	options => ["-u"],
 	conf => <<"EOF",
 !nonexist
-*.*	$objdir/prog1.log
-!syslogd-regress
-*.*	$objdir/prog2.log
-*.*	$objdir/prog4.log
+*.*	$objdir/file-0.log
+!syslogd
+*.*	$objdir/file-1.log
+*.*	$objdir/file-2.log
 !*
-*.*	$objdir/prog4.log
+*.*	$objdir/file-3.log
 EOF
     },
+    multifile => [
+	{ loggrep => { get_testlog() => 0 } },
+	{ loggrep => { get_testlog() => 1 } },
+	{ loggrep => { get_testlog() => 1 } },
+	{ loggrep => { get_testlog() => 1 } },
+    ],
 );
 
 1;
