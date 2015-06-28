@@ -4,7 +4,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the messages appears in the correct log files.
+# Check that the messages appear in the correct log files.
 
 use strict;
 use warnings;
