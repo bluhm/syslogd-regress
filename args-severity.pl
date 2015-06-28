@@ -12,7 +12,7 @@ use Cwd;
 use Sys::Syslog;
 
 my $objdir = getcwd();
-my @messages;
+my (@messages, @priorities);
 
 our %args = (
     client => {
@@ -24,8 +24,10 @@ our %args = (
 		    my $msg = "$fac.$sev";
 		    push @messages, $msg;
 		    no strict 'refs';
-		    syslog(("Sys::Syslog::LOG_".uc($fac))->() |
-			("Sys::Syslog::LOG_".uc($sev))->(), $msg);
+		    my $prio = ("Sys::Syslog::LOG_".uc($fac))->() |
+			("Sys::Syslog::LOG_".uc($sev))->();
+		    push @priorities, $prio;
+		    syslog($prio, $msg);
 		}
 	    }
 	    write_log($self);
@@ -45,8 +47,11 @@ EOF
 	{ loggrep => { get_testlog() => 1 } },
 	{ loggrep => { get_testlog() => 1 } },
     ],
+    server => {
+	loggrep => { map { qr/ <$_>/ => 1 } @priorities },
+    },
     file => {
-	loggrep => { map { $_ => 1 } @messages },
+	loggrep => { map { qr/: $_$/ => 1 } @messages },
     },
 );
 
