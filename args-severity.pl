@@ -13,22 +13,23 @@ use Sys::Syslog;
 
 my $objdir = getcwd();
 my (@messages, @priorities);
+foreach my $fac (qw(local5 local6 local7)) {
+    foreach my $sev (qw(notice warning err)) {
+	my $msg = "$fac.$sev";
+	push @messages, $msg;
+	no strict 'refs';
+	my $prio = ("Sys::Syslog::LOG_".uc($fac))->() |
+	    ("Sys::Syslog::LOG_".uc($sev))->();
+	push @priorities, $prio;
+    }
+}
 
 our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-	    @messages = ();
-	    foreach my $fac (qw(local5 local6 local7)) {
-		foreach my $sev (qw(notice warning err)) {
-		    my $msg = "$fac.$sev";
-		    push @messages, $msg;
-		    no strict 'refs';
-		    my $prio = ("Sys::Syslog::LOG_".uc($fac))->() |
-			("Sys::Syslog::LOG_".uc($sev))->();
-		    push @priorities, $prio;
-		    syslog($prio, $msg);
-		}
+	    for (my $i = 0; $i < @messages; $i++) {
+		syslog($priorities[$i], $messages[$i]);
 	    }
 	    write_log($self);
 	},
