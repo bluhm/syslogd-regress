@@ -12,17 +12,20 @@ use Cwd;
 use Sys::Syslog;
 
 my $objdir = getcwd();
+my @messages;
 
 our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
+	    @messages = ();
 	    foreach my $fac (qw(local5 local6 local7)) {
 		foreach my $sev (qw(notice warning err)) {
+		    my $msg = "$fac.$sev";
+		    push @messages, $msg;
 		    no strict 'refs';
-		    my $facility = ("Sys::Syslog::LOG_".uc($fac))->();
-		    my $severity = ("Sys::Syslog::LOG_".uc($sev))->();
-		    syslog($facility|$severity, "$fac.$sev");
+		    syslog(("Sys::Syslog::LOG_".uc($fac))->() |
+			("Sys::Syslog::LOG_".uc($sev))->(), $msg);
 		}
 	    }
 	    write_log($self);
@@ -42,6 +45,9 @@ EOF
 	{ loggrep => { get_testlog() => 1 } },
 	{ loggrep => { get_testlog() => 1 } },
     ],
+    file => {
+	loggrep => { map { $_ => 1 } @messages },
+    },
 );
 
 1;
