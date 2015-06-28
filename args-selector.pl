@@ -1,5 +1,5 @@
-# The client sends messages with different facility and priority.
-# The syslogd writes into multiple files depending on severity.
+# The client sends messages with different facility and severity.
+# The syslogd writes into multiple files depending on priority.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
