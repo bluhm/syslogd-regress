@@ -26,9 +26,28 @@ foreach my $fac (qw(local5 local6 local7)) {
 }
 
 my %selector2messages = (
+    "*.*" => [@messages],
     "*.info" => [@messages],
+    "*.notice" => [@messages],
+    "*.warning" => [ grep { /\.(warning|err)$/ } @messages],
+    "*.err" => [ grep { /\.err$/ } @messages],
     "*.crit" => [],
+    "*.none" => [],
+    "local5.*" => [qw(local5.notice local5.warning local5.err)],
     "local5.info" => [qw(local5.notice local5.warning local5.err)],
+    "local5.notice" => [qw(local5.notice local5.warning local5.err)],
+    "local5.warning" => [qw(local5.warning local5.err)],
+    "local5.err" => [qw(local5.err)],
+    "local5.crit" => [],
+    "local5.none" => [],
+    "local5.warning;local5.err" => [qw(local5.err)],
+    "local5.err;local5.warning" => [qw(local5.warning local5.err)],
+    "local6.warning;local7.err" => [qw(local6.warning local6.err local7.err)],
+    "local6.err;local7.err" => [qw(local6.err local7.err)],
+    "local6,local7.err" => [qw(local6.err local7.err)],
+    "local6,local7.warning;local6.err" => [qw(local6.err local7.warning
+	local7.err)],
+    "*.*;local6,local7.none" => [qw(local5.notice local5.warning local5.err)],
 );
 
 sub selector2config {
