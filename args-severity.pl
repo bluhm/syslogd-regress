@@ -49,13 +49,14 @@ our %args = (
     },
     syslogd => {
 	conf => <<"EOF",
-local5.info	$objdir/file-0.log
-*.*	$objdir/file-1.log
-*.*	$objdir/file-2.log
-*.*	$objdir/file-3.log
+*.info		$objdir/file-0.log
+*.crit		$objdir/file-1.log
+local5.info	$objdir/file-2.log
 EOF
     },
     multifile => [
+	m2l(@messages),
+	m2l(),
 	m2l(qw(local5.notice local5.warning local5.err)),
     ],
     server => {
