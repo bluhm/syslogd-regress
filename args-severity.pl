@@ -12,6 +12,7 @@ use Cwd;
 use Sys::Syslog;
 
 my $objdir = getcwd();
+
 my (@messages, @priorities);
 foreach my $fac (qw(local5 local6 local7)) {
     foreach my $sev (qw(notice warning err)) {
@@ -24,17 +25,38 @@ foreach my $fac (qw(local5 local6 local7)) {
     }
 }
 
-sub m2l {
-    my (%msg, %nomsg);
-    @msg{@_} = ();
-    @nomsg{@messages} = ();
-    delete @nomsg{@_};
-    return {
-	loggrep => {
+my %selector2messages = (
+    "*.info" => [@messages],
+    "*.crit" => [],
+    "local5.info" => [qw(local5.notice local5.warning local5.err)],
+);
+
+sub selector2config {
+    my %s2m = @_;
+    my $conf = "";
+    my $i = 0;
+    foreach my $sel (sort keys %s2m) {
+	$conf .= "$sel\t$objdir/file-$i.log\n";
+	$i++;
+    }
+    return $conf;
+}
+
+sub messages2loggrep {
+    my %s2m = @_;
+    my @loggrep;
+    foreach my $sel (sort keys %s2m) {
+	my @m = @{$s2m{$sel}};
+	my (%msg, %nomsg);
+	@msg{@m} = ();
+	@nomsg{@messages} = ();
+	delete @nomsg{@m};
+	push @loggrep, {
 	    (map { qr/: $_$/ => 1 } sort keys %msg),
 	    (map { qr/: $_$/ => 0 } sort keys %nomsg),
-	},
-    };
+	};
+    }
+    return @loggrep;
 }
 
 our %args = (
@@ -48,16 +70,10 @@ our %args = (
 	},
     },
     syslogd => {
-	conf => <<"EOF",
-*.info		$objdir/file-0.log
-*.crit		$objdir/file-1.log
-local5.info	$objdir/file-2.log
-EOF
+	conf => selector2config(%selector2messages),
     },
     multifile => [
-	m2l(@messages),
-	m2l(),
-	m2l(qw(local5.notice local5.warning local5.err)),
+	(map { { loggrep => $_ } } (messages2loggrep(%selector2messages))),
     ],
     server => {
 	loggrep => { map { qr/ <$_>/ => 1 } @priorities },
