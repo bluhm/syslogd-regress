@@ -24,6 +24,19 @@ foreach my $fac (qw(local5 local6 local7)) {
     }
 }
 
+sub m2l {
+    my (%msg, %nomsg);
+    @msg{@_} = ();
+    @nomsg{@messages} = ();
+    delete @nomsg{@_};
+    return {
+	loggrep => {
+	    (map { qr/: $_$/ => 1 } sort keys %msg),
+	    (map { qr/: $_$/ => 0 } sort keys %nomsg),
+	},
+    };
+}
+
 our %args = (
     client => {
 	func => sub {
@@ -36,17 +49,14 @@ our %args = (
     },
     syslogd => {
 	conf => <<"EOF",
-*.*	$objdir/file-0.log
+local5.info	$objdir/file-0.log
 *.*	$objdir/file-1.log
 *.*	$objdir/file-2.log
 *.*	$objdir/file-3.log
 EOF
     },
     multifile => [
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 1 } },
-	{ loggrep => { get_testlog() => 1 } },
-	{ loggrep => { get_testlog() => 1 } },
+	m2l(qw(local5.notice local5.warning local5.err)),
     ],
     server => {
 	loggrep => { map { qr/ <$_>/ => 1 } @priorities },
