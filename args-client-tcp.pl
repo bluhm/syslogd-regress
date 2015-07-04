@@ -18,7 +18,7 @@ our %args = (
         fstat => {
             qr/^root .* internet/ => 0,
             qr/^_syslogd .* internet/ => 3,
-            qr/ internet stream tcp 0x0 127.0.0.1:514$/ => 1,
+            qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
 	},
     },
     file => {
