@@ -90,6 +90,7 @@ sub write_message {
 			print STDERR $msg, "\n";
 		} else {
 			print @_;
+			print "\n" if $self->{connectproto} eq "tcp";
 			print STDERR @_, "\n";
 		}
 	} else {

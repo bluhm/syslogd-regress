@@ -13,12 +13,6 @@ our %args = (
     client => {
 	connect => { domain => AF_INET6, proto => "tcp", addr => "::1",
 	    port => 514 },
-	func => sub {
-	    my $self = shift;
-	    write_message($self, get_testlog());
-	    print "\n";
-	    write_shutdown($self);
-	},
 	loggrep => {
 	    qr/connect sock: ::1 \d+/ => 1,
 	    get_testlog() => 1,
