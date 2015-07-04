@@ -1,4 +1,5 @@
-# The client writes a message to Sys::Syslog unix method.
+# The syslogd listens on localhost TCP socket.
+# The client writes a message to Sys::Syslog tcp method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -7,16 +8,21 @@
 
 use strict;
 use warnings;
-use Sys::Hostname;
-
-(my $host = hostname()) =~ s/\..*//;  # short name
 
 our %args = (
     client => {
-	logsock => { type => "unix" },
+	logsock => { type => "tcp", host => "127.0.0.1", port => 514 },
+    },
+    syslogd => {
+	options => ["-T", "127.0.0.1:514"],
+        fstat => {
+            qr/^root .* internet/ => 0,
+            qr/^_syslogd .* internet/ => 3,
+            qr/ internet stream tcp 0x0 127.0.0.1:514$/ => 1,
+	},
     },
     file => {
-	loggrep => qr/ $host syslogd-regress\[\d+\]: /. get_testlog(),
+	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_testlog(),
     },
 );
 
