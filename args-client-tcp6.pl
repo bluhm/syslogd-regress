@@ -1,5 +1,5 @@
-# The syslogd listens on localhost TCP socket.
-# The client writes a message to Sys::Syslog tcp method.
+# The syslogd listens on ::1 TCP socket.
+# The client writes a message into a ::1 TCP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -11,18 +11,29 @@ use warnings;
 
 our %args = (
     client => {
-	logsock => { type => "tcp", host => "127.0.0.1", port => 514 },
+	connect => { domain => AF_INET6, proto => "tcp", addr => "::1",
+	    port => 514 },
+	func => sub {
+	    my $self = shift;
+	    write_message($self, get_testlog());
+	    print "\n";
+	    write_shutdown($self);
+	},
+	loggrep => {
+	    qr/connect sock: ::1 \d+/ => 1,
+	    get_testlog() => 1,
+	},
     },
     syslogd => {
-	options => ["-T", "127.0.0.1:514"],
-        fstat => {
-            qr/^root .* internet/ => 0,
-            qr/^_syslogd .* internet/ => 3,
-            qr/ internet stream tcp 0x0 127.0.0.1:514$/ => 1,
+	options => ["-T", "[::1]:514"],
+	fstat => {
+	    qr/^root .* internet/ => 0,
+	    qr/^_syslogd .* internet/ => 3,
+	    qr/ internet6 stream tcp \w+ \[::1\]:514$/ => 1,
 	},
     },
     file => {
-	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_testlog(),
+	loggrep => qr/ localhost /. get_testlog(),
     },
 );
 
