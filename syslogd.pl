@@ -41,11 +41,6 @@ if (@ARGV and -f $ARGV[-1]) {
 @ARGV == 0 or usage();
 
 create_multifile(@{$args{multifile} || []});
-if ($args{rsyslogd}) {
-	$args{rsyslogd}{listen}{domain} ||= AF_INET;
-	$args{rsyslogd}{listen}{addr}   ||= "127.0.0.1";
-	$args{rsyslogd}{listen}{proto}  ||= "udp";
-}
 foreach my $name (qw(client syslogd server rsyslogd)) {
 	$args{$name} or next;
 	foreach my $action (qw(connect listen)) {
