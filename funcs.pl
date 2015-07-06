@@ -100,6 +100,8 @@ sub write_message {
 sub write_shutdown {
 	my $self = shift;
 
+	IO::Handle::flush(\*STDOUT);
+	sleep .1 if $self->{connectdomain};
 	setlogsock("native")
 	    or die ref($self), " setlogsock native failed: $!";
 	syslog(LOG_NOTICE, $downlog);
