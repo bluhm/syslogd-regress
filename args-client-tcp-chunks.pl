@@ -31,6 +31,11 @@ our %args = (
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
+	loggrep => {
+	    qr/tcp logger .* buffer \d+ bytes/ =>
+		int((length(get_testlog())+4)/5),
+	    get_testlog() => 1,
+	},
     },
 );
 
