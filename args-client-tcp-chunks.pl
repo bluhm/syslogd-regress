@@ -3,7 +3,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, server log.
+# Find the message in file, pipe, syslogd, server log.
 # Check that the file log contains the complete message.
 
 use strict;
