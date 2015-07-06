@@ -50,7 +50,10 @@ foreach my $name (qw(client syslogd server rsyslogd)) {
 	$args{$name} or next;
 	foreach my $action (qw(connect listen)) {
 		my $h = $args{$name}{$action} or next;
-		foreach my $k (qw(domain addr proto port)) {
+		defined $h->{domain}
+		    or die "No domain specified in $name $action";
+		foreach my $k (qw(domain proto addr port)) {
+			next unless defined $h->{$k};
 			$args{$name}{"$action$k"} = $h->{$k};
 		}
 	}
