@@ -58,7 +58,7 @@ $s = RSyslogd->new(
     %{$args{rsyslogd}},
     listenport          => scalar find_ports(%{$args{rsyslogd}{listen}}),
     testfile            => $testfile,
-) if $args{rsyslogd};
+) if $args{rsyslogd}{listen} && !$args{rsyslogd}{connect};
 $s ||= Server->new(
     func                => \&read_log,
     listendomain        => AF_INET,
@@ -85,13 +85,20 @@ $r = Syslogd->new(
     client              => \$c,
     server              => \$s,
 );
+my $rc = RSyslogd->new(
+    %{$args{rsyslogd}},
+    listenport          => scalar find_ports(%{$args{rsyslogd}{listen}}),
+    testfile            => $testfile,
+) if $args{rsyslogd}{connect};
 $c = Client->new(
     func                => \&write_log,
+    connectport         => $rc && $rc->{listenport},
     %{$args{client}},
     testfile            => $testfile,
     syslogd             => \$r,
     server              => \$s,
 ) unless $args{client}{noclient};
+($rc, $c) = ($c, $rc) if $rc;  # chain client -> rsyslogd -> syslogd
 
 $r->run unless $r->{late};
 $s->run->up unless $args{server}{noserver};
@@ -111,6 +118,7 @@ foreach (@m) {
 	}
 }
 $c->run->up unless $args{client}{noclient};
+$rc->run->up if $args{rsyslogd}{connect};
 
 $c->down unless $args{client}{noclient};
 $s->down unless $args{server}{noserver};

@@ -1,4 +1,4 @@
-# Test with rsyslogd as receiver.
+# Test with rsyslogd as sender.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the rsyslogd.
@@ -10,12 +10,16 @@ use strict;
 use warnings;
 
 our %args = (
+    client => {
+	connect => { domain => AF_INET, proto => "udp", addr => "127.0.0.1" },
+    },
     rsyslogd => {
 	listen => { domain => AF_INET, proto => "udp", addr => "127.0.0.1" },
-	loggrep => {
-	    get_testlog() => 2,
-	    qr/Error/ => 0,
-	},
+	connect => { domain => AF_INET, proto => "udp", addr => "127.0.0.1",
+	    port => 514 },
+    },
+    syslogd => {
+	options => ["-U", "127.0.0.1:514"],
     },
 );
 
