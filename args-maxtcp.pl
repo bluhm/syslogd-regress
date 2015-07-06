@@ -8,22 +8,18 @@
 
 use strict;
 use warnings;
+use constant MAXTCP => 20;
 
 our %args = (
     client => {
-	connect => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1",
-	    port => 514 },
-	loggrep => {
-	    qr/connect sock: 127.0.0.1 \d+/ => 1,
-	    get_testlog() => 1,
-	},
+	connect => { proto => "tcp", addr => "localhost", port => 514 },
     },
     syslogd => {
-	options => ["-T", "127.0.0.1:514"],
+	options => ["-T", "localhost:514"],
 	fstat => {
 	    qr/^root .* internet/ => 0,
 	    qr/^_syslogd .* internet/ => 3,
-	    qr/ internet stream tcp \w+ 127.0.0.1:514$/ => 1,
+	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
 	},
     },
     file => {
