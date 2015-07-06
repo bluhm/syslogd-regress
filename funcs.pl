@@ -82,7 +82,7 @@ sub write_message {
 	if (defined($self->{connectdomain})) {
 		my $msg = join("", @_);
 		if ($self->{connectproto} eq "udp") {
-			# writing udp packets works only with syswrite()
+			# writing UDP packets works only with syswrite()
 			defined(my $n = syswrite(STDOUT, $msg))
 			    or die ref($self), " write log line failed: $!";
 			$n == length($msg)
@@ -191,7 +191,7 @@ sub read_message {
 	local $_;
 	for (;;) {
 		if ($self->{listenproto} eq "udp") {
-			# reading udp packets works only with sysread()
+			# reading UDP packets works only with sysread()
 			defined(my $n = sysread(STDIN, $_, 8194))
 			    or die ref($self), " read log line failed: $!";
 			last if $n == 0;

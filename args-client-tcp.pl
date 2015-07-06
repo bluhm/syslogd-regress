@@ -1,5 +1,5 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes a message to Sys::Syslog tcp method.
+# The client writes a message to Sys::Syslog TCP method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
