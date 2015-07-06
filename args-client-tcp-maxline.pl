@@ -1,14 +1,15 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
 # The client writes long line into a 127.0.0.1 TCP socket.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via TCP to the loghost.
-# The server receives the message on its TCP socket.
+# The syslogd passes it via UDP to the loghost.
+# The server receives the message on its UDP socket.
 # Find the message in file, syslogd, server log.
 # Check that the file log contains the truncated message.
 
 use strict;
 use warnings;
 use constant MAXLINE => 8192;
+use constant MAX_UDPMSG => 1180;
 
 our %args = (
     client => {
@@ -28,12 +29,11 @@ our %args = (
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	loghost => '@tcp://127.0.0.1:$connectport',
 	loggrep => qr/incomplete line, use /.(MAXLINE+1).qr/ bytes/,
     },
     server => {
-	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
-	loggrep => generate_chars(MAXLINE).qr/$/,
+	# >>> <13>Jul  6 22:33:32 0123456789ABC...fgh
+	loggrep => qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/,
     },
     file => {
 	loggrep => generate_chars(MAXLINE).qr/$/,
