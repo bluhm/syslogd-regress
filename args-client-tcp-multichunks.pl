@@ -14,7 +14,7 @@ our %args = (
 	connect => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1",
 	    port => 514 },
 	func => sub {
-            my $self = shift;
+	    my $self = shift;
 	    local $| = 1;
 	    my $n = 0;
 	    foreach (get_testlog() =~ /.{1,5}/g) {
@@ -25,6 +25,8 @@ our %args = (
 		    or die ref($self), " syslogd did not receive $n bytes";
 	    }
 	    print "\n";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* complete line", 5)
+		or die ref($self), " syslogd did not receive complete line";
 	    write_shutdown($self);
 	},
 	loggrep => {},
@@ -34,6 +36,7 @@ our %args = (
 	loggrep => {
 	    qr/tcp logger .* buffer \d+ bytes/ =>
 		int((length(get_testlog())+4)/5),
+	    qr/tcp logger .* complete line/ => 1,
 	    get_testlog() => 1,
 	},
     },

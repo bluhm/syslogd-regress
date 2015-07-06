@@ -19,6 +19,7 @@ our %args = (
 	    port => 514 },
 	func => sub {
 	    my $self = shift;
+	    local $| = 1;
 	    my @s;
 	    $s[0] = \*STDOUT;
 	    # open all additional connections and one more
@@ -36,6 +37,8 @@ our %args = (
 	    # close and reopen a single connection
 	    close($s[1])
 		or die "tcp socket 1 close failed: $!";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* connection close", 5)
+		or die ref($self), " syslogd did not close connection";
 	    $s[1] = IO::Socket::INET6->new(
 		Domain              => AF_INET,
 		Proto               => "tcp",
@@ -49,6 +52,9 @@ our %args = (
 		print $fh "$msg\n";
 		print STDERR "<<< $msg\n";
 	    }
+	    ${$self->{syslogd}}->loggrep("tcp logger .* complete line", 5,
+		MAXTCP) or die ref($self),
+		" syslogd did not receive all complete lines";
 	    write_shutdown($self);
 	},
     },

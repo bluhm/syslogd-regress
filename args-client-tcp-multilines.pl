@@ -20,16 +20,21 @@ our %args = (
 	connect => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1",
 	    port => 514 },
 	func => sub {
-            my $self = shift;
+	    my $self = shift;
 	    my $msg = get_firstlog()."\n".get_secondlog()."\n".get_thirdlog();
 	    write_message($self, $msg);
+	    ${$self->{syslogd}}->loggrep(get_thirdlog(), 5)
+		or die ref($self), " syslogd did not receive third log";
 	    write_shutdown($self);
 	},
 	loggrep => {},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	loggrep => \%threegrep,
+	loggrep => {
+	    %threegrep,
+	    qr/tcp logger .* complete line/ => 3,
+	},
     },
     server => { loggrep => \%threegrep },
     file => { loggrep => \%threegrep },

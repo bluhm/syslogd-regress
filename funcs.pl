@@ -63,6 +63,8 @@ sub write_log {
 	my $self = shift;
 
 	write_message($self, $testlog);
+	IO::Handle::flush(\*STDOUT);
+	${$self->{syslogd}}->loggrep($testlog, 2);
 	write_shutdown($self);
 }
 
@@ -73,6 +75,8 @@ sub write_between2logs {
 	write_message($self, $firstlog);
 	$func->($self, @_);
 	write_message($self, $testlog);
+	IO::Handle::flush(\*STDOUT);
+	${$self->{syslogd}}->loggrep($testlog, 2);
 	write_shutdown($self);
 }
 
@@ -100,8 +104,6 @@ sub write_message {
 sub write_shutdown {
 	my $self = shift;
 
-	IO::Handle::flush(\*STDOUT);
-	sleep .1;
 	setlogsock("native")
 	    or die ref($self), " setlogsock native failed: $!";
 	syslog(LOG_NOTICE, $downlog);

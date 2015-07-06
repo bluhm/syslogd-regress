@@ -16,7 +16,7 @@ our %args = (
 	connect => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1",
 	    port => 514 },
 	func => sub {
-            my $self = shift;
+	    my $self = shift;
 	    local $| = 1;
 	    my $msg = generate_chars(MAXLINE+1);
 	    print $msg;
