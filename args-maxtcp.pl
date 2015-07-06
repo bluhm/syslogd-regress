@@ -1,10 +1,12 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes a message into a 127.0.0.1 TCP socket.
+# The client creates MAXTCP connections to syslogd TCP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains the hostname and message.
+# Check that an additional connection gets denied by syslogd.
+# Check that close and reopen a connection succeeds.
+# Check that every connection transfers a message.
 
 use strict;
 use warnings;
