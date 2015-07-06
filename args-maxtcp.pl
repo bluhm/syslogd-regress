@@ -12,7 +12,8 @@ use constant MAXTCP => 20;
 
 our %args = (
     client => {
-	connect => { proto => "tcp", addr => "localhost", port => 514 },
+	connect => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost",
+	    port => 514 },
     },
     syslogd => {
 	options => ["-T", "localhost:514"],
