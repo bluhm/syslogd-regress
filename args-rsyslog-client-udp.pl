@@ -1,10 +1,11 @@
 # Test with rsyslogd as sender.
-# The client writes a message to Sys::Syslog native method.
+# The client writes a message to rsyslogd UDP socket.
+# The rsyslogd forwards the message to syslogd UDP bind socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the rsyslogd.
 # The rsyslogd receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, rsyslogd log.
-# Check that the message is in the rsyslogd out file.
+# Find the message in rsyslogd, file, pipe, syslogd, server log.
+# Check that the message is in rsyslogd, syslogd, server log.
 
 use strict;
 use warnings;
