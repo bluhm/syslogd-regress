@@ -80,19 +80,18 @@ sub write_message {
 	my $self = shift;
 
 	if (defined($self->{connectdomain})) {
+		my $msg = join("", @_);
 		if ($self->{connectproto} eq "udp") {
 			# writing udp packets works only with syswrite()
-			my $msg = join("", @_);
 			defined(my $n = syswrite(STDOUT, $msg))
 			    or die ref($self), " write log line failed: $!";
 			$n == length($msg)
 			    or die ref($self), " short UDP write";
-			print STDERR $msg, "\n";
 		} else {
-			print @_;
+			print $msg;
 			print "\n" if $self->{connectproto} eq "tcp";
-			print STDERR @_, "\n";
 		}
+		print STDERR "<<< $msg\n";
 	} else {
 		syslog(LOG_INFO, @_);
 	}
@@ -158,7 +157,7 @@ sub write_unix {
 	) or die ref($self), " connect to $path unix socket failed: $!";
 	my $msg = get_testlog(). " $path unix socket";
 	print $u $msg;
-	print STDERR $msg, "\n";
+	print STDERR "<<< $msg\n";
 }
 
 ########################################################################
