@@ -1,4 +1,4 @@
-# Test with rsyslogd as sender.
+# Test UDP with rsyslogd as sender.
 # The client writes a message to rsyslogd UDP socket.
 # The rsyslogd forwards the message to syslogd UDP bind socket.
 # The syslogd writes it into a file and through a pipe.
