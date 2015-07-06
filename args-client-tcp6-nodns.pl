@@ -1,4 +1,5 @@
-# The client writes a message to a localhost IPv6 UDP socket.
+# The syslogd listens on ::1 TCP socket.
+# The client writes a message into a ::1 TCP socket.
 # The syslogd writes it into a file and through a pipe without dns.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -11,10 +12,11 @@ use Socket;
 
 our %args = (
     client => {
-	connect => { domain => AF_INET6, addr => "::1", port => 514 },
+	connect => { domain => AF_INET6, proto => "tcp", addr => "::1",
+	    port => 514 },
     },
     syslogd => {
-	options => ["-un"],
+	options => ["-n", "-T", "[::1]:514"],
     },
     file => {
 	loggrep => qr/ ::1 /. get_testlog(),
