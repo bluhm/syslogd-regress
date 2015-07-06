@@ -1,4 +1,4 @@
-# The syslogd listens on localhost TCP socket.
+# The syslogd listens on 127.0.0.1 TCP socket.
 # The client writes a message to Sys::Syslog tcp method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -15,10 +15,10 @@ our %args = (
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-        fstat => {
-            qr/^root .* internet/ => 0,
-            qr/^_syslogd .* internet/ => 3,
-            qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
+	fstat => {
+	    qr/^root .* internet/ => 0,
+	    qr/^_syslogd .* internet/ => 3,
+	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
 	},
     },
     file => {
