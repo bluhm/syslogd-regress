@@ -17,7 +17,7 @@ our %args = (
 	func => sub {
             my $self = shift;
 	    local $| = 1;
-	    my $msg = generate_chars($self, MAXLINE+1);
+	    my $msg = generate_chars(MAXLINE+1);
 	    print $msg;
 	    print STDERR "<<< $msg\n";
 	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete line", 5)
@@ -33,10 +33,10 @@ our %args = (
     },
     server => {
 	listen => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1" },
-	loggrep => generate_chars(undef, MAXLINE).qr/$/,
+	loggrep => generate_chars(MAXLINE).qr/$/,
     },
     file => {
-	loggrep => generate_chars(undef, MAXLINE).qr/$/,
+	loggrep => generate_chars(MAXLINE).qr/$/,
     },
     pipe => { loggrep => {} },  # XXX syslogd ignore short writes to pipe
 );
