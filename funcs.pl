@@ -123,6 +123,24 @@ sub write_lengths {
 	write_chars($self, $lenghts, $tail);
 }
 
+sub generate_chars {
+	my $self = shift;
+	my ($len) = @_;
+
+	my $msg = "";
+	my $char = '0';
+	for (my $i = 0; $i < $len; $i++) {
+		$msg .= $char;
+		given ($char) {
+			when(/9/)       { $char = 'A' }
+			when(/Z/)       { $char = 'a' }
+			when(/z/)       { $char = '0' }
+			default         { $char++ }
+		}
+	}
+	return $msg;
+}
+
 sub write_chars {
 	my $self = shift;
 	my ($length, $tail) = @_;
@@ -131,17 +149,7 @@ sub write_chars {
 		my $t = $tail // "";
 		substr($t, 0, length($t) - $len, "")
 		    if length($t) && length($t) > $len;
-		my $msg = "";
-		my $char = '0';
-		for (my $i = 0; $i < $len - length($t); $i++) {
-			$msg .= $char;
-			given ($char) {
-				when(/9/)       { $char = 'A' }
-				when(/Z/)       { $char = 'a' }
-				when(/z/)       { $char = '0' }
-				default         { $char++ }
-			}
-		}
+		my $msg = generate_chars($self, $len - length($t));
 		$msg .= $t if length($t);
 		write_message($self, $msg);
 		# if client is sending too fast, syslogd will not see everything
