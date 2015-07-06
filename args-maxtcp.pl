@@ -1,4 +1,4 @@
-# The syslogd listens on localhost TCP socket.
+# The syslogd listens on 127.0.0.1 TCP socket.
 # The client writes a message into a 127.0.0.1 TCP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -13,7 +13,7 @@ use constant MAXTCP => 20;
 
 our %args = (
     client => {
-	connect => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost",
+	connect => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1",
 	    port => 514 },
 	func => sub {
 	    my $self = shift;
@@ -22,9 +22,9 @@ our %args = (
 	    # open all additional connections and one more
 	    for (my $i = 1; $i <= MAXTCP; $i++) {
 		$s[$i] = IO::Socket::INET6->new(
-		    Domain              => AF_UNSPEC,
+		    Domain              => AF_INET,
 		    Proto               => "tcp",
-		    PeerAddr            => "localhost",
+		    PeerAddr            => "127.0.0.1",
 		    PeerPort            => 514,
 		) or die "tcp socket $i connect failed: $!";
 	    }
@@ -35,9 +35,9 @@ our %args = (
 	    close($s[1])
 		or die "tcp socket 1 close failed: $!";
 	    $s[1] = IO::Socket::INET6->new(
-		Domain              => AF_UNSPEC,
+		Domain              => AF_INET,
 		Proto               => "tcp",
-		PeerAddr            => "localhost",
+		PeerAddr            => "127.0.0.1",
 		PeerPort            => 514,
 	    ) or die "tcp socket 1 connect again failed: $!";
 	    # write messages over all connections
@@ -51,7 +51,7 @@ our %args = (
 	},
     },
     syslogd => {
-	options => ["-T", "localhost:514"],
+	options => ["-T", "127.0.0.1:514"],
 	fstat => {
 	    qr/^root .* internet/ => 0,
 	    qr/^_syslogd .* internet/ => 3,
