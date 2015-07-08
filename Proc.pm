@@ -19,6 +19,7 @@ use strict;
 use warnings;
 
 package Proc;
+use BSD::Resource qw(getrlimit setrlimit get_rlimits);
 use Carp;
 use Errno;
 use IO::File;
@@ -107,6 +108,18 @@ sub run {
 	    or die ref($self), " dup STDIN failed: $!";
 	close($reader);
 
+	if ($self->{rlimit}) {
+		my $rlimits = get_rlimits()
+		    or die ref($self), " get_rlimits failed: $!";
+		while (my($name, $newsoft) = each %{$self->{rlimit}}) {
+			defined(my $resource = $rlimits->{$name})
+			    or die ref($self), " rlimit $name does not exists";
+			my ($soft, $hard) = getrlimit($resource)
+			    or die ref($self), " getrlimit $name failed: $!";
+			setrlimit($resource, $newsoft, $hard) or die ref($self),
+			    " setrlimit $name to $newsoft failed: $!";
+		}
+	}
 	if ($self->{ktrace}) {
 		my @cmd = ("ktrace", "-f", $self->{ktracefile}, "-p", $$);
 		system(@cmd)
