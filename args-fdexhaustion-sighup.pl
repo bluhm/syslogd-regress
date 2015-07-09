@@ -1,5 +1,5 @@
 # The syslogd is started with reduced file descriptor limits.
-# The syslogd config after SIGHUP contains more log files than possible.
+# The syslogd config is reread after SIGHUP.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -27,10 +27,12 @@ our %args = (
 	rlimit => {
 	    RLIMIT_NOFILE => 30,
 	},
-	fstat => {},
-	ktrace => {},
 	loggrep => {
+	    # If not in startup, each failed PRIV_OPEN_LOG is logged
+	    # to tty, so PRIV_OPEN_TTY fails again.
 	    qr/syslogd: receive_fd: recvmsg: Message too long/ => 4+2*3,
+	    # During first initialization the lockpipe is open.  When
+	    # SIGHUP happens it is closed and one more file can be opened.
 	    qr/X FILE:/ => 1+16+1+17,
 	    qr/X UNUSED:/ => 4+3,
 	},

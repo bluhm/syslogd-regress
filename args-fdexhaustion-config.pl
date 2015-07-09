@@ -21,6 +21,7 @@ our %args = (
 	},
 	loggrep => {
 	    qr/syslogd: receive_fd: recvmsg: Message too long/ => 4,
+	    # One file is opened by test default config, 20 by multifile.
 	    qr/X FILE:/ => 1+16,
 	    qr/X UNUSED:/ => 4,
 	},
