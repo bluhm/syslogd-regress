@@ -20,7 +20,7 @@ our %args = (
 	    RLIMIT_NOFILE => 30,
 	},
 	loggrep => {
-	    qr/receive_fd:/ => 4,
+	    qr/syslogd: receive_fd: recvmsg: Message too long/ => 4,
 	    qr/X FILE:/ => 1+16,
 	    qr/X UNUSED:/ => 4,
 	},
