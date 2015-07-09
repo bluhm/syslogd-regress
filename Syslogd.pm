@@ -53,6 +53,8 @@ sub new {
 	_make_abspath(\$self->{$_}) foreach (qw(conffile outfile outpipe));
 
 	# substitute variables in config file
+	my $curdir = dirname($0) || ".";
+	my $objdir = getcwd();
 	my $connectdomain = $self->{connectdomain};
 	my $connectaddr = $self->{connectaddr};
 	my $connectproto = $self->{connectproto};
