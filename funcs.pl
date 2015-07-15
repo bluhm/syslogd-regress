@@ -166,7 +166,7 @@ sub write_unix {
 	    Type  => SOCK_DGRAM,
 	    Peer => $path,
 	) or die ref($self), " connect to $path unix socket failed: $!";
-	my $msg = get_testlog(). " $path unix socket";
+	my $msg = "$testlog $path unix socket";
 	print $u $msg;
 	print STDERR "<<< $msg\n";
 }
@@ -221,7 +221,7 @@ sub read_message {
 ########################################################################
 
 sub get_testlog {
-	return $testlog;
+	return qr/$testlog/;
 }
 
 sub get_firstlog {
@@ -262,7 +262,7 @@ sub check_logs {
 	check_fstat($c, $r, $s);
 	check_ktrace($c, $r, $s);
 	if (my $file = $s->{"outfile"}) {
-		my $pattern = $s->{filegrep} || $testlog;
+		my $pattern = $s->{filegrep} || get_testlog();
 		check_pattern(ref $s, $file, $pattern, \&filegrep);
 	}
 	check_multifile(@{$args{multifile} || []});
@@ -309,7 +309,7 @@ sub check_pattern {
 sub check_log {
 	foreach my $proc (@_) {
 		next unless $proc && !$proc->{nocheck};
-		my $pattern = $proc->{loggrep} || $testlog;
+		my $pattern = $proc->{loggrep} || get_testlog();
 		check_pattern(ref $proc, $proc, $pattern, \&loggrep);
 	}
 }
@@ -330,7 +330,7 @@ sub check_out {
 	foreach my $name (qw(file pipe)) {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or die;
-		my $pattern = $args{$name}{loggrep} || $testlog;
+		my $pattern = $args{$name}{loggrep} || get_testlog();
 		check_pattern($name, $file, $pattern, \&filegrep);
 	}
 }
