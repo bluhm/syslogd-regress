@@ -21,15 +21,15 @@ our %args = (
 	    my $msg = generate_chars(MAXLINE+1);
 	    print $msg;
 	    print STDERR "<<< $msg\n";
-	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete line", 5)
-		or die ref($self), " syslogd did not receive incomplete line";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
+		or die ref($self), " syslogd did not receive incomplete";
 	    write_shutdown($self);
 	},
 	loggrep => {},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	loggrep => qr/incomplete line, use /.(MAXLINE+1).qr/ bytes/,
+	loggrep => qr/incomplete frame, use /.(MAXLINE+1).qr/ bytes/,
     },
     server => {
 	# >>> <13>Jul  6 22:33:32 0123456789ABC...fgh
