@@ -171,6 +171,16 @@ sub write_unix {
 	print STDERR "<<< $msg\n";
 }
 
+sub write_tcp {
+	my $self = shift;
+	my $fh = shift || \*STDOUT;
+	my $id = shift // $fh;
+
+	my $msg = "$testlog $id tcp socket";
+	print $fh "$msg\n";
+	print STDERR "<<< $msg\n";
+}
+
 ########################################################################
 # Server funcs
 ########################################################################

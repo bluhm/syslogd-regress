@@ -47,10 +47,8 @@ our %args = (
 	    ) or die "tcp socket 1 connect again failed: $!";
 	    # write messages over all connections
 	    for (my $i = 0; $i < MAXTCP; $i++) {
-		my $msg = get_testlog(). " $i tcp socket";
 		my $fh = $s[$i];
-		print $fh "$msg\n";
-		print STDERR "<<< $msg\n";
+		write_tcp($self, $fh, $i);
 	    }
 	    ${$self->{syslogd}}->loggrep("tcp logger .* complete line", 5,
 		MAXTCP) or die ref($self),
