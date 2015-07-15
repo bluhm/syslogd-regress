@@ -98,7 +98,7 @@ sub child {
 	my $self = shift;
 	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
 
-	my @pkill = (@sudo, "pkill", "-x", "syslogd");
+	my @pkill = (@sudo, "pkill", "-KILL", "-x", "syslogd");
 	my @pgrep = ("pgrep", "-x", "syslogd");
 	system(@pkill) && $? != 256
 	    and die ref($self), " system '@pkill' failed: $?";
