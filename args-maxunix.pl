@@ -12,7 +12,7 @@ use Sys::Hostname;
 use IO::Socket::UNIX;
 use constant MAXUNIX => 21;
 
-(my $hostname = hostname()) =~ s/\..*//;
+(my $host = hostname()) =~ s/\..*//;
 
 our %args = (
     client => {
@@ -35,7 +35,7 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    qr/ $hostname .* unix socket: /.get_testgrep() => MAXUNIX,
+	    qr/ $host .* unix socket: /.get_testgrep() => MAXUNIX,
 	    "/dev/log unix socket" => 1,
 	    (map { " $_ unix socket: ".get_testgrep() => 1 } 1..MAXUNIX-1),
 	    MAXUNIX." unix socket: ".get_testgrep() => 0,

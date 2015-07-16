@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Sys::Hostname;
 
-(my $host = hostname()) =~ s/\..*//;  # short name
+(my $host = hostname()) =~ s/\..*//;
 
 our %args = (
     client => {

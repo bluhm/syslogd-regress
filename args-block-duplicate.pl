@@ -12,7 +12,7 @@ use Cwd;
 use Sys::Hostname;
 
 my $objdir = getcwd();
-(my $hostname = hostname()) =~ s/\..*//;
+(my $host = hostname()) =~ s/\..*//;
 
 our %args = (
     syslogd => {
@@ -28,7 +28,7 @@ our %args = (
 *.*	$objdir/file-2.log
 *.*	$objdir/file-4.log
 *.*	$objdir/file-5.log
-+$hostname
++$host
 *.*	$objdir/file-2.log
 *.*	$objdir/file-3.log
 *.*	$objdir/file-5.log
