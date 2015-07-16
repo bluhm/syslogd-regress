@@ -16,7 +16,7 @@ our %args = (
 	options => ["-un"],
     },
     file => {
-	loggrep => qr/ 127.0.0.1 syslogd-regress\[\d+\]: /. get_testlog(),
+	loggrep => qr/ 127.0.0.1 syslogd-regress\[\d+\]: /. get_testgrep(),
     },
 );
 

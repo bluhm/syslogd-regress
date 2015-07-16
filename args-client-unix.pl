@@ -16,7 +16,7 @@ our %args = (
 	logsock => { type => "unix" },
     },
     file => {
-	loggrep => qr/ $host syslogd-regress\[\d+\]: /. get_testlog(),
+	loggrep => qr/ $host syslogd-regress\[\d+\]: /. get_testgrep(),
     },
 );
 

@@ -35,13 +35,13 @@ our %args = (
 EOF
     },
     multifile => [
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 1 } },
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 0 } },
-	{ loggrep => { get_testlog() => 1 } },
+	{ loggrep => { get_testgrep() => 0 } },
+	{ loggrep => { get_testgrep() => 0 } },
+	{ loggrep => { get_testgrep() => 1 } },
+	{ loggrep => { get_testgrep() => 0 } },
+	{ loggrep => { get_testgrep() => 0 } },
+	{ loggrep => { get_testgrep() => 0 } },
+	{ loggrep => { get_testgrep() => 1 } },
     ],
 );
 

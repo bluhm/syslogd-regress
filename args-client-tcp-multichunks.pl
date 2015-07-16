@@ -17,7 +17,7 @@ our %args = (
 	    my $self = shift;
 	    local $| = 1;
 	    my $n = 0;
-	    foreach (get_testlog() =~ /.{1,5}/g) {
+	    foreach (get_testgrep() =~ /.{1,5}/g) {
 		$n += length;
 		print;
 		print STDERR "<<< $_\n";
@@ -35,9 +35,9 @@ our %args = (
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
 	    qr/tcp logger .* buffer \d+ bytes/ =>
-		int((length(get_testlog())+4)/5),
+		int((length(get_testgrep())+4)/5),
 	    qr/tcp logger .* complete line/ => 1,
-	    get_testlog() => 1,
+	    get_testgrep() => 1,
 	},
     },
 );

@@ -19,7 +19,7 @@ our %args = (
 	    foreach (1..(MAXUNIX-1)) {
 		write_unix($self, "unix-$_.sock");
 	    }
-	    ${$self->{syslogd}}->loggrep(get_testlog(), 5, MAXUNIX)
+	    ${$self->{syslogd}}->loggrep(get_testgrep(), 5, MAXUNIX)
 		or die ref($self), " syslogd did not receive complete line";
 	    write_shutdown($self);
 	},
@@ -32,10 +32,10 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    get_testlog()." /dev/log unix socket" => 1,
-	    (map { (get_testlog()." unix-$_.sock unix socket" => 1) }
+	    get_testgrep()." /dev/log unix socket" => 1,
+	    (map { (get_testgrep()." unix-$_.sock unix socket" => 1) }
 		(1..(MAXUNIX-1))),
-	    get_testlog()." unix-".MAXUNIX.".sock unix socket" => 0,
+	    get_testgrep()." unix-".MAXUNIX.".sock unix socket" => 0,
 	},
     },
 );
