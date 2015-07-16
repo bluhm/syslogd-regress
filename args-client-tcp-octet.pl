@@ -15,7 +15,7 @@ our %args = (
 	    port => 514 },
 	func => sub {
 	    my $self = shift;
-	    print "0 1 a2 bc3 de\n3 fg\0003 hi 4 jk\n\n1 l0 1 m2 n ";
+	    print "0 1 a2 bc3 de\n3 fg\0003 hi 4 jk\n\n1 l0 1 m1  2  n2 o ";
 	    write_log($self);
 	},
     },
@@ -26,6 +26,17 @@ our %args = (
     },
     file => {
 	loggrep => {
+	    qr/localhost $/ => 3,
+	    qr/localhost a$/ => 1,
+	    qr/localhost bc$/ => 1,
+	    qr/localhost de$/ => 1,
+	    qr/localhost fg$/ => 1,
+	    qr/localhost hi $/ => 1,
+	    qr/localhost jk $/ => 1,
+	    qr/localhost l$/ => 1,
+	    qr/localhost m$/ => 1,
+	    qr/localhost n$/ => 1,
+	    qr/localhost o $/ => 1,
 	    get_testgrep() => 1,
 	},
     },
