@@ -167,7 +167,7 @@ sub write_unix {
 	    Type  => SOCK_DGRAM,
 	    Peer => $path,
 	) or die ref($self), " connect to $path unix socket failed: $!";
-	my $msg = "$id unix socket: $testlog";
+	my $msg = "id $id unix socket: $testlog";
 	print $u $msg;
 	print STDERR "<<< $msg\n";
 }
@@ -177,7 +177,7 @@ sub write_tcp {
 	my $fh = shift || \*STDOUT;
 	my $id = shift // $fh;
 
-	my $msg = "$id tcp socket: $testlog";
+	my $msg = "id $id tcp socket: $testlog";
 	print $fh "$msg\n";
 	print STDERR "<<< $msg\n";
 }
