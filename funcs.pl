@@ -232,7 +232,7 @@ sub read_message {
 ########################################################################
 
 sub get_testlog {
-	return qr/$testlog$/;
+	return $testlog;
 }
 
 sub get_testgrep {
