@@ -15,8 +15,18 @@ our %args = (
     client => {
 	logsock => { type => "unix" },
     },
+    syslogd => {
+	loggrep => get_testlog(),
+    },
+    server => {
+	loggrep => get_testlog(),
+    },
+    pipe => {
+	loggrep => get_testlog(),
+    },
     file => {
-	loggrep => qr/ $host syslogd-regress\[\d+\]: /. get_testgrep(),
+	# Sys::Syslog unix is broken, it appends a \n\0.
+	loggrep => qr/ $host syslogd-regress\[\d+\]: /.get_testlog().qr/ $/,
     },
 );
 
