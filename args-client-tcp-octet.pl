@@ -11,18 +11,23 @@ use warnings;
 
 our %args = (
     client => {
-	logsock => { type => "tcp", host => "127.0.0.1", port => 514 },
+	connect => { domain => AF_INET, proto => "tcp", addr => "127.0.0.1",
+	    port => 514 },
+	func => sub {
+	    my $self = shift;
+	    print "0 1 a2 bc3 de\n3 fg\0003 hi 4 jk\n\n1 l0 1 m2 n ";
+	    write_log($self);
+	},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	fstat => {
-	    qr/^root .* internet/ => 0,
-	    qr/^_syslogd .* internet/ => 3,
-	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
+	loggrep => {
 	},
     },
     file => {
-	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_testgrep(),
+	loggrep => {
+	    get_testgrep() => 1,
+	},
     },
 );
 
