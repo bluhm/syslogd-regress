@@ -70,7 +70,9 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    qr/ localhost /.get_testgrep().qr/ \d+ tcp socket/ => MAXTCP,
+	    qr/ localhost .* tcp socket: /.get_testgrep() => MAXTCP,
+	    (map { " $_ tcp socket: ".get_testgrep() => 1 } 0..MAXTCP-1),
+	    MAXTCP." tcp socket: ".get_testgrep() => 0,
 	},
     },
 );

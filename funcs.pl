@@ -161,12 +161,13 @@ sub write_chars {
 sub write_unix {
 	my $self = shift;
 	my $path = shift || "/dev/log";
+	my $id = shift // $path;
 
 	my $u = IO::Socket::UNIX->new(
 	    Type  => SOCK_DGRAM,
 	    Peer => $path,
 	) or die ref($self), " connect to $path unix socket failed: $!";
-	my $msg = "$testlog $path unix socket";
+	my $msg = "$id unix socket: $testlog";
 	print $u $msg;
 	print STDERR "<<< $msg\n";
 }
@@ -176,7 +177,7 @@ sub write_tcp {
 	my $fh = shift || \*STDOUT;
 	my $id = shift // $fh;
 
-	my $msg = "$testlog $id tcp socket";
+	my $msg = "$id tcp socket: $testlog";
 	print $fh "$msg\n";
 	print STDERR "<<< $msg\n";
 }
