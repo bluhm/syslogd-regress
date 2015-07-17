@@ -1,15 +1,13 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes octet counting message that is too long.
+# The client writes octet counting messages with invalid framing.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in file, syslogd, server log.
-# Check that the file log contains the truncated message.
+# Check that an invalid octet counting is handled as non transparent framing.
 
 use strict;
 use warnings;
-use constant MAXLINE => 8192;
-use constant MAX_UDPMSG => 1180;
 
 our %args = (
     client => {
@@ -18,45 +16,27 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    local $| = 1;
-	    my $msg = generate_chars(MAXLINE+1);
-	    printf "%05d %s", MAXLINE+1, $msg;
-	    print STDERR "<<< $msg\n";
-	    ${$self->{syslogd}}->loggrep(qr/tcp logger .* use \d+ bytes/, 5)
-		or die ref($self), " syslogd did not use bytes";
-	    $msg = generate_chars(MAXLINE);
-	    printf "%05d %s", MAXLINE+1, $msg;
-	    print STDERR "<<< $msg\n";
-	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
-		or die ref($self), " syslogd did not receive 2 incomplete";
-	    print "\n";
-	    print STDERR "<<< \n";
-	    write_shutdown($self);
-	},
-	loggrep => {
-	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 2,
+	    print "000002 ab\n";
+	    print STDERR "<<< 000002 ab\n";
+	    print "2bc\n";
+	    print STDERR "<<< 00002bc\n";
+	    write_log($self);
 	},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
-	    qr/octet counting /.(MAXLINE+1).qr/, incomplete frame, /.
-		qr/buffer \d+ bytes/ => 2,
-	    qr/octet counting /.(MAXLINE+1).
-		qr/, use /.(MAXLINE+1).qr/ bytes/ => 2,
+	    qr/non transparent framing/ => 3,
+	    qr/octet counting/ => 0,
 	},
-    },
-    server => {
-	# >>> <13>Jul  6 22:33:32 0123456789ABC...fgh
-	loggrep => {
-	    qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/ => 2,
-	}
     },
     file => {
 	loggrep => {
-	    generate_chars(MAXLINE).qr/$/ => 2,
+	    qr/localhost 000002 ab$/ => 1,
+	    qr/localhost 2bc$/ => 1,
+	    get_testgrep() => 1,
 	},
     },
-    pipe => { loggrep => {} },  # XXX syslogd ignore short writes to pipe
 );
 
 1;
