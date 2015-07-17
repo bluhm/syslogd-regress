@@ -26,10 +26,10 @@ our %args = (
 	    $msg = generate_chars(5+1+MAXLINE);
 	    print $msg;
 	    print STDERR "<<< $msg\n";
-            ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5, 2)
-                or die ref($self), " syslogd did not receive 2 incomplete";
-            print "\n";
-            print STDERR "<<< \n";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5, 2)
+		or die ref($self), " syslogd did not receive 2 incomplete";
+	    print "\n";
+	    print STDERR "<<< \n";
 	    write_shutdown($self);
 	},
 	loggrep => {
