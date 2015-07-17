@@ -21,8 +21,6 @@ our %args = (
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	loggrep => {
-	},
     },
     file => {
 	loggrep => {
