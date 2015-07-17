@@ -24,8 +24,12 @@ our %args = (
 	    ${$self->{syslogd}}->loggrep(qr/tcp logger .* use \d+ bytes/, 5)
 		or die ref($self), " syslogd did not use bytes";
 	    $msg = generate_chars(MAXLINE);
-	    print (MAXLINE." ".$msg);
+	    print ((MAXLINE+1)." ".$msg);
 	    print STDERR "<<< $msg\n";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
+		or die ref($self), " syslogd did not receive 2 incomplete";
+	    print "\n";
+	    print STDERR "<<< \n";
 	    write_shutdown($self);
 	},
 	loggrep => {
@@ -36,9 +40,9 @@ our %args = (
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
 	    qr/octet counting /.(MAXLINE+1).qr/, incomplete frame, /.
-		qr/buffer \d+ bytes/ => 1,
+		qr/buffer \d+ bytes/ => 2,
 	    qr/octet counting /.(MAXLINE+1).
-		qr/, use /.(MAXLINE+1).qr/ bytes/ => 1,
+		qr/, use /.(MAXLINE+1).qr/ bytes/ => 2,
 	},
     },
     server => {
