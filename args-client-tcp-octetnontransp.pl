@@ -16,15 +16,31 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    print "2 ab";
+	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 1)
+		or die ref($self), " syslogd did not 1 octet counting";
 	    print "2 c";
+	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 2)
+		or die ref($self), " syslogd did not 2 octet counting";
 	    print "def\n";
+	    ${$self->{syslogd}}->loggrep("non transparent framing", 5, 1)
+		or die ref($self), " syslogd did not 1 non transparent framing";
 	    print "g";
-	    print "h\n2 ij";
+	    ${$self->{syslogd}}->loggrep("non transparent framing", 5, 2)
+		or die ref($self), " syslogd did not 2 non transparent framing";
+	    print "h\nil\n2 kl";
+	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 4)
+		or die ref($self), " syslogd did not 4 octet counting";
 	    write_log($self);
 	},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
+	loggrep => {
+	    qr/tcp logger .* octet counting 2,/ => 4,
+	    qr/tcp logger .* non transparent framing,/ => 4,
+	    qr/tcp logger .* octet counting 2, incomplete frame/ => 1,
+	    qr/tcp logger .* non transparent framing, incomplete frame/ => 1,
+	}
     },
     file => {
 	loggrep => {
@@ -33,6 +49,7 @@ our %args = (
 	    qr/localhost ef$/ => 1,
 	    qr/localhost gh$/ => 1,
 	    qr/localhost ij$/ => 1,
+	    qr/localhost kl$/ => 1,
 	    get_testgrep() => 1,
 	},
     },
