@@ -27,7 +27,7 @@ our %args = (
 	    print "g";
 	    ${$self->{syslogd}}->loggrep("non transparent framing", 5, 2)
 		or die ref($self), " syslogd did not 2 non transparent framing";
-	    print "h\nil\n2 kl";
+	    print "h\nij\n2 kl";
 	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 4)
 		or die ref($self), " syslogd did not 4 octet counting";
 	    write_log($self);
@@ -36,10 +36,14 @@ our %args = (
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
-	    qr/tcp logger .* octet counting 2,/ => 4,
-	    qr/tcp logger .* non transparent framing,/ => 4,
-	    qr/tcp logger .* octet counting 2, incomplete frame/ => 1,
-	    qr/tcp logger .* non transparent framing, incomplete frame/ => 1,
+	    qr/tcp logger .* octet counting 2, use 2 bytes/ => 3,
+	    qr/tcp logger .* octet counting 2, incomplete frame, /.
+		qr/buffer 3 bytes/ => 1,
+	    qr/tcp logger .* non transparent framing, use 3 bytes/ => 3,
+	    qr/tcp logger .* non transparent framing, incomplete frame, /.
+		qr/buffer 1 bytes/ => 1,
+	    qr/tcp logger .* use 0 bytes/ => 0,
+	    qr/tcp logger .* unknown method/ => 0,
 	}
     },
     file => {
