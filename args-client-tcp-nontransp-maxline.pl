@@ -21,18 +21,20 @@ our %args = (
 	    my $msg = generate_chars(MAXLINE+1);
 	    print "$msg\n";
 	    print STDERR "<<< $msg\n";
-	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
-		or die ref($self), " syslogd did not receive incomplete";
+	    ${$self->{syslogd}}->loggrep(qr/tcp logger .* use \d+ bytes/, 5)
+		or die ref($self), " syslogd did not use bytes";
 	    write_shutdown($self);
 	},
-	loggrep => qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/,
+	loggrep => {
+	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 1,
+	},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
 	    qr/non transparent framing, incomplete frame, /.
-		qr/use /.(MAXLINE+1).qr/ bytes/ => 1,
-	    qr/non transparent framing, use /.(MAXLINE+1).qr/ bytes/ => 1,
+                qr/buffer \d+ bytes/ => 1,
+	    qr/non transparent framing, use /.(MAXLINE+2).qr/ bytes/ => 1,
 	},
     },
     server => {
