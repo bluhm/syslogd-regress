@@ -23,10 +23,13 @@ our %args = (
 	    print STDERR "<<< $msg\n";
 	    ${$self->{syslogd}}->loggrep(qr/tcp logger .* use \d+ bytes/, 5)
 		or die ref($self), " syslogd did not use bytes";
+	    $msg = generate_chars(MAXLINE);
+	    print "$msg\n";
+	    print STDERR "<<< $msg\n";
 	    write_shutdown($self);
 	},
 	loggrep => {
-	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 1,
+	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 2,
 	},
     },
     syslogd => {
@@ -39,10 +42,14 @@ our %args = (
     },
     server => {
 	# >>> <13>Jul  6 22:33:32 0123456789ABC...fgh
-	loggrep => qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/,
+	loggrep => {
+	    qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/ => 2,
+	},
     },
     file => {
-	loggrep => generate_chars(MAXLINE).qr/$/,
+	loggrep => {
+	    generate_chars(MAXLINE).qr/$/ => 2,
+	},
     },
     pipe => { loggrep => {} },  # XXX syslogd ignore short writes to pipe
 );
