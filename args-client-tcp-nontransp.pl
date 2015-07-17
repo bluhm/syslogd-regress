@@ -1,5 +1,5 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes message encoded with octet counting into TCP socket.
+# The client writes non transparent framing messages into TCP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -15,7 +15,7 @@ our %args = (
 	    port => 514 },
 	func => sub {
 	    my $self = shift;
-	    print "0 1 a2 bc3 de\n3 fg\0003 hi 4 jk\n\n1 l0 1 m1  2  n2 o ";
+	    print "\na\nbc\nde\r\nfg\000hi \njk\007\nl\n\nm\n \n n\n o \n";
 	    write_log($self);
 	},
     },
@@ -30,9 +30,9 @@ our %args = (
 	    qr/localhost a$/ => 1,
 	    qr/localhost bc$/ => 1,
 	    qr/localhost de$/ => 1,
-	    qr/localhost fg$/ => 1,
+	    qr/localhost fg$/ => 1,  # NUL terminates message
 	    qr/localhost hi $/ => 1,
-	    qr/localhost jk $/ => 1,  # new line converted to space
+	    qr/localhost jk\\\^G$/ => 1,  # bell character visual
 	    qr/localhost l$/ => 1,
 	    qr/localhost m$/ => 1,
 	    qr/localhost n$/ => 1,  # leading spaces are striped
