@@ -3,7 +3,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Find the message in client, file, syslogd, server log.
+# Find the message in file, syslogd, server log.
 # Check that the file log contains the truncated message.
 
 use strict;
@@ -18,21 +18,22 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    local $| = 1;
-	    my $msg = (MAXLINE+1)." ".generate_chars(MAXLINE+1);
-	    print $msg;
+	    my $msg = generate_chars(MAXLINE+1);
+	    print ((MAXLINE+1)." ".$msg);
 	    print STDERR "<<< $msg\n";
-	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
-		or die ref($self), " syslogd did not receive incomplete";
+	    ${$self->{syslogd}}->loggrep(qr/tcp logger .* use \d+ bytes/, 5)
+		or die ref($self), " syslogd did not use bytes";
 	    write_shutdown($self);
 	},
-	loggrep => qr/<<< /.(MAXLINE+1).
-	    qr/ 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/,
+	loggrep => {
+	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 1,
+	},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
-	    qr/octet counting /.(MAXLINE+1).
-		qr/, incomplete frame, buffer \d+ bytes/ => 1,
+	    qr/octet counting /.(MAXLINE+1).qr/, incomplete frame, /.
+		qr/buffer \d+ bytes/ => 1,
 	    qr/octet counting /.(MAXLINE+1).
 		qr/, use /.(MAXLINE+1).qr/ bytes/ => 1,
 	},
