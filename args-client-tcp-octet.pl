@@ -1,10 +1,10 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes a message to Sys::Syslog TCP method.
+# The client writes message encoded with octet counting into TCP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains the hostname and message.
+# Check that the file log contains all the messages.
 
 use strict;
 use warnings;
@@ -32,10 +32,10 @@ our %args = (
 	    qr/localhost de$/ => 1,
 	    qr/localhost fg$/ => 1,
 	    qr/localhost hi $/ => 1,
-	    qr/localhost jk $/ => 1,
+	    qr/localhost jk $/ => 1,  # new line converted to space
 	    qr/localhost l$/ => 1,
 	    qr/localhost m$/ => 1,
-	    qr/localhost n$/ => 1,
+	    qr/localhost n$/ => 1,  # leading spaces are striped
 	    qr/localhost o $/ => 1,
 	    get_testgrep() => 1,
 	},
