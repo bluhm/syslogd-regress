@@ -15,6 +15,7 @@ our %args = (
 	    port => 514 },
 	func => sub {
 	    my $self = shift;
+	    local $| = 1;
 	    print "2 ab";
 	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 1)
 		or die ref($self), " syslogd did not 1 octet counting";
