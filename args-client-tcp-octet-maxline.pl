@@ -1,13 +1,15 @@
 # The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes octet counting and non transpatent framing in chunks.
+# The client writes octet counting message that is too long.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains all the messages.
+# Find the message in client, file, syslogd, server log.
+# Check that the file log contains the truncated message.
 
 use strict;
 use warnings;
+use constant MAXLINE => 8192;
+use constant MAX_UDPMSG => 1180;
 
 our %args = (
     client => {
@@ -15,48 +17,34 @@ our %args = (
 	    port => 514 },
 	func => sub {
 	    my $self = shift;
-	    print "2 ab";
-	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 1)
-		or die ref($self), " syslogd did not 1 octet counting";
-	    print "2 c";
-	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 2)
-		or die ref($self), " syslogd did not 2 octet counting";
-	    print "def\n";
-	    ${$self->{syslogd}}->loggrep("non transparent framing", 5, 1)
-		or die ref($self), " syslogd did not 1 non transparent framing";
-	    print "g";
-	    ${$self->{syslogd}}->loggrep("non transparent framing", 5, 2)
-		or die ref($self), " syslogd did not 2 non transparent framing";
-	    print "h\nij\n2 kl";
-	    ${$self->{syslogd}}->loggrep("octet counting 2", 5, 4)
-		or die ref($self), " syslogd did not 4 octet counting";
-	    write_log($self);
+	    local $| = 1;
+	    my $msg = (MAXLINE+1)." ".generate_chars(MAXLINE+1);
+	    print $msg;
+	    print STDERR "<<< $msg\n";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
+		or die ref($self), " syslogd did not receive incomplete";
+	    write_shutdown($self);
 	},
+	loggrep => qr/<<< /.(MAXLINE+1).
+	    qr/ 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/,
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
 	loggrep => {
-	    qr/tcp logger .* octet counting 2, use 2 bytes/ => 3,
-	    qr/tcp logger .* octet counting 2, incomplete frame, /.
-		qr/buffer 3 bytes/ => 1,
-	    qr/tcp logger .* non transparent framing, use 3 bytes/ => 3,
-	    qr/tcp logger .* non transparent framing, incomplete frame, /.
-		qr/buffer 1 bytes/ => 1,
-	    qr/tcp logger .* use 0 bytes/ => 0,
-	    qr/tcp logger .* unknown method/ => 0,
-	}
-    },
-    file => {
-	loggrep => {
-	    qr/localhost ab$/ => 1,
-	    qr/localhost cd$/ => 1,
-	    qr/localhost ef$/ => 1,
-	    qr/localhost gh$/ => 1,
-	    qr/localhost ij$/ => 1,
-	    qr/localhost kl$/ => 1,
-	    get_testgrep() => 1,
+	    qr/octet counting /.(MAXLINE+1).
+		qr/, incomplete frame, buffer \d+ bytes/ => 1,
+	    qr/octet counting /.(MAXLINE+1).
+		qr/, use /.(MAXLINE+1).qr/ bytes/ => 1,
 	},
     },
+    server => {
+	# >>> <13>Jul  6 22:33:32 0123456789ABC...fgh
+	loggrep => qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/,
+    },
+    file => {
+	loggrep => generate_chars(MAXLINE).qr/$/,
+    },
+    pipe => { loggrep => {} },  # XXX syslogd ignore short writes to pipe
 );
 
 1;
