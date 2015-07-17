@@ -19,12 +19,12 @@ our %args = (
 	    my $self = shift;
 	    local $| = 1;
 	    my $msg = generate_chars(MAXLINE+1);
-	    print ((MAXLINE+1)." ".$msg);
+	    printf "%05d %s", MAXLINE+1, $msg;
 	    print STDERR "<<< $msg\n";
 	    ${$self->{syslogd}}->loggrep(qr/tcp logger .* use \d+ bytes/, 5)
 		or die ref($self), " syslogd did not use bytes";
 	    $msg = generate_chars(MAXLINE);
-	    print ((MAXLINE+1)." ".$msg);
+	    printf "%05d %s", MAXLINE+1, $msg;
 	    print STDERR "<<< $msg\n";
 	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
 		or die ref($self), " syslogd did not receive 2 incomplete";
