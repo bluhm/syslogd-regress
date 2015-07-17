@@ -21,24 +21,38 @@ our %args = (
 	    my $msg = generate_chars(5+1+MAXLINE+1);
 	    print $msg;
 	    print STDERR "<<< $msg\n";
-	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5)
-		or die ref($self), " syslogd did not receive incomplete";
+	    ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5, 1)
+		or die ref($self), " syslogd did not receive 1 incomplete";
+	    $msg = generate_chars(5+1+MAXLINE);
+	    print $msg;
+	    print STDERR "<<< $msg\n";
+            ${$self->{syslogd}}->loggrep("tcp logger .* incomplete", 5, 2)
+                or die ref($self), " syslogd did not receive 2 incomplete";
+            print "\n";
+            print STDERR "<<< \n";
 	    write_shutdown($self);
 	},
 	loggrep => {
-	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 1,
+	    qr/<<< 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/ => 2,
 	},
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	loggrep => qr/incomplete frame, use /.(MAXLINE+7).qr/ bytes/,
+	loggrep => {
+	    qr/incomplete frame, use /.(MAXLINE+7).qr/ bytes/ => 1,
+	    qr/non transparent framing, use /.(MAXLINE+7).qr/ bytes/ => 1,
+	}
     },
     server => {
 	# >>> <13>Jul  6 22:33:32 0123456789ABC...fgh
-	loggrep => qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/,
+	loggrep => {
+	    qr/>>> .{19} /.generate_chars(MAX_UDPMSG-20).qr/$/ => 2,
+	},
     },
     file => {
-	loggrep => generate_chars(MAXLINE).qr/$/,
+	loggrep => {
+	    generate_chars(MAXLINE).qr/$/ => 2,
+	},
     },
     pipe => { loggrep => {} },  # XXX syslogd ignore short writes to pipe
 );
