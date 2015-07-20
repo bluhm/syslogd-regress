@@ -56,7 +56,8 @@ sub new {
 	# substitute variables in config file
 	my $curdir = dirname($0) || ".";
 	my $objdir = getcwd();
-	(my $host = hostname()) =~ s/\..*//;
+	my $hostname = hostname();
+	(my $host = $hostname) =~ s/\..*//;
 	my $connectdomain = $self->{connectdomain};
 	my $connectaddr = $self->{connectaddr};
 	my $connectproto = $self->{connectproto};
