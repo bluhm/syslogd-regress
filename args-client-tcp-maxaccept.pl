@@ -30,6 +30,10 @@ our %args = (
 		    PeerAddr            => "127.0.0.1",
 		    PeerPort            => 514,
 		) or die "tcp socket $i connect failed: $!";
+		print STDERR ">>> $i connected\n";
+		${$self->{syslogd}}->loggrep("tcp logger .* accepted", 1, $i);
+		${$self->{syslogd}}->loggrep("accept deferred")
+		    and last;
 	    }
 	    # the last connection was denied
 	    defined $s[MAXTCP]->getline()
@@ -57,6 +61,9 @@ our %args = (
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
+	rlimit => {
+	    RLIMIT_NOFILE => 30,
+	},
 	fstat => {
 	    qr/^root .* internet/ => 0,
 	    qr/^_syslogd .* internet/ => 3,
