@@ -5,9 +5,6 @@
 
 use strict;
 use warnings;
-use Cwd;
-
-my $objdir = getcwd();
 
 our %args = (
     client => {
@@ -22,7 +19,7 @@ our %args = (
     },
     syslogd => {
 	options => ["-T", "127.0.0.1:514"],
-	conf => join("", map { "*.*\t$objdir/file-$_.log\n" } 0..19),
+	conf => join("", map { "*.*\t\$objdir/file-$_.log\n" } 0..19),
 	rlimit => {
 	    RLIMIT_NOFILE => 30,
 	},
