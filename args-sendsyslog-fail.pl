@@ -14,8 +14,7 @@ my $kernlog = "/bsd: send message to syslog failed";
 our %args = (
     client => {
 	early => 1,
-	ktrace => 1,
-	kdump => {
+	ktrace => {
 	    qr/CALL  sendsyslog/ => '>=2',
 	    qr/RET   sendsyslog -1 errno 57 Socket is not connected/ => '>=2',
 	},
