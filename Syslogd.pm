@@ -116,7 +116,7 @@ sub child {
 
 	my @libevent;
 	foreach (qw(EVENT_NOKQUEUE EVENT_NOPOLL EVENT_NOSELECT)) {
-		push @libevent, "$_=$ENV{$_}" if $ENV{$_};
+		push @libevent, "$_=1" if delete $ENV{$_};
 	}
 	push @libevent, "EVENT_SHOW_METHOD=1" if @libevent;
 	my @ktrace = $ENV{KTRACE} || ();
