@@ -61,9 +61,8 @@ sub find_ports {
 
 sub write_log {
 	my $self = shift;
-	my $msg = shift || $testlog;
 
-	write_message($self, $msg);
+	write_message($self, $testlog);
 	IO::Handle::flush(\*STDOUT);
 	${$self->{syslogd}}->loggrep($testlog, 2);
 	write_shutdown($self);
