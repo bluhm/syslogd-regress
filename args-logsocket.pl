@@ -1,32 +1,35 @@
-# The client writes a message to Sys::Syslog unix method.
+# The client writes a messages to /dev/log and an alternative log socket.
+# The syslogd listens on /var/run/log but not on /dev/log.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains the hostname and message.
+# Check that only the meassge to the alternative log socket is logged.
 
 use strict;
 use warnings;
-use Sys::Hostname;
-
-(my $host = hostname()) =~ s/\..*//;
 
 our %args = (
     client => {
-	logsock => { type => "unix" },
+	func => sub {
+	    my $self = shift;
+	    eval { write_unix($self, "/dev/log") };
+	    $@ =~ m,connect to /dev/log unix socket failed,
+		or die ref($self), " connect to /dev/log succeeded";
+	    write_unix($self, "/var/run/log");
+	    ${$self->{syslogd}}->loggrep(get_testgrep(), 2)
+		or die ref($self), " syslogd did not receive message";
+	    write_shutdown($self);
+	},
     },
     syslogd => {
-	loggrep => get_testlog(),
-    },
-    server => {
-	loggrep => get_testlog(),
-    },
-    pipe => {
-	loggrep => get_testlog(),
+	options => ["-p", "/var/run/log"],
     },
     file => {
-	# Sys::Syslog unix is broken, it appends a \n\0.
-	loggrep => qr/ $host syslogd-regress\[\d+\]: /.get_testlog().qr/ $/,
+	loggrep => {
+	    "id /dev/log unix socket" => 0,
+	    "id /var/run/log unix socket" => 1,
+	},
     },
 );
 
