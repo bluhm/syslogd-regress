@@ -8,13 +8,18 @@
 
 use strict;
 use warnings;
+use Socket;
 
 our %args = (
+    client => {
+	connect => { domain => AF_INET, addr => "127.0.0.1", port => 514 },
+    },
     syslogd => {
+	options => [ '-nu' ],
 	conf => <<'EOF',
 +nonexist
 *.*	$objdir/file-0.log
-+$host
++127.0.0.1
 *.*	$objdir/file-1.log
 *.*	$objdir/file-2.log
 +*
