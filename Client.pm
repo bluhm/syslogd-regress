@@ -37,7 +37,8 @@ sub new {
 sub child {
 	my $self = shift;
 
-	if (defined($self->{connectdomain})) {
+	if (defined($self->{connectdomain}) &&
+	    $self->{connectdomain} ne "sendsyslog") {
 		my $cs;
 		if ($self->{connectdomain} == AF_UNIX) {
 			$cs = IO::Socket::UNIX->new(

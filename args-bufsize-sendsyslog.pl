@@ -1,11 +1,11 @@
 # Stop syslogd.
-# The client writes 8 message with 8192 to unix domain socket /dev/log.
+# The client writes 8 message with 8192 with sendsyslog(2).
 # Continue syslogd.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via TCP to the loghost.
 # The server receives the message on its TCP socket.
 # Find the message in client, file, syslogd, server log.
-# Check that 8 long UNIX messages can be processed at once.
+# Check that 8 long messages from sendsyslog(2) can be processed at once.
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use constant MAXLINE => 8192;
 
 our %args = (
     client => {
-	connect => { domain => AF_UNIX },
+	connect => { domain => "sendsyslog" },
 	func => sub {
 	    my $self = shift;
 	    ${$self->{syslogd}}->kill_syslogd('STOP');
