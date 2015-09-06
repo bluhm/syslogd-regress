@@ -1,11 +1,11 @@
 # Stop syslogd.
-# The client writes 8 message with 8192 to a localhost IPv6 UDP socket.
-# Resume syslogd.
+# The client writes 8 message with 8192 to unix domain socket /dev/log.
+# Continue syslogd.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
+# The syslogd passes it via TCP to the loghost.
+# The server receives the message on its TCP socket.
 # Find the message in client, file, syslogd, server log.
-# Check that 8 long UDP messages can be processed at once.
+# Check that 8 long UNIX messages can be processed at once.
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use constant MAXLINE => 8192;
 
 our %args = (
     client => {
-	connect => { domain => AF_INET6, addr => "::1", port => 514 },
+	connect => { domain => AF_UNIX },
 	func => sub {
 	    my $self = shift;
 	    ${$self->{syslogd}}->kill_syslogd('STOP');
@@ -28,7 +28,6 @@ our %args = (
 	loggrep => { get_charlog() => 8 },
     },
     syslogd => {
-	options => ["-un"],
 	loghost => '@tcp://localhost:$connectport',
 	loggrep => {
 	    qr/[gs]etsockopt bufsize/ => 0,

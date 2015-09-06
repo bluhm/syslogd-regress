@@ -1,9 +1,9 @@
 # Stop syslogd.
 # The client writes 8 message with 8192 to a localhost IPv6 UDP socket.
-# Resume syslogd.
+# Continue syslogd.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
+# The syslogd passes it via TCP to the loghost.
+# The server receives the message on its TCP socket.
 # Find the message in client, file, syslogd, server log.
 # Check that 8 long UDP messages can be processed at once.
 
