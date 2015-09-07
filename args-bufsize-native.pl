@@ -3,22 +3,24 @@
 # The syslogd passes it via TCP to the loghost.
 # The server receives the message on its TCP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that 8000 bytes messages can be processed.
+# Check that 8192 bytes messages can be processed.
 
 use strict;
 use warnings;
 use Socket;
 use Sys::Hostname;
-use constant BUFLEN => 8192;
+use constant MAXLINE => 8192;
 
 (my $host = hostname()) =~ s/\..*//;
+# file entry is without <70> but with space and hostname
+my $filelen = MAXLINE - 4 + 1 + length($host);
 
 our %args = (
     client => {
 	logsock => { type => "native" },
 	func => sub {
 	    my $self = shift;
-	    write_chars($self, 4000);
+	    write_chars($self, MAXLINE);
 	    write_shutdown($self);
 	},
 	loggrep => { get_charlog() => 1 },
@@ -32,13 +34,14 @@ our %args = (
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tcp", addr => "localhost" },
-	loggrep => { get_charlog() => 1 },
+	# syslog over TCP appends a \n
+	loggrep => { qr/^>>> 8193 .{8192}\n/ => 1 },
     },
     pipe => {
-	loggrep => { get_charlog() => 1 },
+	nocheck => 1,
     },
     file => {
-	loggrep => { get_charlog() => 1 },
+	loggrep => { qr/^.{$filelen}\n/ => 1 },
     },
 );
 
