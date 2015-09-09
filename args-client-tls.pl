@@ -1,5 +1,5 @@
-# The syslogd listens on 127.0.0.1 TCP socket.
-# The client writes a message to Sys::Syslog TCP method.
+# The syslogd listens on loalhost TLS socket.
+# The client writes a message into a loalhost TLS socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
@@ -8,13 +8,19 @@
 
 use strict;
 use warnings;
+use Socket;
 
 our %args = (
     client => {
-	logsock => { type => "tcp", host => "127.0.0.1", port => 514 },
+	connect => { domain => AF_UNSPEC, proto => "tls", addr => "localhost",
+	    port => 6514 },
+	loggrep => {
+	    qr/connect sock: (127.0.0.1|::1) \d+/ => 1,
+	    get_testgrep() => 1,
+	},
     },
     syslogd => {
-	options => ["-T", "127.0.0.1:514"],
+	options => ["-S", "localhost:6514"],
 	fstat => {
 	    qr/^root .* internet/ => 0,
 	    qr/^_syslogd .* internet/ => 3,
@@ -22,7 +28,7 @@ our %args = (
 	},
     },
     file => {
-	loggrep => qr/ localhost syslogd-regress\[\d+\]: /. get_testgrep(),
+	loggrep => qr/ localhost /. get_testgrep(),
     },
 );
 
