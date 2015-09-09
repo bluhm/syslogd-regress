@@ -2,7 +2,7 @@
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via TCP to the loghost.
 # The server receives the message on its TCP socket.
-# Find the message in client, file, pipe, syslogd, server log.
+# Find the message in client, file, syslogd, server log.
 # Check that 8192 bytes messages can be processed.
 
 use strict;
