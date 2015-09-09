@@ -71,6 +71,11 @@ run-regress-$a: $a
 
 # create certificates for TLS
 
+127.0.0.1.crt: ca.crt
+	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=syslogd/CN=127.0.0.1/ -nodes -newkey rsa -keyout 127.0.0.1.key -x509 -out $@
+	${SUDO} cp 127.0.0.1.crt /etc/ssl/
+	${SUDO} cp 127.0.0.1.key /etc/ssl/private/
+
 ca.crt fake-ca.crt:
 	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -nodes -newkey rsa -keyout ${@:R}.key -x509 -out $@
 
@@ -86,7 +91,7 @@ empty:
 toobig:
 	dd if=/dev/zero of=$@ bs=1 count=1 seek=50M
 
-${REGRESS_TARGETS:M*tls*}: server.crt
+${REGRESS_TARGETS:M*tls*}: server.crt 127.0.0.1.crt
 ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
