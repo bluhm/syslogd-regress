@@ -1,4 +1,4 @@
-#	$OpenBSD: funcs.pl,v 1.23 2015/07/19 20:18:18 bluhm Exp $
+#	$OpenBSD: funcs.pl,v 1.24 2015/09/09 08:48:46 bluhm Exp $
 
 # Copyright (c) 2010-2015 Alexander Bluhm <bluhm@openbsd.org>
 #
