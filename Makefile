@@ -84,7 +84,7 @@ empty:
 	true >$@
 
 toobig:
-	dd if=/dev/zero of=$@ bs=1 count=1 seek=1G
+	dd if=/dev/zero of=$@ bs=1 count=1 seek=50M
 
 ${REGRESS_TARGETS:M*tls*}: server.crt
 ${REGRESS_TARGETS:M*empty*}: empty
