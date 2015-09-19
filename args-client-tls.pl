@@ -28,7 +28,11 @@ our %args = (
 	},
     },
     file => {
-	loggrep => qr/ localhost /. get_testgrep(),
+	loggrep => {
+	    qr/ localhost /. get_testgrep() => 1,
+	    qr/^Keyfile \/etc\/ssl\/private\/127.0.0.1.key/ => 1,
+	    qr/^Certfile \/etc\/ssl\/127.0.0.1.crt/ => 1,
+	},
     },
 );
 
