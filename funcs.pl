@@ -96,7 +96,7 @@ sub write_message {
 			    or die ref($self), " short UDP write";
 		} else {
 			print $msg;
-			print "\n" if $self->{connectproto} eq "tcp";
+			print "\n" if $self->{connectproto} =~ /^(tcp|tls)$/;
 		}
 		print STDERR "<<< $msg\n";
 	} else {
