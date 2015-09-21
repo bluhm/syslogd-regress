@@ -26,9 +26,15 @@ our %args = (
 	    qr/^_syslogd .* internet/ => 3,
 	    qr/ internet stream tcp \w+ 127.0.0.1:6514$/ => 1,
 	},
+	ktrace => {
+	    qr{NAMI  "/etc/ssl/private/127.0.0.1:6514.key"} => 1,
+	    qr{NAMI  "/etc/ssl/private/127.0.0.1.key"} => 1,
+	    qr{NAMI  "/etc/ssl/127.0.0.1:6514.crt"} => 1,
+	    qr{NAMI  "/etc/ssl/127.0.0.1.crt"} => 1,
+	},
 	loggrep => {
-	    qr/Keyfile \/etc\/ssl\/private\/127.0.0.1.key/ => 1,
-	    qr/Certfile \/etc\/ssl\/127.0.0.1.crt/ => 1,
+	    qr{Keyfile /etc/ssl/private/127.0.0.1.key} => 1,
+	    qr{Certfile /etc/ssl/127.0.0.1.crt} => 1,
 	},
     },
     file => {
