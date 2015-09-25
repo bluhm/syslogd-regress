@@ -1,12 +1,17 @@
 # The syslogd listens on 127.0.0.1 TLS socket.
-# The client connects and closes the connection to syslogd.
+# The client connects and aborts the connection to syslogd.
 # The syslogd writes the error into a file and through a pipe.
 # Find the error message in file, syslogd log.
-# Check that syslogd writes a log message about the client close.
+# Check that syslogd writes a log message about the client error.
 
 use strict;
 use warnings;
 use Socket;
+
+use Errno ':POSIX';
+
+my @errors = (ECONNRESET);
+my $errors = "(". join("|", map { $! = $_ } @errors). ")";
 
 our %args = (
     client => {
@@ -14,10 +19,8 @@ our %args = (
 	    port => 6514 },
 	func => sub {
 	    my $self = shift;
-	    shutdown(\*STDOUT, 1)
-		or die "shutdown write failed: $!";
-	    ${$self->{syslogd}}->loggrep("tls logger .* connection close", 5)
-		or die "no connection close in syslogd.log";
+	    setsockopt(STDOUT, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0))
+		or die "set socket linger failed: $!";
 	},
 	loggrep => {
 	    qr/connect sock: 127.0.0.1 \d+/ => 1,
@@ -26,14 +29,15 @@ our %args = (
     syslogd => {
 	options => ["-S", "127.0.0.1:6514"],
 	loggrep => {
-	    qr/syslogd: tls logger .* connection close/ => 1,
+	    qr/syslogd: tls logger .* accept/ => 1,
+	    qr/syslogd: tls logger .* connection error/ => 1,
 	},
     },
     server => {
 	func => sub {
 	    my $self = shift;
-	    ${$self->{syslogd}}->loggrep("tls logger .* connection close", 5)
-		or die "no connection close in syslogd.log";
+	    ${$self->{syslogd}}->loggrep("tls logger .* connection error", 5)
+		or die "no connection error in syslogd.log";
 	},
 	loggrep => {},
     },
@@ -42,7 +46,8 @@ our %args = (
     },
     file => {
 	loggrep => {
-	    qr/syslogd: tls logger .* connection close/ => 1,
+	    qr/syslogd: tls logger .* connection error: read failed: $errors/
+		=> 1,
 	},
     },
 );
