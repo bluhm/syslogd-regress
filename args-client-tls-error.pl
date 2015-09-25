@@ -7,7 +7,6 @@
 use strict;
 use warnings;
 use Socket;
-
 use Errno ':POSIX';
 
 my @errors = (ECONNRESET);
