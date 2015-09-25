@@ -75,6 +75,8 @@ run-regress-$a: $a
 	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=syslogd/CN=127.0.0.1/ -nodes -newkey rsa -keyout 127.0.0.1.key -x509 -out $@
 	${SUDO} cp 127.0.0.1.crt /etc/ssl/
 	${SUDO} cp 127.0.0.1.key /etc/ssl/private/
+	${SUDO} cp 127.0.0.1.crt /etc/ssl/localhost.crt
+	${SUDO} cp 127.0.0.1.key /etc/ssl/private/localhost.key
 
 ca.crt fake-ca.crt:
 	openssl req -batch -new -subj /L=OpenBSD/O=syslogd-regress/OU=ca/CN=root/ -nodes -newkey rsa -keyout ${@:R}.key -x509 -out $@
