@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <err.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <termios.h>
@@ -27,10 +28,18 @@
 
 #define LOGFILE	"tty.log"
 
+__dead void usage(void);
 void timeout(int);
 void terminate(int);
 
 char *tty;
+
+__dead void
+usage()
+{
+	fprintf(stderr, "usage: ttylog username ttyname\n");
+	exit(2);
+}
 
 int
 main(int argc, char *argv[])
@@ -40,6 +49,9 @@ main(int argc, char *argv[])
 	FILE *log;
 	int mfd, sfd;
 	ssize_t n;
+
+	if (argc != 1)
+		usage();
 
 	if (signal(SIGTERM, terminate) == SIG_ERR)
 		err(1, "signal SIGTERM");
@@ -89,7 +101,7 @@ void
 timeout(int sig)
 {
 	logout(tty);
-	errx(2, "timeout");
+	errx(3, "timeout");
 }
 
 void
