@@ -91,12 +91,13 @@ main(int argc, char *argv[])
 	}
 	if (n < 0)
 		err(1, "read %s", ptyname);
+	fprintf(lg, "EOF %s\n", ptyname);
 
 	if (logout(tty) == 0)
 		errx(1, "logout %s", tty);
 	fprintf(lg, "logout %s\n", tty);
 
-	return (0);
+	errx(3, "EOF");
 }
 
 void
