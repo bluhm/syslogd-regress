@@ -42,6 +42,7 @@ sub new {
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
 	$args{outpipe} ||= "pipe.log";
+	$args{outtty} ||= "tty.log";
 	if ($args{memory}) {
 		$args{memory} = {} unless ref $args{memory};
 		$args{memory}{name} ||= "memory";
@@ -67,6 +68,7 @@ sub new {
 	    or die ref($self), " create conf file $self->{conffile} failed: $!";
 	print $fh "*.*\t$self->{outfile}\n";
 	print $fh "*.*\t|dd of=$self->{outpipe}\n";
+	print $fh "*.*\tsyslogd\n";
 	my $memory = $self->{memory};
 	print $fh "*.*\t:$memory->{size}:$memory->{name}\n" if $memory;
 	my $loghost = $self->{loghost};
@@ -95,6 +97,9 @@ sub create_out {
 	close $fh;
 	chmod(0666, $self->{outpipe})
 	    or die ref($self), " chmod pipe file $self->{outpipe} failed: $!";
+
+	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
+	my @cmd = (@sudo, "logtty", "syslogd", $self->{outtty});
 
 	return $self;
 }

@@ -33,8 +33,9 @@ TARGETS ?=		${ARGS}
 TARGETS ?=		${ARGS:Nargs-rsyslog*}
 .endif
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
+LDFLAGS +=		-lutil
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
-CLEANFILES +=		*.out *.sock *.ktrace *.fstat
+CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog
 CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty toobig
 
 .MAIN: all
@@ -99,6 +100,7 @@ ${REGRESS_TARGETS:M*tls*}: server.crt 127.0.0.1.crt
 ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
+${REGRESS_TARGETS}: ttylog
 
 # make perl syntax check for all args files
 
