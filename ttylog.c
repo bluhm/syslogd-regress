@@ -30,6 +30,7 @@ __dead void usage(void);
 void timeout(int);
 void terminate(int);
 
+FILE *lg;
 char *tty;
 
 __dead void
@@ -44,7 +45,6 @@ main(int argc, char *argv[])
 {
 	char buf[8192], ptyname[16], *username, *logfile;
 	struct utmp utmp;
-	FILE *log;
 	int mfd, sfd;
 	ssize_t n;
 
@@ -58,14 +58,14 @@ main(int argc, char *argv[])
 	if (signal(SIGINT, terminate) == SIG_ERR)
 		err(1, "signal SIGINT");
 
-	if ((log = fopen(logfile, "w")) == NULL)
+	if ((lg = fopen(logfile, "w")) == NULL)
 		err(1, "fopen %s", logfile);
-	if (setlinebuf(log) != 0)
+	if (setlinebuf(lg) != 0)
 		err(1, "setlinebuf");
 
 	if (openpty(&mfd, &sfd, ptyname, NULL, NULL) == -1)
 		err(1, "openpty");
-	fprintf(log, "openpty %s\n", ptyname);
+	fprintf(lg, "openpty %s\n", ptyname);
 	if ((tty = strrchr(ptyname, '/')) == NULL)
 		errx(1, "tty: %s", ptyname);
 	tty++;
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
 	strlcpy(utmp.ut_name, username, sizeof(utmp.ut_name));
 	time(&utmp.ut_time);
 	login(&utmp);
-	fprintf(log, "login %s %s\n", username, tty);
+	fprintf(lg, "login %s %s\n", username, tty);
 
 	if (signal(SIGALRM, timeout) == SIG_ERR)
 		err(1, "signal SIGALRM");
@@ -83,18 +83,18 @@ main(int argc, char *argv[])
 		err(1, "alarm");
 
 	while ((n = read(mfd, buf, sizeof(buf))) > 0) {
-		fprintf(log, ">>> ");
-		if (fwrite(buf, 1, n, log) != (size_t)n)
+		fprintf(lg, ">>> ");
+		if (fwrite(buf, 1, n, lg) != (size_t)n)
 			err(1, "fwrite %s", logfile);
 		if (buf[n-1] != '\n')
-			fprintf(log, "\n");
+			fprintf(lg, "\n");
 	}
 	if (n < 0)
 		err(1, "read %s", ptyname);
 
 	if (logout(tty) == 0)
 		errx(1, "logout %s", tty);
-	fprintf(log, "logout %s\n", tty);
+	fprintf(lg, "logout %s\n", tty);
 
 	return (0);
 }
@@ -102,14 +102,19 @@ main(int argc, char *argv[])
 void
 timeout(int sig)
 {
+	fprintf(lg, "signal timeout %d\n", sig);
 	logout(tty);
+	fprintf(lg, "logout %s\n", tty);
 	errx(3, "timeout");
 }
 
 void
 terminate(int sig)
 {
-	if (tty)
+	fprintf(lg, "signal terminate %d\n", sig);
+	if (tty) {
 		logout(tty);
+		fprintf(lg, "logout %s\n", tty);
+	}
 	errx(0, "terminate");
 }
