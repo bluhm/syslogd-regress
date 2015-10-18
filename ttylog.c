@@ -26,8 +26,6 @@
 #include <util.h>
 #include <utmp.h>
 
-#define LOGFILE	"tty.log"
-
 __dead void usage(void);
 void timeout(int);
 void terminate(int);
@@ -44,37 +42,40 @@ usage()
 int
 main(int argc, char *argv[])
 {
-	char buf[8192], pty[16];
+	char buf[8192], ptyname[16], *username, *logfile;
 	struct utmp utmp;
 	FILE *log;
 	int mfd, sfd;
 	ssize_t n;
 
-	if (argc != 1)
+	if (argc != 3)
 		usage();
+	username = argv[1];
+	logfile = argv[2];
 
 	if (signal(SIGTERM, terminate) == SIG_ERR)
 		err(1, "signal SIGTERM");
 	if (signal(SIGINT, terminate) == SIG_ERR)
 		err(1, "signal SIGINT");
 
-	if ((log = fopen(LOGFILE, "w")) == NULL)
-		err(1, "fopen %s", LOGFILE);
+	if ((log = fopen(logfile, "w")) == NULL)
+		err(1, "fopen %s", logfile);
 	if (setlinebuf(log) != 0)
 		err(1, "setlinebuf");
 
-	if (openpty(&mfd, &sfd, pty, NULL, NULL) == -1)
+	if (openpty(&mfd, &sfd, ptyname, NULL, NULL) == -1)
 		err(1, "openpty");
-	fprintf(log, "openpty %s\n", pty);
-	if ((tty = strrchr(pty, '/')) == NULL)
-		errx(1, "tty: %s", pty);
+	fprintf(log, "openpty %s\n", ptyname);
+	if ((tty = strrchr(ptyname, '/')) == NULL)
+		errx(1, "tty: %s", ptyname);
 	tty++;
 
 	memset(&utmp, 0, sizeof(utmp));
 	strlcpy(utmp.ut_line, tty, sizeof(utmp.ut_line));
-	strlcpy(utmp.ut_name, "syslogd", sizeof(utmp.ut_name));
+	strlcpy(utmp.ut_name, username, sizeof(utmp.ut_name));
 	time(&utmp.ut_time);
 	login(&utmp);
+	fprintf(log, "login %s %s\n", username, tty);
 
 	if (signal(SIGALRM, timeout) == SIG_ERR)
 		err(1, "signal SIGALRM");
@@ -84,15 +85,16 @@ main(int argc, char *argv[])
 	while ((n = read(mfd, buf, sizeof(buf))) > 0) {
 		fprintf(log, ">>> ");
 		if (fwrite(buf, 1, n, log) != (size_t)n)
-			err(1, "fwrite %s", LOGFILE);
+			err(1, "fwrite %s", logfile);
 		if (buf[n-1] != '\n')
 			fprintf(log, "\n");
 	}
 	if (n < 0)
-		err(1, "read %s", pty);
+		err(1, "read %s", ptyname);
 
 	if (logout(tty) == 0)
 		errx(1, "logout %s", tty);
+	fprintf(log, "logout %s\n", tty);
 
 	return (0);
 }
