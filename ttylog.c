@@ -29,6 +29,7 @@
 __dead void usage(void);
 void timeout(int);
 void terminate(int);
+void closestdin(int);
 
 FILE *lg;
 char *tty;
@@ -53,15 +54,15 @@ main(int argc, char *argv[])
 	username = argv[1];
 	logfile = argv[2];
 
-	if (signal(SIGTERM, terminate) == SIG_ERR)
-		err(1, "signal SIGTERM");
-	if (signal(SIGINT, terminate) == SIG_ERR)
-		err(1, "signal SIGINT");
-
 	if ((lg = fopen(logfile, "w")) == NULL)
 		err(1, "fopen %s", logfile);
 	if (setlinebuf(lg) != 0)
 		err(1, "setlinebuf");
+
+	if (signal(SIGTERM, terminate) == SIG_ERR)
+		err(1, "signal SIGTERM");
+	if (signal(SIGINT, terminate) == SIG_ERR)
+		err(1, "signal SIGINT");
 
 	if (openpty(&mfd, &sfd, ptyname, NULL, NULL) == -1)
 		err(1, "openpty");
