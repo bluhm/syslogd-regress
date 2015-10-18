@@ -28,6 +28,7 @@
 #define LOGFILE	"tty.log"
 
 void timeout(int);
+void terminate(int);
 
 char *tty;
 
@@ -39,6 +40,11 @@ main(int argc, char *argv[])
 	FILE *log;
 	int mfd, sfd;
 	ssize_t n;
+
+	if (signal(SIGTERM, terminate) == SIG_ERR)
+		err(1, "signal SIGTERM");
+	if (signal(SIGINT, terminate) == SIG_ERR)
+		err(1, "signal SIGINT");
 
 	if ((log = fopen(LOGFILE, "w")) == NULL)
 		err(1, "fopen %s", LOGFILE);
@@ -83,5 +89,13 @@ void
 timeout(int sig)
 {
 	logout(tty);
-	errx(1, "timeout");
+	errx(2, "timeout");
+}
+
+void
+terminate(int sig)
+{
+	if (tty)
+		logout(tty);
+	errx(0, "terminate");
 }
