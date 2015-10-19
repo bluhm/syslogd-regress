@@ -245,7 +245,7 @@ sub get_testlog {
 }
 
 sub get_testgrep {
-	return qr/$testlog$/;
+	return qr/$testlog\r*$/;
 }
 
 sub get_firstlog {
@@ -351,7 +351,7 @@ sub check_out {
 		$r->loggrep("bytes transferred", 1) or sleep 1;
 	}
 
-	foreach my $name (qw(file pipe)) {
+	foreach my $name (qw(file pipe tty)) {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or die;
 		my $pattern = $args{$name}{loggrep} || get_testgrep();
