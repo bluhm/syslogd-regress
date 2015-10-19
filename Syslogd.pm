@@ -98,8 +98,16 @@ sub create_out {
 	chmod(0666, $self->{outpipe})
 	    or die ref($self), " chmod pipe file $self->{outpipe} failed: $!";
 
+	unlink($self->{outtty});
+	open($fh, '>', $self->{outtty})
+	    or die ref($self), " create tty file $self->{outtty} failed: $!";
+	close $fh;
 	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
-	my @cmd = (@sudo, "logtty", "syslogd", $self->{outtty});
+	my @cmd = (@sudo, "./ttylog", "syslogd-regress", $self->{outtty});
+	open($fh, '|-', @cmd)
+	    or die ref($self), " pipe to ttylog $self->{outfile} failed: $!";
+	# remember until object is destroyed, perl autoclose will send EOF
+	$self->{fhtty} = $fh;
 
 	return $self;
 }
@@ -162,6 +170,17 @@ sub up {
 		    "after $timeout seconds";
 		sleep .1;
 	}
+
+	while ($self->{fhtty}) {
+		open(my $fh, '<', $self->{outtty}) or die ref($self),
+		    " open $self->{outtty} for reading failed: $!";
+		last if grep { /ttylog: started/ } <$fh>;
+		time() < $end
+		    or croak ref($self), " no 'started' in $self->{outtty} ".
+		    "after $timeout seconds";
+		sleep .1;
+	}
+
 	return $self;
 }
 
