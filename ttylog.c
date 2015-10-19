@@ -33,7 +33,7 @@
 __dead void usage(void);
 void timeout(int);
 void terminate(int);
-void eofstdin(int);
+void iostdin(int);
 
 FILE *lg;
 char *tty;
@@ -83,14 +83,16 @@ main(int argc, char *argv[])
 	login(&utmp);
 	fprintf(lg, "login %s %s\n", username, tty);
 
-	if (signal(SIGIO, eofstdin) == SIG_ERR)
+	if (signal(SIGIO, iostdin) == SIG_ERR)
 		err(1, "signal SIGIO");
-	if (fcntl(0, F_SETFL, O_ASYNC) == -1)
-		err(1, "fcntl O_ASYNC");
+	if (setpgid(0, 0) == -1)
+		err(1, "setpgid");
 	i = getpid();
 	if (fcntl(0, F_SETOWN, i) == -1 &&
 	    ioctl(0, SIOCSPGRP, &i) == -1)  /* pipe(2) with F_SETOWN broken */
 		err(1, "fcntl F_SETOWN, ioctl SIOCSPGRP");
+	if (fcntl(0, F_SETFL, O_ASYNC) == -1)
+		err(1, "fcntl O_ASYNC");
 
 	if (signal(SIGALRM, timeout) == SIG_ERR)
 		err(1, "signal SIGALRM");
@@ -119,8 +121,10 @@ void
 timeout(int sig)
 {
 	fprintf(lg, "signal timeout %d\n", sig);
-	logout(tty);
-	fprintf(lg, "logout %s\n", tty);
+	if (tty) {
+		logout(tty);
+		fprintf(lg, "logout %s\n", tty);
+	}
 	errx(3, "timeout");
 }
 
@@ -132,20 +136,23 @@ terminate(int sig)
 		logout(tty);
 		fprintf(lg, "logout %s\n", tty);
 	}
-	errx(0, "terminate");
+	errx(3, "terminate");
 }
 
 void
-eofstdin(int sig)
+iostdin(int sig)
 {
 	char buf[8192];
 	size_t n;
 
-	if ((n = read(0, buf, sizeof(buf))) > 0)
-		return;
-	if (n < 0)
+	fprintf(lg, "signal iostdin %d\n", sig);
+	if ((n = read(0, buf, sizeof(buf))) < 0)
 		err(1, "read stdin");
-	logout(tty);
-	fprintf(lg, "logout %s\n", tty);
-	errx(0, "eofstdin");
+	if (n > 0)
+		errx(3, "read stdin %zd bytes", n);
+	if (tty) {
+		logout(tty);
+		fprintf(lg, "logout %s\n", tty);
+	}
+	exit(0);
 }
