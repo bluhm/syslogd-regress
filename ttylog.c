@@ -76,6 +76,10 @@ main(int argc, char *argv[])
 		errx(1, "tty: %s", ptyname);
 	tty++;
 
+	/* login(3) searches for a controlling tty, use the created one */
+	if (dup2(sfd, 1) == -1)
+		err(1, "dup2 stdout");
+
 	memset(&utmp, 0, sizeof(utmp));
 	strlcpy(utmp.ut_line, tty, sizeof(utmp.ut_line));
 	strlcpy(utmp.ut_name, username, sizeof(utmp.ut_name));
