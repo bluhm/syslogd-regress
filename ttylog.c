@@ -41,7 +41,7 @@ char *tty;
 __dead void
 usage()
 {
-	fprintf(stderr, "usage: ttylog username logfile\n");
+	fprintf(stderr, "usage: %s username logfile\n", getprogname());
 	exit(2);
 }
 
@@ -71,7 +71,7 @@ main(int argc, char *argv[])
 
 	if (openpty(&mfd, &sfd, ptyname, NULL, NULL) == -1)
 		err(1, "openpty");
-	fprintf(lg, "openpty %s, mfd %d, sfd %d\n", ptyname, mfd, sfd);
+	fprintf(lg, "openpty %s\n", ptyname);
 	if ((tty = strrchr(ptyname, '/')) == NULL)
 		errx(1, "tty: %s", ptyname);
 	tty++;
@@ -98,6 +98,8 @@ main(int argc, char *argv[])
 		err(1, "signal SIGALRM");
 	if (alarm(30) == (unsigned int)-1)
 		err(1, "alarm");
+
+	fprintf(lg, "%s: started\n", getprogname());
 
 	while ((n = read(mfd, buf, sizeof(buf))) > 0) {
 		fprintf(lg, ">>> ");
