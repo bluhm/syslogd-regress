@@ -14,8 +14,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/ioctl.h>
+#include <sys/sockio.h>
+
 #include <errno.h>
 #include <err.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -29,7 +33,7 @@
 __dead void usage(void);
 void timeout(int);
 void terminate(int);
-void closestdin(int);
+void eofstdin(int);
 
 FILE *lg;
 char *tty;
@@ -37,7 +41,7 @@ char *tty;
 __dead void
 usage()
 {
-	fprintf(stderr, "usage: ttylog username ttyname\n");
+	fprintf(stderr, "usage: ttylog username logfile\n");
 	exit(2);
 }
 
@@ -48,6 +52,7 @@ main(int argc, char *argv[])
 	struct utmp utmp;
 	int mfd, sfd;
 	ssize_t n;
+	int i;
 
 	if (argc != 3)
 		usage();
@@ -66,7 +71,7 @@ main(int argc, char *argv[])
 
 	if (openpty(&mfd, &sfd, ptyname, NULL, NULL) == -1)
 		err(1, "openpty");
-	fprintf(lg, "openpty %s\n", ptyname);
+	fprintf(lg, "openpty %s, mfd %d, sfd %d\n", ptyname, mfd, sfd);
 	if ((tty = strrchr(ptyname, '/')) == NULL)
 		errx(1, "tty: %s", ptyname);
 	tty++;
@@ -77,6 +82,15 @@ main(int argc, char *argv[])
 	time(&utmp.ut_time);
 	login(&utmp);
 	fprintf(lg, "login %s %s\n", username, tty);
+
+	if (signal(SIGIO, eofstdin) == SIG_ERR)
+		err(1, "signal SIGIO");
+	if (fcntl(0, F_SETFL, O_ASYNC) == -1)
+		err(1, "fcntl O_ASYNC");
+	i = getpid();
+	if (fcntl(0, F_SETOWN, i) == -1 &&
+	    ioctl(0, SIOCSPGRP, &i) == -1)  /* pipe(2) with F_SETOWN broken */
+		err(1, "fcntl F_SETOWN, ioctl SIOCSPGRP");
 
 	if (signal(SIGALRM, timeout) == SIG_ERR)
 		err(1, "signal SIGALRM");
@@ -119,4 +133,19 @@ terminate(int sig)
 		fprintf(lg, "logout %s\n", tty);
 	}
 	errx(0, "terminate");
+}
+
+void
+eofstdin(int sig)
+{
+	char buf[8192];
+	size_t n;
+
+	if ((n = read(0, buf, sizeof(buf))) > 0)
+		return;
+	if (n < 0)
+		err(1, "read stdin");
+	logout(tty);
+	fprintf(lg, "logout %s\n", tty);
+	errx(0, "eofstdin");
 }
