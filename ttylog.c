@@ -150,11 +150,11 @@ iostdin(int sig)
 	fprintf(lg, "signal iostdin %d\n", sig);
 	if ((n = read(0, buf, sizeof(buf))) < 0)
 		err(1, "read stdin");
-	if (n > 0)
-		errx(3, "read stdin %zd bytes", n);
 	if (tty) {
 		logout(tty);
 		fprintf(lg, "logout %s\n", tty);
 	}
+	if (n > 0)
+		errx(3, "read stdin %zd bytes", n);
 	exit(0);
 }
