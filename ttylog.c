@@ -50,6 +50,7 @@ main(int argc, char *argv[])
 {
 	char buf[8192], ptyname[16], *username, *logfile;
 	struct utmp utmp;
+	sigset_t set;
 	int mfd, sfd;
 	ssize_t n;
 	int i;
@@ -58,6 +59,12 @@ main(int argc, char *argv[])
 		usage();
 	username = argv[1];
 	logfile = argv[2];
+
+	sigemptyset(&set);
+	sigaddset(&set, SIGTERM);
+	sigaddset(&set, SIGIO);
+	if (sigprocmask(SIG_BLOCK, &set, NULL) == -1)
+		err(1, "sigprocmask block init");
 
 	if ((lg = fopen(logfile, "w")) == NULL)
 		err(1, "fopen %s", logfile);
@@ -105,13 +112,23 @@ main(int argc, char *argv[])
 
 	fprintf(lg, "%s: started\n", getprogname());
 
+	if (sigprocmask(SIG_UNBLOCK, &set, NULL) == -1)
+		err(1, "sigprocmask unblock init");
+
+	/* do not block signals during read, it has to be interrupted */
 	while ((n = read(mfd, buf, sizeof(buf))) > 0) {
+		if (sigprocmask(SIG_BLOCK, &set, NULL) == -1)
+			err(1, "sigprocmask block write");
 		fprintf(lg, ">>> ");
 		if (fwrite(buf, 1, n, lg) != (size_t)n)
 			err(1, "fwrite %s", logfile);
 		if (buf[n-1] != '\n')
 			fprintf(lg, "\n");
+		if (sigprocmask(SIG_UNBLOCK, &set, NULL) == -1)
+			err(1, "sigprocmask unblock write");
 	}
+	if (sigprocmask(SIG_BLOCK, &set, NULL) == -1)
+		err(1, "sigprocmask block exit");
 	if (n < 0)
 		err(1, "read %s", ptyname);
 	fprintf(lg, "EOF %s\n", ptyname);
