@@ -50,6 +50,7 @@ main(int argc, char *argv[])
 {
 	char buf[8192], ptyname[16], *username, *logfile;
 	struct utmp utmp;
+	struct sigaction act;
 	sigset_t set;
 	int mfd, sfd;
 	ssize_t n;
@@ -71,10 +72,14 @@ main(int argc, char *argv[])
 	if (setlinebuf(lg) != 0)
 		err(1, "setlinebuf");
 
-	if (signal(SIGTERM, terminate) == SIG_ERR)
-		err(1, "signal SIGTERM");
-	if (signal(SIGINT, terminate) == SIG_ERR)
-		err(1, "signal SIGINT");
+	memset(&act, 0, sizeof(act));
+	act.sa_mask = set;
+	act.sa_flags = SA_RESTART;
+	act.sa_handler = terminate;
+	if (sigaction(SIGTERM, &act, NULL) == -1)
+		err(1, "sigaction SIGTERM");
+	if (sigaction(SIGINT, &act, NULL) == -1)
+		err(1, "sigaction SIGINT");
 
 	if (openpty(&mfd, &sfd, ptyname, NULL, NULL) == -1)
 		err(1, "openpty");
@@ -94,8 +99,9 @@ main(int argc, char *argv[])
 	login(&utmp);
 	fprintf(lg, "login %s %s\n", username, tty);
 
-	if (signal(SIGIO, iostdin) == SIG_ERR)
-		err(1, "signal SIGIO");
+	act.sa_handler = iostdin;
+	if (sigaction(SIGIO, &act, NULL) == -1)
+		err(1, "sigaction SIGIO");
 	if (setpgid(0, 0) == -1)
 		err(1, "setpgid");
 	i = getpid();
@@ -105,8 +111,9 @@ main(int argc, char *argv[])
 	if (fcntl(0, F_SETFL, O_ASYNC) == -1)
 		err(1, "fcntl O_ASYNC");
 
-	if (signal(SIGALRM, timeout) == SIG_ERR)
-		err(1, "signal SIGALRM");
+	act.sa_handler = timeout;
+	if (sigaction(SIGALRM, &act, NULL) == -1)
+		err(1, "sigaction SIGALRM");
 	if (alarm(30) == (unsigned int)-1)
 		err(1, "alarm");
 
