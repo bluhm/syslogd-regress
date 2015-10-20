@@ -173,11 +173,47 @@ void
 iostdin(int sig)
 {
 	char buf[8192];
-	size_t n;
+	ssize_t n;
+	size_t i;
+	int stopped = 0;
 
 	fprintf(lg, "signal iostdin %d\n", sig);
 	if ((n = read(0, buf, sizeof(buf))) < 0)
 		err(1, "read stdin");
+	for (i = 0; i < (size_t)n; i++) {
+		switch (buf[i]) {
+		case '\r':
+		case '\n':
+			break;
+		case 's':
+			fprintf(lg, "stop\n");
+			stopped = 1;
+			break;
+		case 'c':
+			fprintf(lg, "cont\n");
+			stopped = 0;
+			break;
+		case 'q':
+			fprintf(lg, "quit\n");
+			n = 0;
+			goto out;
+		default:
+			fprintf(lg, "unknown %d\n", buf[i]);
+			n -= i;
+			goto out;
+		}
+	}
+	if (n > 0) {
+		if (stopped) {
+			sigset_t set;
+
+			sigemptyset(&set);
+			if (sigsuspend(&set) == -1 && errno != EINTR)
+				err(1, "sigsuspend");
+		}
+		return;
+	}
+ out:
 	if (tty) {
 		logout(tty);
 		fprintf(lg, "logout %s\n", tty);
