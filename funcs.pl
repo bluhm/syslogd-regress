@@ -350,6 +350,12 @@ sub check_out {
 	unless ($args{pipe}{nocheck}) {
 		$r->loggrep("bytes transferred", 1) or sleep 1;
 	}
+	unless ($args{tty}{nocheck}) {
+		open(my $fh, '<', $r->{outtty})
+		    or die "Open file $r->{outtty} for reading failed: $!";
+		grep { qr/^logout/ } <$fh> or sleep 1;
+		close($fh);
+	}
 
 	foreach my $name (qw(file pipe tty)) {
 		next if $args{$name}{nocheck};
