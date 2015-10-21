@@ -112,11 +112,28 @@ sub create_out {
 		my @cmd = (@sudo, "./ttylog", $user, $file);
 		open(my $ctl, '|-', @cmd)
 		    or die ref($self), " pipe to @cmd failed: $!";
+		$ctl->autoflush(1);
 		# remember until object is destroyed, autoclose will send EOF
 		$self->{"ctl$dev"} = $ctl;
 	}
 
 	return $self;
+}
+
+sub ttylog_stop {
+	my $self = shift;
+	my $fh = $self->{fhtty}
+	    or die ref($self), " no tty log handle";
+
+	$fh->print("s");
+}
+
+sub ttylog_cont {
+	my $self = shift;
+	my $fh = $self->{fhtty}
+	    or die ref($self), " no tty log handle";
+
+	$fh->print("c");
 }
 
 sub child {
