@@ -54,7 +54,6 @@ main(int argc, char *argv[])
 	sigset_t set;
 	int mfd, sfd;
 	ssize_t n;
-	int i;
 
 	if (argc != 3)
 		usage();
@@ -104,10 +103,8 @@ main(int argc, char *argv[])
 		err(1, "sigaction SIGIO");
 	if (setpgid(0, 0) == -1)
 		err(1, "setpgid");
-	i = getpid();
-	if (fcntl(0, F_SETOWN, i) == -1 &&
-	    ioctl(0, SIOCSPGRP, &i) == -1)  /* pipe(2) with F_SETOWN broken */
-		err(1, "fcntl F_SETOWN, ioctl SIOCSPGRP");
+	if (fcntl(0, F_SETOWN, getpid()) == -1)
+		err(1, "fcntl F_SETOWN");
 	if (fcntl(0, F_SETFL, O_ASYNC) == -1)
 		err(1, "fcntl O_ASYNC");
 
