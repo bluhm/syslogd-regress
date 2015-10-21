@@ -106,10 +106,27 @@ sub create_out {
 	my @cmd = (@sudo, "./ttylog", "syslogd-regress", $self->{outtty});
 	open($fh, '|-', @cmd)
 	    or die ref($self), " pipe to ttylog $self->{outfile} failed: $!";
+	$fh->autoflush(1);
 	# remember until object is destroyed, perl autoclose will send EOF
 	$self->{fhtty} = $fh;
 
 	return $self;
+}
+
+sub ttylog_stop {
+	my $self = shift;
+	my $fh = $self->{fhtty}
+	    or die ref($self), " no tty log handle";
+
+	$fh->print("s");
+}
+
+sub ttylog_cont {
+	my $self = shift;
+	my $fh = $self->{fhtty}
+	    or die ref($self), " no tty log handle";
+
+	$fh->print("c");
 }
 
 sub child {
