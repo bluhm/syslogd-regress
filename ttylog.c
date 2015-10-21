@@ -176,6 +176,7 @@ iostdin(int sig)
 	ssize_t n;
 	size_t i;
 	int stopped = 0;
+	int save_errno = errno;
 
 	fprintf(lg, "signal iostdin %d\n", sig);
 	if ((n = read(0, buf, sizeof(buf))) < 0)
@@ -211,6 +212,7 @@ iostdin(int sig)
 			if (sigsuspend(&set) == -1 && errno != EINTR)
 				err(1, "sigsuspend");
 		}
+		errno = save_errno;
 		return;
 	}
  out:
