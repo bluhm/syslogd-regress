@@ -1,4 +1,4 @@
-# Syslogd gets an empty TLS server key.
+# Syslogd gets no TLS server key.
 # The client cannot connect to 127.0.0.1 TLS socket.
 # Check that syslog log contains an error message.
 
@@ -6,12 +6,12 @@ use strict;
 use warnings;
 use Socket;
 
-my $key = "/etc/ssl/private/127.0.0.1:6514.key";
+my $key = "/etc/ssl/private/127.0.0.1.key";
 my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
-my @cmd = (@sudo, "cp", "--", "empty", $key);
+my @cmd = (@sudo, "rm", "-f", "--", $key);
 system(@cmd) and die "Command '@cmd' failed: $?";
 END {
-    my @cmd = (@sudo, "rm", "-f", "--", $key);
+    my @cmd = (@sudo, "cp", "--", "127.0.0.1.key", $key);
     system(@cmd) and warn "Command '@cmd' failed: $?";
 }
 
@@ -32,13 +32,14 @@ our %args = (
 	options => ["-S", "127.0.0.1:6514"],
 	ktrace => {
 	    qr{NAMI  "/etc/ssl/private/127.0.0.1:6514.key"} => 1,
-	    qr{NAMI  "/etc/ssl/private/127.0.0.1.key"} => 0,
+	    qr{NAMI  "/etc/ssl/private/127.0.0.1.key"} => 1,
 	    qr{NAMI  "/etc/ssl/127.0.0.1:6514.crt"} => 1,
 	    qr{NAMI  "/etc/ssl/127.0.0.1.crt"} => 1,
 	},
 	loggrep => {
-	    qr{Keyfile $key} => 1,
+	    qr{Keyfile } => 0,
 	    qr{Certfile /etc/ssl/127.0.0.1.crt} => 1,
+	    qr{syslogd: open keyfile: No such file or directory} => 2,
 	    qr{syslogd: tls_configure server} => 2,
 	},
     },
