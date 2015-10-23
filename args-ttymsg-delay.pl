@@ -12,19 +12,15 @@ use Sys::Syslog qw(:macros);
 
 our %args = (
     client => {
-	func => sub { write_between2logs(shift, sub {
+	func => sub {
 	    my $self = shift;
-	    write_lines($self, 300, 1024);
-	})},
+	    write_lines($self, 3, 1024);
+	    write_log($self);
+	},
     },
     syslogd => {
 	loggrep => {
 	    qr/ttymsg delayed write/ => '>=1',
-	},
-    },
-    tty => {
-	loggrep => {
-	    get_between2loggrep(),
 	},
     },
 );
