@@ -31,6 +31,8 @@ our %args = (
     syslogd => {
 	options => ["-S", "127.0.0.1:6514"],
 	ktrace => {
+	    qr{NAMI  "/etc/ssl/private/127.0.0.1:6514.key"} => 1,
+	    qr{NAMI  "/etc/ssl/private/127.0.0.1.key"} => 1,
 	    qr{NAMI  "/etc/ssl/127.0.0.1:6514.crt"} => 1,
 	    qr{NAMI  "/etc/ssl/127.0.0.1.crt"} => 0,
 	},
