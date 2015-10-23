@@ -1,4 +1,4 @@
-# Syslogd gets an empty TLS server certificate.
+# Syslogd gets no TLS server certificate.
 # The client cannot connect to 127.0.0.1 TLS socket.
 # Check that syslog log contains an error message.
 
@@ -6,12 +6,12 @@ use strict;
 use warnings;
 use Socket;
 
-my $cert = "/etc/ssl/127.0.0.1:6514.crt";
+my $cert = "/etc/ssl/127.0.0.1.crt";
 my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
-my @cmd = (@sudo, "cp", "--", "empty", $cert);
+my @cmd = (@sudo, "rm", "-f", "--", $cert);
 system(@cmd) and die "Command '@cmd' failed: $?";
 END {
-    my @cmd = (@sudo, "rm", "-f", "--", $cert);
+    my @cmd = (@sudo, "cp", "--", "127.0.0.1.crt", $cert);
     system(@cmd) and warn "Command '@cmd' failed: $?";
 }
 
@@ -34,11 +34,12 @@ our %args = (
 	    qr{NAMI  "/etc/ssl/private/127.0.0.1:6514.key"} => 1,
 	    qr{NAMI  "/etc/ssl/private/127.0.0.1.key"} => 1,
 	    qr{NAMI  "/etc/ssl/127.0.0.1:6514.crt"} => 1,
-	    qr{NAMI  "/etc/ssl/127.0.0.1.crt"} => 0,
+	    qr{NAMI  "/etc/ssl/127.0.0.1.crt"} => 1,
 	},
 	loggrep => {
 	    qr{Keyfile /etc/ssl/private/127.0.0.1.key} => 1,
-	    qr{Certfile $cert} => 1,
+	    qr{Certfile } => 0,
+	    qr{syslogd: open certfile: No such file or directory} => 2,
 	    qr{syslogd: tls_configure server} => 2,
 	},
     },
