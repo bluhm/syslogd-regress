@@ -1,6 +1,5 @@
-# The client writes messages to Sys::Syslog native method.
+# The client writes long messages to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe and to tty.
-# The tty reader blocks the read for a while.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, tty, syslogd, server log.
