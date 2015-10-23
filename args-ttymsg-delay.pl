@@ -13,13 +13,19 @@ our %args = (
     client => {
 	func => sub {
 	    my $self = shift;
-	    write_lines($self, 3, 1024);
+	    write_lines($self, 2, 900);
 	    write_log($self);
 	},
     },
     syslogd => {
 	loggrep => {
 	    qr/ttymsg delayed write/ => '>=1',
+	},
+    },
+    tty => {
+	loggrep => {
+	    qr/ 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.* [12]$/ => 2,
+	    get_testgrep() => 1,
 	},
     },
 );
