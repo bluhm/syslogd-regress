@@ -78,6 +78,12 @@ sub child {
 				    $cs->get_sslversion(),"\n";
 				print STDERR "ssl cipher: ",
 				    $cs->get_cipher(),"\n";
+				print STDERR "ssl issuer: ",
+				    $cs->peer_certificate('issuer'),"\n";
+				print STDERR "ssl subject: ",
+				    $cs->peer_certificate('subject'),"\n";
+				print STDERR "ssl cn: ",
+				    $cs->peer_certificate('cn'),"\n";
 			}
 		}
 
