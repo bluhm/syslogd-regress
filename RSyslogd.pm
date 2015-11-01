@@ -91,6 +91,20 @@ sub new {
 	if ($connectdomain && $connectproto eq "tcp") {
 		print $fh "*.* \@\@$connectaddr:$connectport\n";
 	}
+	if ($connectdomain && $connectproto eq "tls") {
+		print $fh "\$DefaultNetstreamDriver gtls\n";
+		my %cert = (
+		    CA   => "127.0.0.1.crt",
+		);
+		while(my ($k, $v) = each %cert) {
+			_make_abspath(\$v);
+			print $fh "\$DefaultNetstreamDriver${k}File $v\n";
+		}
+		print $fh "\$ActionSendStreamDriverAuthMode x509/name\n";
+		print $fh "\$ActionSendStreamDriverPermittedPeer 127.0.0.1\n";
+		print $fh "\$ActionSendStreamDriverMode 1\n";
+		print $fh "*.* \@\@$connectaddr:$connectport\n";
+	}
 	print $fh "*.*	$self->{outfile}\n";
 	print $fh $self->{conf} if $self->{conf};
 	close $fh;
