@@ -19,9 +19,17 @@ our %args = (
 	listen => { domain => AF_INET, proto => "udp", addr => "127.0.0.1" },
 	connect => { domain => AF_INET, proto => "tls", addr => "127.0.0.1",
 	    port => 6514 },
+	loggrep => {
+	    get_testgrep() => 1,
+	    qr/GnuTLS handshake succeeded/ => 1,
+	},
     },
     syslogd => {
 	options => ["-S", "127.0.0.1"],
+	loggrep => {
+	    get_testgrep() => 1,
+	    qr/syslogd: tls logger .* accepted/ => 1,
+	},
     },
 );
 
