@@ -365,6 +365,7 @@ sub check_out {
 	}
 	foreach my $dev (qw(console user)) {
 		$args{$dev}{nocheck} ||= $args{tty}{nocheck};
+		$args{$dev}{loggrep} ||= $args{tty}{loggrep};
 		next if $args{$dev}{nocheck};
 		my $ctl = $r->{"ctl$dev"};
 		close($ctl);
