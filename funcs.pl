@@ -363,7 +363,8 @@ sub check_out {
 	unless ($args{pipe}{nocheck}) {
 		$r->loggrep("bytes transferred", 1) or sleep 1;
 	}
-	foreach my $dev (qw(console tty)) {
+	foreach my $dev (qw(console user)) {
+		$args{$dev}{nocheck} ||= $args{tty}{nocheck};
 		next if $args{$dev}{nocheck};
 		my $pipe = $r->{"pipe$dev"};
 		close($pipe);
@@ -374,7 +375,7 @@ sub check_out {
 		close($fh);
 	}
 
-	foreach my $name (qw(file pipe console tty)) {
+	foreach my $name (qw(file pipe console user)) {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or die;
 		my $pattern = $args{$name}{loggrep} || get_testgrep();

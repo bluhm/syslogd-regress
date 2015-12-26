@@ -43,7 +43,7 @@ sub new {
 	$args{outfile} ||= "file.log";
 	$args{outpipe} ||= "pipe.log";
 	$args{outconsole} ||= "console.log";
-	$args{outtty} ||= "tty.log";
+	$args{outuser} ||= "user.log";
 	if ($args{memory}) {
 		$args{memory} = {} unless ref $args{memory};
 		$args{memory}{name} ||= "memory";
@@ -101,7 +101,7 @@ sub create_out {
 	chmod(0666, $self->{outpipe})
 	    or die ref($self), " chmod pipe file $self->{outpipe} failed: $!";
 
-	foreach my $dev (qw(console tty)) {
+	foreach my $dev (qw(console user)) {
 		my $file = $self->{"out$dev"};
 		unlink($file);
 		open($fh, '>', $file)
@@ -178,7 +178,7 @@ sub up {
 		sleep .1;
 	}
 
-	foreach my $dev (qw(console tty)) {
+	foreach my $dev (qw(console user)) {
 		my $file = $self->{"out$dev"};
 		while ($self->{"pipe$dev"}) {
 			open(my $fh, '<', $file) or die ref($self),
