@@ -149,9 +149,17 @@ void
 redirect(void)
 {
 	struct utmp utmp;
-	int on;
+	int fd, on;
 
 	if (console) {
+		/* first remove any existing console redirection */
+		on = 0;
+		if ((fd = open("/dev/console", O_WRONLY)) == -1)
+			err(1, "open /dev/console");
+		if (ioctl(fd, TIOCCONS, &on) == -1)
+			err(1, "ioctl TIOCCONS");
+		close(fd);
+		/* then redirect console to our pseudo tty */
 		on = 1;
 		if (ioctl(sfd, TIOCCONS, &on) == -1)
 			err(1, "ioctl TIOCCONS on");
