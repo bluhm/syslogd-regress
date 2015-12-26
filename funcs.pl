@@ -366,8 +366,8 @@ sub check_out {
 	foreach my $dev (qw(console user)) {
 		$args{$dev}{nocheck} ||= $args{tty}{nocheck};
 		next if $args{$dev}{nocheck};
-		my $pipe = $r->{"pipe$dev"};
-		close($pipe);
+		my $ctl = $r->{"ctl$dev"};
+		close($ctl);
 		my $file = $r->{"out$dev"};
 		open(my $fh, '<', $file)
 		    or die "Open file $file for reading failed: $!";

@@ -110,10 +110,10 @@ sub create_out {
 		my $user = $dev eq "console" ?
 		    "/dev/console" : "syslogd-regress";
 		my @cmd = (@sudo, "./ttylog", $user, $file);
-		open(my $pipe, '|-', @cmd)
+		open(my $ctl, '|-', @cmd)
 		    or die ref($self), " pipe to @cmd failed: $!";
 		# remember until object is destroyed, autoclose will send EOF
-		$self->{"pipe$dev"} = $pipe;
+		$self->{"ctl$dev"} = $ctl;
 	}
 
 	return $self;
@@ -180,7 +180,7 @@ sub up {
 
 	foreach my $dev (qw(console user)) {
 		my $file = $self->{"out$dev"};
-		while ($self->{"pipe$dev"}) {
+		while ($self->{"ctl$dev"}) {
 			open(my $fh, '<', $file) or die ref($self),
 			    " open $file for reading failed: $!";
 			last if grep { /ttylog: started/ } <$fh>;
