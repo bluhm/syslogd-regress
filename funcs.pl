@@ -363,14 +363,18 @@ sub check_out {
 	unless ($args{pipe}{nocheck}) {
 		$r->loggrep("bytes transferred", 1) or sleep 1;
 	}
-	unless ($args{tty}{nocheck}) {
-		open(my $fh, '<', $r->{outtty})
-		    or die "Open file $r->{outtty} for reading failed: $!";
-		grep { qr/^logout/ } <$fh> or sleep 1;
+	foreach my $dev (qw(console tty)) {
+		next if $args{$dev}{nocheck};
+		my $pipe = $r->{"pipe$dev"};
+		close($pipe);
+		my $file = $r->{"out$dev"};
+		open(my $fh, '<', $file)
+		    or die "Open file $file for reading failed: $!";
+		grep { /^logout/ or /^console .* off/ } <$fh> or sleep 1;
 		close($fh);
 	}
 
-	foreach my $name (qw(file pipe tty)) {
+	foreach my $name (qw(file pipe console tty)) {
 		next if $args{$name}{nocheck};
 		my $file = $r->{"out$name"} or die;
 		my $pattern = $args{$name}{loggrep} || get_testgrep();
