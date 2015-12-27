@@ -1,23 +1,35 @@
-# The client writes a message with sendsyslog2 syscall.
-# The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, server log.
-# Create a ktrace dump of the client and check that sendsyslog2(2)
-# has been used.
+# The client kills syslogd.
+# The client writes a message with sendsyslog2 LOG_CONS flag.
+# Find the message in console log.
+# Create a ktrace dump of the client and check for sendsyslog2.
 
 use strict;
 use warnings;
+use Errno ':POSIX';
+use Sys::Syslog 'LOG_CONS';
+
+my $errno = ENOTCONN;
 
 our %args = (
     client => {
-	connect => { domain => "sendsyslog", version => 2, flags => 0 },
-	ktrace => {
-	    qr/CALL  sendsyslog2\(/ => 2,
-	    qr/GIO   fd -1 wrote \d+ bytes/ => 2,
-	    qr/RET   sendsyslog2 0/ => 2,
+	func => sub {
+	    my $self = shift;
+	    ${$self->{syslogd}}->kill_syslogd('TERM');
+	    ${$self->{syslogd}}->down();
+	    sendsyslog2(get_testlog(), LOG_CONS)
+		and die ref($self), " sendsyslog2 succeeded";
 	},
+	ktrace => {
+	    qr/CALL  sendsyslog2\(/ => 1,
+	    qr/RET   sendsyslog2 -1 errno $errno / => 1,
+	},
+	loggrep => {},
     },
+    syslogd => { loggrep => {} },
+    server => { noserver => 1 },
+    file => { nocheck => 1 },
+    pipe => { nocheck => 1 },
+    user => { nocheck => 1 },
 );
 
 1;
