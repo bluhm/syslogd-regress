@@ -10,7 +10,6 @@ use Errno ':POSIX';
 use Sys::Syslog 'LOG_CONS';
 
 my $errno = ENOTCONN;
-my $message = "<123>". get_testlog();
 
 our %args = (
     client => {
@@ -18,13 +17,13 @@ our %args = (
 	    my $self = shift;
 	    ${$self->{syslogd}}->kill_syslogd('TERM');
 	    ${$self->{syslogd}}->down();
-	    sendsyslog2($message, LOG_CONS)
+	    sendsyslog2("<123>".get_testlog(), LOG_CONS)
 		and die ref($self), " sendsyslog2 succeeded";
 	    write_shutdown($self);
 	},
 	ktrace => {
 	    qr/CALL  sendsyslog2\(/ => 2,
-	    qr/GIO   fd -1 wrote /.length($message).qr/ bytes/ => 1,
+	    qr/GIO   fd -1 wrote /.length(get_testlog()).qr/ bytes/ => 1,
 	    qr/RET   sendsyslog2 -1 errno $errno / => 2,
 	},
 	loggrep => {},
