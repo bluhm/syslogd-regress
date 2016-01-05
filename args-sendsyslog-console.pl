@@ -19,12 +19,22 @@ our %args = (
 	    ${$self->{syslogd}}->down();
 	    sendsyslog2("<123>".get_testlog(), LOG_CONS)
 		and die ref($self), " sendsyslog2 succeeded";
+	    sendsyslog2(get_testlog(), LOG_CONS)
+		and die ref($self), " sendsyslog2 succeeded";
+	    foreach (qw(< <1 <12 <123 <1234)) {
+		sendsyslog2($_, LOG_CONS)
+		    and die ref($self), " sendsyslog2 succeeded";
+		sendsyslog2("$_>", LOG_CONS)
+		    and die ref($self), " sendsyslog2 succeeded";
+		sendsyslog2("$_>foo", LOG_CONS)
+		    and die ref($self), " sendsyslog2 succeeded";
+	    }
 	    write_shutdown($self);
 	},
 	ktrace => {
-	    qr/CALL  sendsyslog2\(/ => 2,
-	    qr/GIO   fd -1 wrote /.length(get_testlog()).qr/ bytes/ => 1,
-	    qr/RET   sendsyslog2 -1 errno $errno / => 2,
+	    qr/CALL  sendsyslog2\(/ => 18,
+	    qr/GIO   fd -1 wrote /.length(get_testlog()).qr/ bytes/ => 2,
+	    qr/RET   sendsyslog2 -1 errno $errno / => 18,
 	},
 	loggrep => {},
     },
@@ -38,7 +48,7 @@ our %args = (
     user => { nocheck => 1 },
     console => {
 	loggrep => {
-	    get_testgrep() => 1,
+	    get_testgrep() => 2,
 	    qr/<\d+>/ => 0,
 	    qr/dropped \d+ message/ => 0,
 	},
