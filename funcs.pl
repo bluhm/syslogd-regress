@@ -86,14 +86,9 @@ sub write_message {
 	if (defined($self->{connectdomain})) {
 		my $msg = join("", @_);
 		if ($self->{connectdomain} eq "sendsyslog") {
-			if (($self->{connect}{version} || 0) == 2) {
-				my $flags = $self->{connect}{flags} || 0;
-				sendsyslog2($msg, $flags) or die ref($self),
-				    " sendsyslog2 failed: $!";
-			} else {
-				sendsyslog($msg) or die ref($self),
-				    " sendsyslog failed: $!";
-			}
+			my $flags = $self->{connect}{flags} || 0;
+			sendsyslog($msg, $flags) or die ref($self),
+			    " sendsyslog failed: $!";
 		} elsif ($self->{connectproto} eq "udp") {
 			# writing UDP packets works only with syswrite()
 			defined(my $n = syswrite(STDOUT, $msg))
@@ -112,15 +107,9 @@ sub write_message {
 
 sub sendsyslog {
 	my $msg = shift;
-	require 'sys/syscall.ph';
-	return syscall(&SYS_sendsyslog, $msg, length($msg)) != -1;
-}
-
-sub sendsyslog2 {
-	my $msg = shift;
 	my $flags = shift;
 	require 'sys/syscall.ph';
-	return syscall(&SYS_sendsyslog2, $msg, length($msg), $flags) != -1;
+	return syscall(&SYS_sendsyslog, $msg, length($msg), $flags) != -1;
 }
 
 sub write_shutdown {
