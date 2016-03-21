@@ -4,16 +4,17 @@
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
 # Create a ktrace dump of the client and check that sendsyslog(2)
-# has been used.
+# has been used with flags.
 
 use strict;
 use warnings;
+use Sys::Syslog 'LOG_CONS';
 
 our %args = (
     client => {
-	connect => { domain => "sendsyslog", flags => 0 },
+	connect => { domain => "sendsyslog", flags => LOG_CONS },
 	ktrace => {
-	    qr/CALL  sendsyslog\(/ => 2,
+	    qr/CALL  sendsyslog\(.*,0x2\)/ => 1,
 	    qr/GIO   fd -1 wrote \d+ bytes/ => 2,
 	    qr/RET   sendsyslog 0/ => 2,
 	},
