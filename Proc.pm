@@ -164,7 +164,8 @@ sub loggrep {
 	my($regex, $timeout, $count) = @_;
 	my $exit = ($self->{exit} // 0) << 8;
 
-	my $end = time() + $timeout if $timeout;
+	my $end;
+	$end = time() + $timeout if $timeout;
 
 	do {
 		my($kid, $status, $code) = $self->wait(WNOHANG);

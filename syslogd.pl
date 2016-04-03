@@ -53,7 +53,7 @@ foreach my $name (qw(client syslogd server rsyslogd)) {
 		}
 	}
 }
-my($s, $c, $r, @m);
+my($s, $c, $r, $rc, @m);
 $s = RSyslogd->new(
     %{$args{rsyslogd}},
     listenport          => scalar find_ports(%{$args{rsyslogd}{listen}}),
@@ -85,7 +85,7 @@ $r = Syslogd->new(
     client              => \$c,
     server              => \$s,
 );
-my $rc = RSyslogd->new(
+$rc = RSyslogd->new(
     %{$args{rsyslogd}},
     listenport          => scalar find_ports(%{$args{rsyslogd}{listen}}),
     testfile            => $testfile,
