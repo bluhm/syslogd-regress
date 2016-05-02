@@ -116,7 +116,7 @@ sub new {
 sub child {
 	my $self = shift;
 
-	my @cmd = ("rsyslogd", "-dn", "-c4", "-f", $self->{conffile},
+	my @cmd = ("rsyslogd", "-dn", "-f", $self->{conffile},
 	    "-i", $self->{pidfile});
 	print STDERR "execute: @cmd\n";
 	exec @cmd;
