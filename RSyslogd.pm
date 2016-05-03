@@ -1,4 +1,4 @@
-#	$OpenBSD: RSyslogd.pm,v 1.4 2015/11/02 00:48:17 bluhm Exp $
+#	$OpenBSD: RSyslogd.pm,v 1.5 2016/05/03 17:05:31 bluhm Exp $
 
 # Copyright (c) 2010-2014 Alexander Bluhm <bluhm@openbsd.org>
 #
