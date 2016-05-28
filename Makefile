@@ -36,7 +36,7 @@ REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 LDFLAGS +=		-lutil
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog
-CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty toobig
+CLEANFILES +=		*.pem *.req *.crt *.key *.srl
 
 .MAIN: all
 
