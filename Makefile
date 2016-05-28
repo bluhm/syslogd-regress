@@ -36,7 +36,7 @@ REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 LDFLAGS +=		-lutil
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog
-CLEANFILES +=		*.pem *.req *.crt *.key *.srl empty toobig
+CLEANFILES +=		*.pem *.req *.crt *.key *.srl
 
 .MAIN: all
 
@@ -90,15 +90,7 @@ server.req:
 server.crt: ca.crt server.req
 	openssl x509 -CAcreateserial -CAkey ca.key -CA ca.crt -req -in ${@:R}.req -out $@
 
-empty:
-	true >$@
-
-toobig:
-	dd if=/dev/zero of=$@ bs=1 count=1 seek=50M
-
 ${REGRESS_TARGETS:M*tls*}: server.crt 127.0.0.1.crt
-${REGRESS_TARGETS:M*empty*}: empty
-${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
 ${REGRESS_TARGETS}: ttylog
 
