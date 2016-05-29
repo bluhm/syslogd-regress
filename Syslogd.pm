@@ -120,22 +120,14 @@ sub create_out {
 	return $self;
 }
 
-sub ttylog_stop {
+sub ttylog {
 	my $self = shift;
 	my $dev = shift;
+	my $cmd = shift;
 	my $fh = $self->{"ctl$dev"}
 	    or die ref($self), " no tty log ctl$dev handle";
 
-	$fh->print("s");
-}
-
-sub ttylog_cont {
-	my $self = shift;
-	my $dev = shift;
-	my $fh = $self->{"ctl$dev"}
-	    or die ref($self), " no tty log ctl$dev handle";
-
-	$fh->print("c");
+	$fh->print($cmd =~ /^(.)/);
 }
 
 sub child {
