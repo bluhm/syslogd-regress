@@ -122,16 +122,18 @@ sub create_out {
 
 sub ttylog_stop {
 	my $self = shift;
-	my $fh = $self->{fhtty}
-	    or die ref($self), " no tty log handle";
+	my $dev = shift;
+	my $fh = $self->{"ctl$dev"}
+	    or die ref($self), " no tty log ctl$dev handle";
 
 	$fh->print("s");
 }
 
 sub ttylog_cont {
 	my $self = shift;
-	my $fh = $self->{fhtty}
-	    or die ref($self), " no tty log handle";
+	my $dev = shift;
+	my $fh = $self->{"ctl$dev"}
+	    or die ref($self), " no tty log ctl$dev handle";
 
 	$fh->print("c");
 }
