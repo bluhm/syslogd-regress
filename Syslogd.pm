@@ -110,12 +110,30 @@ sub create_out {
 		my $user = $dev eq "console" ?
 		    "/dev/console" : "syslogd-regress";
 		my @cmd = (@sudo, "./ttylog", $user, $file);
-		open(my $ctl, '|-', @cmd)
+		$self->{"pid$dev"} = open(my $ctl, '|-', @cmd)
 		    or die ref($self), " pipe to @cmd failed: $!";
 		# remember until object is destroyed, autoclose will send EOF
 		$self->{"ctl$dev"} = $ctl;
 	}
 
+	return $self;
+}
+
+sub ttykill {
+	my $self = shift;
+	my $dev = shift;
+	my $sig = shift;
+	my $pid = $self->{"pid$dev"}
+	    or die ref($self), " no tty log pid$dev";
+
+	if (kill($sig => $pid) != 1) {
+		my $sudo = $ENV{SUDO};
+		$sudo && $!{EPERM}
+		    or die ref($self), " kill $pid failed: $!";
+		my @cmd = ($sudo, '/bin/kill', "-$sig", $pid);
+		system(@cmd)
+		    and die ref($self), " sudo kill $pid failed: $?";
+	}
 	return $self;
 }
 
