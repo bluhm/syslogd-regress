@@ -55,7 +55,8 @@ sub listen {
 	    SSL_key_file	=> "server.key",
 	    SSL_cert_file	=> "server.crt",
 	    $self->{sslverify}	? (SSL_verify_mode => SSL_VERIFY_PEER) : (),
-	    $self->{sslverify}	? (SSL_client_ca_file => "ca.crt") : (),
+	    $self->{sslverify}	? (SSL_ca_file => "ca.crt") : (),
+	    $self->{sslverify}	? (SSL_verifycn_scheme => "none") : (),
 	    $self->{sslversion}	? (SSL_version => $self->{sslversion}) : (),
 	    $self->{sslciphers}	? (SSL_cipher_list => $self->{sslciphers}) : (),
 	) or die ref($self), " $iosocket socket failed: $!,$SSL_ERROR";
