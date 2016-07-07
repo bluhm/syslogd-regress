@@ -50,13 +50,14 @@ sub listen {
 	    Proto		=> $proto,
 	    ReuseAddr		=> 1,
 	    Domain		=> $self->{listendomain},
-	    $self->{listenaddr} ? (LocalAddr => $self->{listenaddr}) : (),
-	    $self->{listenport} ? (LocalPort => $self->{listenport}) : (),
+	    $self->{listenaddr}	? (LocalAddr => $self->{listenaddr}) : (),
+	    $self->{listenport}	? (LocalPort => $self->{listenport}) : (),
 	    SSL_key_file	=> "server.key",
 	    SSL_cert_file	=> "server.crt",
-	    SSL_verify_mode	=> SSL_VERIFY_NONE,
-	    $self->{sslversion} ? (SSL_version => $self->{sslversion}) : (),
-	    $self->{sslciphers} ? (SSL_cipher_list => $self->{sslciphers}) : (),
+	    $self->{sslverify}	? (SSL_verify_mode => SSL_VERIFY_PEER) : (),
+	    $self->{sslverify}	? (SSL_client_ca_file => "ca.crt") : (),
+	    $self->{sslversion}	? (SSL_version => $self->{sslversion}) : (),
+	    $self->{sslciphers}	? (SSL_cipher_list => $self->{sslciphers}) : (),
 	) or die ref($self), " $iosocket socket failed: $!,$SSL_ERROR";
 	if ($self->{listenproto} ne "udp") {
 		listen($ls, 1)
