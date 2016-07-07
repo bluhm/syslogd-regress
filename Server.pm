@@ -103,6 +103,8 @@ sub child {
 	if ($self->{listenproto} eq "tls") {
 		print STDERR "ssl version: ",$as->get_sslversion(),"\n";
 		print STDERR "ssl cipher: ",$as->get_cipher(),"\n";
+		print STDERR "ssl subject: ", $as->peer_certificate("subject")
+		    ,"\n" if $self->{sslverify};
 	}
 
 	*STDIN = *STDOUT = $self->{as} = $as;
