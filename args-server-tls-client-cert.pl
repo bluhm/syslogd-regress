@@ -4,6 +4,7 @@
 # The server verifies the connection to its TLS socket and gets the message.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check that syslogd has client cert and key in log.
+# Check that server has client certificate subject in log.
 
 use strict;
 use warnings;
@@ -22,6 +23,11 @@ our %args = (
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	sslverify => 1,
+	loggrep => {
+	    qr/ssl subject: /.
+		qr{/L=OpenBSD/O=syslogd-regress/OU=client/CN=localhost} => 1,
+	    get_testgrep() => 1,
+	},
     },
 );
 
