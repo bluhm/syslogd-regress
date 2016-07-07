@@ -11,14 +11,17 @@ use Socket;
 
 our %args = (
     syslogd => {
+	options => [qw(-c client.crt -k client.key)],
 	loghost => '@tls://localhost:$connectport',
 	loggrep => {
-	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
+	    qr/ClientCertfile client.crt/ => 1,
+	    qr/ClientKeyfile client.key/ => 1,
 	    get_testgrep() => 1,
 	},
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
+	sslverify => 1,
 	loggrep => {
 	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
 	    get_testgrep() => 1,
