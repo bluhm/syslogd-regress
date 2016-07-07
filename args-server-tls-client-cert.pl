@@ -1,9 +1,9 @@
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via TLS to an explicit loghost.
-# The server receives the message on its TLS socket.
+# The syslogd passes it via TLS with client certificate to the loghost.
+# The server verifies the connection to its TLS socket and gets the message.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that syslogd and server log contain localhost address.
+# Check that syslogd has client cert and key in log.
 
 use strict;
 use warnings;
@@ -22,10 +22,6 @@ our %args = (
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },
 	sslverify => 1,
-	loggrep => {
-	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
-	    get_testgrep() => 1,
-	},
     },
 );
 
