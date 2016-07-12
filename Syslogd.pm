@@ -139,7 +139,7 @@ sub ttykill {
 
 sub child {
 	my $self = shift;
-	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
+	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : "env";
 
 	my @pkill = (@sudo, "pkill", "-KILL", "-x", "syslogd");
 	my @pgrep = ("pgrep", "-x", "syslogd");
