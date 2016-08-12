@@ -13,9 +13,10 @@ our %args = (
     syslogd => {
 	loghost => '@tls://localhost:$connectport',
 	ktrace => {
-	    qr{NAMI  "/etc/ssl/cert.pem"} => 2,
+	    qr{NAMI  "/etc/ssl/cert.pem"} => 1,
 	},
 	loggrep => {
+	    qr{CAfile /etc/ssl/cert.pem} => 1,
 	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
 	    qr/syslogd: loghost .* connection error: /.
 		qr/handshake failed: error:.*/.
