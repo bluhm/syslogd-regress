@@ -11,6 +11,7 @@ my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
 my @cmd = (@sudo, "rm", "-f", "--", $cert);
 system(@cmd) and die "Command '@cmd' failed: $?";
 END {
+    local $?;
     my @cmd = (@sudo, "cp", "--", "127.0.0.1.crt", $cert);
     system(@cmd) and warn "Command '@cmd' failed: $?";
 }
