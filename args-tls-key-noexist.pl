@@ -39,9 +39,8 @@ our %args = (
 	},
 	loggrep => {
 	    qr{Keyfile } => 0,
-	    qr{Certfile /etc/ssl/127.0.0.1.crt} => 1,
-	    qr{syslogd: Load server TLS cert failed} => 2,
-	    qr{syslogd: open keyfile: No such file or directory} => 2,
+	    qr{Certfile } => 0,
+	    qr{syslogd: Load server TLS key failed} => 4,
 	    qr{syslogd: tls_configure server} => 2,
 	},
     },
