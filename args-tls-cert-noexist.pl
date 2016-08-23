@@ -40,6 +40,7 @@ our %args = (
 	loggrep => {
 	    qr{Keyfile /etc/ssl/private/127.0.0.1.key} => 1,
 	    qr{Certfile } => 0,
+	    qr{syslogd: Load server TLS key failed} => 2,
 	    qr{syslogd: Load server TLS cert failed} => 2,
 	    qr{syslogd: tls_configure server} => 2,
 	},
