@@ -34,13 +34,14 @@ our %args = (
 	ktrace => {
 	    qr{NAMI  "/etc/ssl/private/127.0.0.1:6514.key"} => 1,
 	    qr{NAMI  "/etc/ssl/private/127.0.0.1.key"} => 1,
-	    qr{NAMI  "/etc/ssl/127.0.0.1:6514.crt"} => 1,
+	    qr{NAMI  "/etc/ssl/127.0.0.1:6514.crt"} => 0,
 	    qr{NAMI  "/etc/ssl/127.0.0.1.crt"} => 1,
 	},
 	loggrep => {
 	    qr{Keyfile /etc/ssl/private/127.0.0.1.key} => 1,
 	    qr{Certfile } => 0,
-	    qr{syslogd: open certfile: No such file or directory} => 2,
+	    qr{syslogd: tls_config_set_key_file} => 2,
+	    qr{syslogd: tls_config_set_cert_file} => 2,
 	    qr{syslogd: tls_configure server} => 2,
 	},
     },
