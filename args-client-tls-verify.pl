@@ -18,6 +18,7 @@ our %args = (
 	    qr/connect sock: (127.0.0.1|::1) \d+/ => 1,
 	    get_testgrep() => 1,
 	},
+	sslclientcert => 1,
     },
     syslogd => {
 	options => ["-S", "localhost", "-K", "ca.crt"],

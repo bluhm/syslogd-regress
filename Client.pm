@@ -62,6 +62,10 @@ sub child {
 			    Domain              => $self->{connectdomain},
 			    PeerAddr            => $self->{connectaddr},
 			    PeerPort            => $self->{connectport},
+			    $self->{sslclientcert}    ?
+				(SSL_key_file => "client.key") : (),
+			    $self->{sslclientcert}    ?
+				(SSL_cert_file => "client.crt") : (),
 			    SSL_verify_mode     => SSL_VERIFY_NONE,
 			    $self->{sslversion} ?
 				(SSL_version => $self->{sslversion}) : (),
