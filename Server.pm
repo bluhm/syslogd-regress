@@ -54,9 +54,10 @@ sub listen {
 	    $self->{listenport}	? (LocalPort => $self->{listenport}) : (),
 	    SSL_key_file	=> "server.key",
 	    SSL_cert_file	=> "server.crt",
-	    SSL_ca_file		=> ($self->{cacrt} || "ca.crt"),
-	    $self->{sslverify}	? (SSL_verify_mode => SSL_VERIFY_PEER) : (),
-	    $self->{sslverify}	? (SSL_verifycn_scheme => "none") : (),
+	    SSL_ca_file		=> ($self->{sslcacrt} || "ca.crt"),
+	    SSL_verify_mode     => ($self->{sslcacrt} ?
+		SSL_VERIFY_PEER : SSL_VERIFY_NONE),
+	    $self->{sslcacrt}	? (SSL_verifycn_scheme => "none") : (),
 	    $self->{sslversion}	? (SSL_version => $self->{sslversion}) : (),
 	    $self->{sslciphers}	? (SSL_cipher_list => $self->{sslciphers}) : (),
 	) or die ref($self), " $iosocket socket failed: $!,$SSL_ERROR";
@@ -104,7 +105,7 @@ sub child {
 		print STDERR "ssl version: ",$as->get_sslversion(),"\n";
 		print STDERR "ssl cipher: ",$as->get_cipher(),"\n";
 		print STDERR "ssl subject: ", $as->peer_certificate("subject")
-		    ,"\n" if $self->{sslverify};
+		    ,"\n" if $self->{sslcacrt};
 	}
 
 	*STDIN = *STDOUT = $self->{as} = $as;
