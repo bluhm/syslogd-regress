@@ -28,7 +28,7 @@ our %args = (
 	},
 	loggrep => {
 	    qr{Server CAfile ca.crt} => 1,
-	    qr{tls logger .* accepted} => 1
+	    qr{tls logger .* accepted} => 1,
 	},
     },
 );
