@@ -66,9 +66,9 @@ sub child {
 				(SSL_cert_file => $self->{sslcert}) : (),
 			    $self->{sslkey} ?
 				(SSL_key_file => $self->{sslkey}) : (),
-			    $self->{sslcacrt} ?
-				(SSL_ca_file => $self->{sslcacrt}) : (),
-			    SSL_verify_mode     => ($self->{sslcacrt} ?
+			    $self->{sslca} ?
+				(SSL_ca_file => $self->{sslca}) : (),
+			    SSL_verify_mode     => ($self->{sslca} ?
 				SSL_VERIFY_PEER : SSL_VERIFY_NONE),
 			    $self->{sslversion} ?
 				(SSL_version => $self->{sslversion}) : (),

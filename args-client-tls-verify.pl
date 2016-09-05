@@ -20,7 +20,7 @@ our %args = (
 		qr{/L=OpenBSD/O=syslogd-regress/OU=syslogd/CN=127.0.0.1} => 1,
 	    get_testgrep() => 1,
 	},
-	sslcacrt => "127.0.0.1.crt",
+	sslca => "127.0.0.1.crt",
     },
     syslogd => {
 	options => ["-S", "127.0.0.1"],
