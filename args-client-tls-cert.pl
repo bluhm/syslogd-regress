@@ -14,32 +14,20 @@ our %args = (
     client => {
 	connect => { domain => AF_UNSPEC, proto => "tls", addr => "localhost",
 	    port => 6514 },
+	sslcert => "client.crt",
+	sslkey => "client.key",
 	loggrep => {
 	    qr/connect sock: (127.0.0.1|::1) \d+/ => 1,
 	    get_testgrep() => 1,
 	},
     },
     syslogd => {
-	options => ["-S", "localhost"],
-	fstat => {
-	    qr/^root .* internet/ => 0,
-	    qr/^_syslogd .* internet/ => 3,
-	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):6514$/ => 1,
-	},
+	options => ["-S", "localhost", "-K", "ca.crt"],
 	ktrace => {
-	    qr{NAMI  "/etc/ssl/private/localhost.key"} => 1,
-	    qr{NAMI  "/etc/ssl/localhost.crt"} => 1,
+	    qr{NAMI  "ca.crt"} => 1,
 	},
 	loggrep => {
-	    qr{Keyfile /etc/ssl/private/localhost.key} => 1,
-	    qr{Certfile /etc/ssl/localhost.crt} => 1,
-	    qr/syslogd: tls logger .* accepted/ => 1,
-	    qr/syslogd: tls logger .* connection close/ => 1,
-	},
-    },
-    file => {
-	loggrep => {
-	    qr/ localhost /. get_testgrep() => 1,
+	    qr{Server CAfile ca.crt} => 1,
 	},
     },
 );
