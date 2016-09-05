@@ -1,10 +1,10 @@
-# The syslogd listens on localhost TLS socket.
-# The client writes a message into a localhost TLS socket.
+# The syslogd listens on localhost TLS socket with client verification.
+# The client connects with a client certificate and writes a message.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains the hostname and message.
+# Check that the syslogd accepts client.
 
 use strict;
 use warnings;
@@ -28,6 +28,7 @@ our %args = (
 	},
 	loggrep => {
 	    qr{Server CAfile ca.crt} => 1,
+	    qr{tls logger .* accepted} => 1
 	},
     },
 );
