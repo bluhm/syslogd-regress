@@ -61,6 +61,16 @@ sub listen {
 	    $self->{sslversion}	? (SSL_version => $self->{sslversion}) : (),
 	    $self->{sslciphers}	? (SSL_cipher_list => $self->{sslciphers}) : (),
 	) or die ref($self), " $iosocket socket failed: $!,$SSL_ERROR";
+	if ($self->{sndbuf}) {
+		setsockopt($ls, SOL_SOCKET, SO_SNDBUF,
+		    pack('i', $self->{sndbuf}))
+		    or die ref($self), " set SO_SNDBUF failed: $!";
+	}
+	if ($self->{rcvbuf}) {
+		setsockopt($ls, SOL_SOCKET, SO_RCVBUF,
+		    pack('i', $self->{rcvbuf}))
+		    or die ref($self), " set SO_RCVBUF failed: $!";
+	}
 	if ($self->{listenproto} ne "udp") {
 		listen($ls, 1)
 		    or die ref($self), " socket listen failed: $!";
