@@ -38,7 +38,7 @@ our %args = (
 	},
     },
     syslogd => {
-	options => ["-z"],
+	options => ["-Z"],
     },
     server => {
 	loggrep => {
