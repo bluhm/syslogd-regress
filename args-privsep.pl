@@ -4,7 +4,7 @@
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check fstat for the parent and child process.
-# Check ktrace for setting the correct uid and gid.
+# Check ktrace for setting the correct uid and gid and exec priv.
 
 use strict;
 use warnings;
@@ -26,9 +26,11 @@ our %args = (
 	    qr/^_syslogd .* internet/ => 2,
 	},
 	ktrace => {
-	    qr/CALL  setresuid(.*"_syslogd".*){3}/ => 2,
-	    qr/CALL  setresgid(.*"_syslogd".*){3}/ => 2,
-	    qr/CALL  setsid/ => 0,
+	    qr/syslogd  CALL  setresuid(.*"_syslogd".*){3}/ => 2,
+	    qr/syslogd  CALL  setresgid(.*"_syslogd".*){3}/ => 2,
+	    qr/syslogd  CALL  setsid/ => 0,
+	    qr/syslogd  CALL  execve/ => 2,
+	    qr/\[\d\] = "-P"/ => 1,
 	},
     },
 );
