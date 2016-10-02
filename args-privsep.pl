@@ -11,9 +11,11 @@ use warnings;
 
 our %args = (
     syslogd => {
+	up => qr/fork\+exec done/,
 	loggrep => {
 	    qr/ -F / => 0,
 	    qr/ -d / => 1,
+	    qr/\[priv\]: fork\+exec done/ => 1,
 	},
 	fstat => {
 	    qr/^root .* wd / => 1,
