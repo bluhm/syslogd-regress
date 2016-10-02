@@ -29,7 +29,7 @@ our %args = (
 	    qr/syslogd  CALL  setresuid(.*"_syslogd".*){3}/ => 2,
 	    qr/syslogd  CALL  setresgid(.*"_syslogd".*){3}/ => 2,
 	    qr/syslogd  CALL  setsid/ => 0,
-	    qr/syslogd  CALL  execve/ => 2,
+	    qr/syslogd  RET   execve 0/ => 2,
 	    qr/\[\d\] = "-P"/ => 1,
 	},
     },
