@@ -1,5 +1,5 @@
 # The client writes message with different timestamps to /dev/log.
-# The syslogd runs with -z to translate them to iso time.
+# The syslogd runs with -Z to translate them to iso time.
 # The syslogd writes it into a file and through a pipe and to tty.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
