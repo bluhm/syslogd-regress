@@ -212,6 +212,29 @@ sub up {
 	return $self;
 }
 
+sub down {
+	my $self = Proc::up(shift, @_);
+	return $self unless $self->{foreground} || $self->{daemon};
+
+	my $timeout = shift || 10;
+	my $end = time() + $timeout;
+
+	my @sudo = $ENV{SUDO} ? $ENV{SUDO} : "env";
+	my @pkill = (@sudo, "pkill", "-TERM", "-x", "syslogd");
+	my @pgrep = ("pgrep", "-x", "syslogd");
+	system(@pkill) && $? != 256
+	    and die ref($self), " system '@pkill' failed: $?";
+	do {
+		sleep .1;
+		system(@pgrep) && $? != 256
+		    and die ref($self), " system '@pgrep' failed: $?";
+		return $self if $? == 256;
+		print STDERR "syslogd still running\n";
+	} while (time() < $end);
+
+	return;
+}
+
 sub fstat {
 	my $self = shift;
 
