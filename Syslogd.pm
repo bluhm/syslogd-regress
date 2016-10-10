@@ -214,7 +214,7 @@ sub up {
 
 sub down {
 	my $self = Proc::up(shift, @_);
-	return $self unless $self->{foreground} || $self->{daemon};
+	return $self unless $self->{daemon};
 
 	my $timeout = shift || 10;
 	my $end = time() + $timeout;
