@@ -189,7 +189,7 @@ sub up {
 		# check fstat kqueue entry to detect statup
 		open(my $fh, '<', $self->{fstatfile}) or die ref($self),
 		    " open $self->{fstatfile} for reading failed: $!";
-		last if grep { /kqueue/ } <$fh>;
+		last if grep { /kqueue .* state: W/ } <$fh>;
 		time() < $end
 		    or croak ref($self), " no 'kqueue' in $self->{fstatfile} ".
 		    "after $timeout seconds";
