@@ -41,8 +41,7 @@ our %args = (
 	},
     },
     pipe => { nocheck => 1 },
-    console => { nocheck => 1 },
-    user => { nocheck => 1 },
+    tty => { nocheck => 1 },
 );
 
 1;
