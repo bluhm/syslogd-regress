@@ -108,7 +108,8 @@ ${REGRESS_TARGETS:M*tls*}: client.crt server.crt 127.0.0.1.crt
 ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
-${REGRESS_TARGETS}: ttylog sys/syscall.ph
+${REGRESS_TARGETS:M*sendsyslog*}: sys/syscall.ph
+${REGRESS_TARGETS}: ttylog
 
 # make perl syntax check for all args files
 
