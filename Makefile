@@ -36,7 +36,7 @@ TARGETS ?=		${ARGS:Nargs-rsyslog*}
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 LDFLAGS +=		-lutil
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
-CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog
+CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog *.ph */*.ph
 CLEANFILES +=		*.pem *.req *.key *.crt *.srl empty toobig
 
 .MAIN: all
@@ -101,11 +101,14 @@ empty:
 toobig:
 	dd if=/dev/zero of=$@ bs=1 count=1 seek=50M
 
+sys/syscall.ph: /usr/include/sys/syscall.h
+	cd /usr/include && h2ph -h -d ${.OBJDIR} ${@:R:S/$/.h/}
+
 ${REGRESS_TARGETS:M*tls*}: client.crt server.crt 127.0.0.1.crt
 ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
-${REGRESS_TARGETS}: ttylog
+${REGRESS_TARGETS}: ttylog sys/syscall.ph
 
 # make perl syntax check for all args files
 
