@@ -23,6 +23,7 @@ use parent 'Proc';
 use Carp;
 use Cwd;
 use File::Basename;
+use File::Temp qw(tempfile tempdir);
 use Sys::Hostname;
 use Time::HiRes qw(time alarm sleep);
 
@@ -41,7 +42,13 @@ sub new {
 	$args{func} = sub { Carp::confess "$class func may not be called" };
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
-	$args{outpipe} ||= "pipe.log";
+	unless ($args{outpipe}) {
+		my $dir = tempdir("syslogd-regress-XXXXXXXXXX",
+		    CLEANUP => 1, TMPDIR => 1);
+		chmod(0755, $dir)
+		    or die "$class chmod directory $dir failed: $!";
+		$args{outpipe} = "$dir/pipe.log";
+	}
 	$args{outconsole} ||= "console.log";
 	$args{outuser} ||= "user.log";
 	if ($args{memory}) {
@@ -97,9 +104,12 @@ sub create_out {
 
 	open($fh, '>', $self->{outpipe})
 	    or die ref($self), " create pipe file $self->{outpipe} failed: $!";
-	close $fh;
-	chmod(0666, $self->{outpipe})
+	chmod(0644, $self->{outpipe})
 	    or die ref($self), " chmod pipe file $self->{outpipe} failed: $!";
+	my @cmd = (@sudo, "chown", "_syslogd", $self->{outpipe});
+	system(@cmd)
+	    and die ref($self), " chown pipe file $self->{outpipe} failed: $!";
+	close $fh;
 
 	foreach my $dev (qw(console user)) {
 		my $file = $self->{"out$dev"};
