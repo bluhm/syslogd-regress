@@ -23,6 +23,7 @@ use parent 'Proc';
 use Carp;
 use Cwd;
 use File::Basename;
+use File::Copy;
 use File::Temp qw(tempfile tempdir);
 use Sys::Hostname;
 use Time::HiRes qw(time alarm sleep);
@@ -47,6 +48,7 @@ sub new {
 		    CLEANUP => 1, TMPDIR => 1);
 		chmod(0755, $dir)
 		    or die "$class chmod directory $dir failed: $!";
+		$args{tempdir} = $dir;
 		$args{outpipe} = "$dir/pipe.log";
 	}
 	$args{outconsole} ||= "console.log";
@@ -224,6 +226,12 @@ sub up {
 
 sub down {
 	my $self = Proc::up(shift, @_);
+
+	if (my $dir = $self->{tempdir}) {
+		# keep all logs in single directory for easy debugging
+		copy($_, ".") foreach glob("$dir/*");
+	}
+
 	return $self unless $self->{daemon};
 
 	my $timeout = shift || 10;
