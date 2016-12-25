@@ -1,11 +1,10 @@
-# The syslogd binds UDP socket on localhost.
-# The client writes a message into a localhost UDP socket.
+# The syslogd binds UDP and TCP socket on localhost.
+# The client writes messages into a all localhost sockets.
 # The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains the localhost name.
-# Check that fstat contains a bound UDP socket.
+# Find the messages in client, file, syslogd log.
+# Check that fstat contains all bound sockets.
+# Check that the file log contains all messages.
+# Check that client used expected protocol.
 
 use strict;
 use warnings;
