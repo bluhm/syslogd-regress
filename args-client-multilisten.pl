@@ -19,6 +19,7 @@ our %args = (
 	    $self->{redo} = [ "udp", "tcp" ] unless $self->{redo};
 	    $self->{connectproto} = shift @{$self->{redo}};
 	    undef $self->{redo} unless @{$self->{redo}};
+	    write_message($self, "client proto: ", $self->{connectproto});
 	    write_log($self);
 	},
 	loggrep => {
@@ -34,7 +35,11 @@ our %args = (
 	},
     },
     file => {
-	loggrep => qr/ localhost /. get_testgrep(),
+	loggrep => {
+	    qr/client proto: udp/ => 1,
+	    qr/client proto: tcp/ => 1,
+	    qr/ localhost /. get_testgrep() => 2,
+	}
     },
 );
 
