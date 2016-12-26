@@ -12,22 +12,41 @@ use Socket;
 
 our %args = (
     client => {
-	connect => { domain => AF_UNSPEC, addr => "localhost", port => 514 },
+	connectproto => "none",
 	func => sub {
 	    my $self = shift;
-	    $self->{redo} = [ "udp", "tcp" ] unless $self->{redo};
-	    $self->{connectproto} = shift @{$self->{redo}};
-	    undef $self->{redo} unless @{$self->{redo}};
-	    write_message($self, "client proto: ", $self->{connectproto});
-	    write_log($self);
+	    $self->{redo} ||= [
+		{
+		    proto  => "udp",
+		    domain => AF_INET,
+		    addr   => "127.0.0.1",
+		    port   => 514
+		},
+		{
+		    proto  => "tcp",
+		    domain => AF_INET6,
+		    addr   => "::1",
+		    port   => 514
+		},
+	    ];
+	    write_message($self, "client proto: ". $self->{connectproto});
+	    if (my $connect = shift @{$self->{redo}}) {
+		$self->{connectproto}  = $connect->{proto};
+		$self->{connectdomain} = $connect->{domain};
+		$self->{connectaddr}   = $connect->{addr};
+		$self->{connectport}   = $connect->{port};
+	    } else {
+		write_log($self);
+		undef $self->{redo};
+	    }
 	},
 	loggrep => {
 	    qr/connect sock: (127.0.0.1|::1) \d+/ => 2,
-	    get_testgrep() => 2,
+	    get_testgrep() => 1,
 	},
     },
     syslogd => {
-	options => ["-U", "localhost", "-T", "localhost:514"],
+	options => ["-U", "127.0.0.1", "-T", "[::1]:514"],
 	fstat => {
 	    qr/ internet6? dgram udp (127.0.0.1|\[::1\]):514$/ => 1,
 	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
@@ -37,7 +56,7 @@ our %args = (
 	loggrep => {
 	    qr/client proto: udp/ => 1,
 	    qr/client proto: tcp/ => 1,
-	    qr/ localhost /. get_testgrep() => 2,
+	    qr/ localhost /. get_testgrep() => 1,
 	}
     },
 );
