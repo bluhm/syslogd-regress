@@ -1,12 +1,11 @@
-# Start syslogd in daemon mode with relative path.
+# Start syslogd with relative path.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
-# Find the message in client, file, syslogd, server log.
-# Check fstat for the parent and child process.
-# Check ktrace for setting the correct uid and gid.
-# Check that stdio is dupped to /dev/null.
+# Find the message in client, file, console, user, syslogd, server log.
+# Check fstat for root and working directory.
+# Check ktrace for chroot, chdir, exec.
 
 use strict;
 use warnings;
