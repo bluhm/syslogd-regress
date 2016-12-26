@@ -25,6 +25,12 @@ our %args = (
 		    port   => 514,
 		},
 		{
+		    proto  => "udp",
+		    domain => AF_INET6,
+		    addr   => "::1",
+		    port   => 514,
+		},
+		{
 		    proto  => "tcp",
 		    domain => AF_INET6,
 		    addr   => "::1",
@@ -54,21 +60,22 @@ our %args = (
 	    }
 	},
 	loggrep => {
-	    qr/connect sock: (127.0.0.1|::1) \d+/ => 3,
+	    qr/connect sock: (127.0.0.1|::1) \d+/ => 4,
 	    get_testgrep() => 1,
 	},
     },
     syslogd => {
-	options => ["-U", "127.0.0.1", "-T", "[::1]:514", "-S", "[::1]:6514"],
+	options => [qw(-U 127.0.0.1 -U [::1] -T [::1]:514 -S [::1]:6514)],
 	fstat => {
-	    qr/ internet6? dgram udp (127.0.0.1|\[::1\]):514$/ => 1,
+	    qr/ internet6? dgram udp (127.0.0.1):514$/ => 1,
+	    qr/ internet6? dgram udp (\[::1\]):514$/ => 1,
 	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
 	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):6514$/ => 1,
 	},
     },
     file => {
 	loggrep => {
-	    qr/client proto: udp/ => 1,
+	    qr/client proto: udp/ => 2,
 	    qr/client proto: tcp/ => 1,
 	    qr/client proto: tls/ => 1,
 	    get_testgrep() => 1,
