@@ -1,6 +1,8 @@
-# The syslogd binds UDP and TCP socket on localhost.
+# The syslogd binds UDP, TCP, TLS socket on localhost.
 # The client writes messages into a all localhost sockets.
 # The syslogd writes it into a file and through a pipe.
+# The syslogd passes it via UDP to the loghost.
+# The server receives the messages on its UDP socket.
 # Find the messages in client, file, syslogd log.
 # Check that fstat contains all bound sockets.
 # Check that the file log contains all messages.
@@ -20,43 +22,56 @@ our %args = (
 		    proto  => "udp",
 		    domain => AF_INET,
 		    addr   => "127.0.0.1",
-		    port   => 514
+		    port   => 514,
 		},
 		{
 		    proto  => "tcp",
 		    domain => AF_INET6,
 		    addr   => "::1",
-		    port   => 514
+		    port   => 514,
+		},
+		{
+		    proto  => "tls",
+		    domain => AF_INET6,
+		    addr   => "::1",
+		    port   => 6514,
 		},
 	    ];
 	    write_message($self, "client proto: ". $self->{connectproto});
+	    close($self->{cs}) if $self->{cs};
 	    if (my $connect = shift @{$self->{redo}}) {
 		$self->{connectproto}  = $connect->{proto};
 		$self->{connectdomain} = $connect->{domain};
 		$self->{connectaddr}   = $connect->{addr};
 		$self->{connectport}   = $connect->{port};
 	    } else {
+		delete $self->{connectdomain};
+		$self->{logsock} = { type => "native" };
+		setlogsock($self->{logsock})
+		    or die ref($self), " setlogsock failed: $!";
 		write_log($self);
 		undef $self->{redo};
 	    }
 	},
 	loggrep => {
-	    qr/connect sock: (127.0.0.1|::1) \d+/ => 2,
+	    qr/connect sock: (127.0.0.1|::1) \d+/ => 3,
 	    get_testgrep() => 1,
 	},
     },
     syslogd => {
-	options => ["-U", "127.0.0.1", "-T", "[::1]:514"],
+	options => ["-U", "127.0.0.1", "-T", "[::1]:514", "-S", "[::1]:6514"],
 	fstat => {
 	    qr/ internet6? dgram udp (127.0.0.1|\[::1\]):514$/ => 1,
 	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
+	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):6514$/ => 1,
 	},
     },
     file => {
 	loggrep => {
 	    qr/client proto: udp/ => 1,
 	    qr/client proto: tcp/ => 1,
-	    qr/ localhost /. get_testgrep() => 1,
+	    qr/client proto: tls/ => 1,
+	    get_testgrep() => 1,
 	}
     },
 );

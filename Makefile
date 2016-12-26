@@ -105,6 +105,7 @@ sys/syscall.ph: /usr/include/sys/syscall.h
 	cd /usr/include && h2ph -h -d ${.OBJDIR} ${@:R:S/$/.h/}
 
 ${REGRESS_TARGETS:M*tls*}: client.crt server.crt 127.0.0.1.crt
+${REGRESS_TARGETS:M*multilisten*}: 127.0.0.1.crt
 ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
