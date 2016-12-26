@@ -14,7 +14,7 @@ use warnings;
 our %args = (
     syslogd => {
 	chdir => "/usr/sbin",
-	syslogdfile => $ENV{SYSLOGD} ? "../../$ENV{SYSLOGD}" : "./syslogd",
+	execfile => $ENV{SYSLOGD} ? "../../$ENV{SYSLOGD}" : "./syslogd",
 	daemon => 1,
 	nopipe => 1,
 	noconsole => 1,

@@ -41,7 +41,7 @@ sub new {
 	$args{foreground} && $args{daemon}
 	    and croak "$class cannot run in foreground and as daemon";
 	$args{func} = sub { Carp::confess "$class func may not be called" };
-	$args{syslogdfile} ||= $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
+	$args{execfile} ||= $ENV{SYSLOGD} ? $ENV{SYSLOGD} : "syslogd";
 	$args{conffile} ||= "syslogd.conf";
 	$args{outfile} ||= "file.log";
 	unless ($args{outpipe}) {
@@ -178,7 +178,7 @@ sub child {
 	my @ktrace = $ENV{KTRACE} || ();
 	@ktrace = "ktrace" if $self->{ktrace} && !@ktrace;
 	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
-	my @cmd = (@sudo, @libevent, @ktrace, $self->{syslogdfile},
+	my @cmd = (@sudo, @libevent, @ktrace, $self->{execfile},
 	    "-f", $self->{conffile});
 	push @cmd, "-d" if !$self->{foreground} && !$self->{daemon};
 	push @cmd, "-F" if $self->{foreground};
