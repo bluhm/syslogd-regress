@@ -15,37 +15,20 @@ our %args = (
     syslogd => {
 	chdir => "/usr/sbin",
 	execfile => $ENV{SYSLOGD} ? "../../$ENV{SYSLOGD}" : "./syslogd",
-	daemon => 1,
 	nopipe => 1,
-	noconsole => 1,
-	nouser => 1,
-
-
-	loggrep => {
-	    qr/ -F / => 0,
-	    qr/ -d / => 0,
-	},
 	fstat => {
-	    qr/^root .* wd / => 1,
+	    qr/^root .* wd \/ / => 1,
 	    qr/^root .* root / => 0,
-	    qr/^root .* [012] .* null$/ => 3,
-	    qr/^root .* kqueue / => 0,
-	    qr/^root .* internet/ => 0,
 	    qr/^_syslogd .* wd / => 1,
 	    qr/^_syslogd .* root / => 1,
-	    qr/^_syslogd .* [012] .* null$/ => 3,
-	    qr/^_syslogd .* kqueue / => 1,
-	    qr/^_syslogd .* internet/ => 2,
 	},
 	ktrace => {
-	    qr/CALL  setresuid(.*"_syslogd".*){3}/ => 1,
-	    qr/CALL  setresgid(.*"_syslogd".*){3}/ => 1,
-	    qr/CALL  setsid/ => 1,
-	    qr/RET   setsid.* errno / => 0,
+	    qr/CALL  chroot/ => 1,
+	    qr/CALL  chdir/ => 2,
+	    qr/CALL  exec/ => 2,
 	},
     },
     pipe => { nocheck => 1 },
-    tty => { nocheck => 1 },
 );
 
 1;
