@@ -64,6 +64,7 @@ sub new {
 	    or croak "$class connect addr not given";
 
 	_make_abspath(\$self->{$_}) foreach (qw(conffile outfile outpipe));
+	_make_abspath(\$self->{ktracefile}) if $self->{chdir};
 
 	# substitute variables in config file
 	my $curdir = dirname($0) || ".";
@@ -164,6 +165,10 @@ sub child {
 		    and die ref($self), " system '@pgrep' failed: $?";
 	}
 	print STDERR "syslogd not running\n";
+
+	chdir $self->{chdir}
+	    or die ref($self), " chdir '$self->{chdir}' failed: $!"
+	    if $self->{chdir};
 
 	my @libevent;
 	foreach (qw(EVENT_NOKQUEUE EVENT_NOPOLL EVENT_NOSELECT)) {

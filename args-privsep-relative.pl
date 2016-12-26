@@ -1,4 +1,4 @@
-# Start syslogd in daemon mode.
+# Start syslogd in daemon mode with relative path.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -13,10 +13,13 @@ use warnings;
 
 our %args = (
     syslogd => {
+	chdir => "/usr/sbin",
 	daemon => 1,
 	nopipe => 1,
 	noconsole => 1,
 	nouser => 1,
+
+
 	loggrep => {
 	    qr/ -F / => 0,
 	    qr/ -d / => 0,
