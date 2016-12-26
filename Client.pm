@@ -104,7 +104,9 @@ sub child {
 			}
 		}
 
+		IO::Handle::flush(\*STDOUT);
 		*STDIN = *STDOUT = $self->{cs} = $cs;
+		select(STDOUT);
 	}
 
 	if ($self->{logsock}) {
