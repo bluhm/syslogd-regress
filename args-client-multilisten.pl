@@ -1,4 +1,4 @@
-# The syslogd binds UDP, TCP, TLS socket on localhost.
+# The syslogd binds multiple UDP, TCP, TLS sockets on localhost.
 # The client writes messages into a all localhost sockets.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
@@ -32,6 +32,12 @@ our %args = (
 		},
 		{
 		    proto  => "tcp",
+		    domain => AF_INET,
+		    addr   => "127.0.0.1",
+		    port   => 514,
+		},
+		{
+		    proto  => "tcp",
 		    domain => AF_INET6,
 		    addr   => "::1",
 		    port   => 514,
@@ -60,23 +66,26 @@ our %args = (
 	    }
 	},
 	loggrep => {
-	    qr/connect sock: (127.0.0.1|::1) \d+/ => 4,
+	    qr/connect sock: (127.0.0.1|::1) \d+/ => 5,
 	    get_testgrep() => 1,
 	},
     },
     syslogd => {
-	options => [qw(-U 127.0.0.1 -U [::1] -T [::1]:514 -S [::1]:6514)],
+	options => [qw(
+	    -U 127.0.0.1 -U [::1] -T 127.0.0.1:514 -T [::1]:514 -S [::1]:6514
+	)],
 	fstat => {
 	    qr/ internet6? dgram udp (127.0.0.1):514$/ => 1,
 	    qr/ internet6? dgram udp (\[::1\]):514$/ => 1,
-	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):514$/ => 1,
+	    qr/ internet6? stream tcp \w+ (127.0.0.1):514$/ => 1,
+	    qr/ internet6? stream tcp \w+ (\[::1\]):514$/ => 1,
 	    qr/ internet6? stream tcp \w+ (127.0.0.1|\[::1\]):6514$/ => 1,
 	},
     },
     file => {
 	loggrep => {
 	    qr/client proto: udp/ => 2,
-	    qr/client proto: tcp/ => 1,
+	    qr/client proto: tcp/ => 2,
 	    qr/client proto: tls/ => 1,
 	    get_testgrep() => 1,
 	}
