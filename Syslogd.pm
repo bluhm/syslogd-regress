@@ -1,4 +1,4 @@
-#	$OpenBSD: Syslogd.pm,v 1.21 2016/11/28 20:57:41 bluhm Exp $
+#	$OpenBSD: Syslogd.pm,v 1.22 2016/12/27 19:43:07 bluhm Exp $
 
 # Copyright (c) 2010-2015 Alexander Bluhm <bluhm@openbsd.org>
 # Copyright (c) 2014 Florian Riehm <mail@friehm.de>
