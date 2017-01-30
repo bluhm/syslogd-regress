@@ -40,8 +40,8 @@ our %args = (
     file => {
 	loggrep => {
 	    qr/syslogd: loghost .* connection error: /.
-		qr/handshake failed: error:.*/.
-		qr/.*:unknown protocol/ => 1,
+		qr/handshake failed: error:.*:/.
+		qr/(unknown protocol|wrong version number)/ => 1,
 	},
     },
 );
