@@ -16,7 +16,7 @@ our %args = (
 	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
 	    qr/syslogd: loghost .* connection error: /.
 		qr/handshake failed: error:.*:/.
-		qr/sslv3 alert handshake failure/ => 2,
+		qr/SSL_internal:sslv3 alert handshake failure/ => 2,
 	    get_testgrep() => 1,
 	},
 	cacrt => "ca.crt",
@@ -29,7 +29,7 @@ our %args = (
 	exit => 255,
 	loggrep => {
 	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
-	    qr/no shared cipher/ => 1,
+	    qr/SSL_internal:no shared cipher/ => 1,
 	    get_testgrep() => 0,
 	},
     },
