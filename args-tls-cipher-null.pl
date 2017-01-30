@@ -15,8 +15,8 @@ our %args = (
 	loggrep => {
 	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
 	    qr/syslogd: loghost .* connection error: /.
-		qr/handshake failed: error.*:/.
-		qr/.*:sslv3 alert handshake failure/ => 2,
+		qr/handshake failed: error:.*:/.
+		qr/sslv3 alert handshake failure/ => 2,
 	    get_testgrep() => 1,
 	},
 	cacrt => "ca.crt",
