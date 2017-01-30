@@ -16,7 +16,7 @@ our %args = (
 	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
 	    qr/syslogd: loghost .* connection error: /.
 		qr/handshake failed: error.*:/.
-		qr/SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure/ => 2,
+		qr/.*:sslv3 alert handshake failure/ => 2,
 	    get_testgrep() => 1,
 	},
 	cacrt => "ca.crt",

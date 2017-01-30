@@ -18,7 +18,7 @@ our %args = (
 	    qr/ClientKeyfile client.key/ => 1,
 	    qr/syslogd: loghost .* connection error: /.
 		qr/handshake failed: error:.*/.
-		qr/SSL3_READ_BYTES:tlsv1 alert decrypt error/ => 2,
+		qr/.*:tlsv1 alert decrypt error/ => 2,
 	    get_testgrep() => 1,
 	},
     },

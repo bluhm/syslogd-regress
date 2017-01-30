@@ -42,7 +42,7 @@ our %args = (
 	loggrep => {
 	    qr/syslogd: tls logger .* connection error: /.
 		qr/handshake failed: error:.*/.
-		qr/SSL routines:SSL23_GET_CLIENT_HELLO:unknown protocol/ => 1,
+		qr/SSL routines:*.:unknown protocol/ => 1,
 	},
     },
     pipe => { nocheck => 1 },
