@@ -52,6 +52,7 @@ sub listen {
 	    Domain		=> $self->{listendomain},
 	    $self->{listenaddr}	? (LocalAddr => $self->{listenaddr}) : (),
 	    $self->{listenport}	? (LocalPort => $self->{listenport}) : (),
+	    SSL_server          => 1,
 	    SSL_key_file	=> "server.key",
 	    SSL_cert_file	=> "server.crt",
 	    SSL_ca_file		=> ($self->{sslca} || "ca.crt"),
