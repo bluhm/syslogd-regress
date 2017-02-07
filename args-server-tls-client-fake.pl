@@ -30,8 +30,8 @@ our %args = (
 	exit => 255,
 	loggrep => {
 	    qr/Server IO::Socket::SSL socket accept failed: /.
-		qr/,SSL accept attempt failed error:.*:/.
-		qr/SSL_internal:no certificate returned/ => 1.
+		qr/,SSL accept attempt failed error:.*:SSL routines:/.
+		qr/ACCEPT_SR_CERT:no certificate returned/ => 1.
 	},
     },
 );
