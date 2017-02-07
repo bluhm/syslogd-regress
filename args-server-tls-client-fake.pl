@@ -17,8 +17,8 @@ our %args = (
 	    qr/ClientCertfile client.crt/ => 1,
 	    qr/ClientKeyfile client.key/ => 1,
 	    qr/syslogd: loghost .* connection error: /.
-		qr/handshake failed: error:.*:/.
-		qr/SSL_internal:tlsv1 alert decrypt error/ => 2,
+		qr/handshake failed: error:.*:SSL routines:/.
+		qr/CONNECT_CR_FINISHED:tlsv1 alert decrypt error/ => 2,
 	    get_testgrep() => 1,
 	},
     },
