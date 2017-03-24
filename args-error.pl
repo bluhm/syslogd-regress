@@ -1,4 +1,4 @@
-# Commandline options passed to syslogd generate errors.
+# Command line options passed to syslogd generate errors.
 # The client writes a message to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe and to tty.
 # The syslogd passes it via UDP to the loghost.
