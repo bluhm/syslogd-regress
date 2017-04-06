@@ -23,38 +23,6 @@ my %selector2messages = (
     "syslog.none"    => [],
 );
 
-sub selector2config {
-    my %s2m = @_;
-    my $conf = "";
-    my $i = 0;
-    foreach my $sel (sort keys %s2m) {
-	$conf .= "$sel\t\$objdir/file-$i.log\n";
-	$i++;
-    }
-    return $conf;
-}
-
-sub messages2loggrep {
-    my %s2m = @_;
-
-    my %allmsg;
-    @allmsg{map { @$_} values %s2m} = ();
-
-    my @loggrep;
-    foreach my $sel (sort keys %s2m) {
-	my @m = @{$s2m{$sel}};
-	my %msg;
-	@msg{@m} = ();
-	my %nomsg = %allmsg;
-	delete @nomsg{@m};
-	push @loggrep, {
-	    (map { qr/: $_$/ => 1 } sort keys %msg),
-	    (map { qr/: $_$/ => 0 } sort keys %nomsg),
-	};
-    }
-    return @loggrep;
-}
-
 our %args = (
     client => {
 	logsock => { type => "tcp", host => "127.0.0.1", port => 514 },
