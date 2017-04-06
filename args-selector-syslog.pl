@@ -1,50 +1,26 @@
-# The client sends messages with different facility and severity.
-# The syslogd writes into multiple files depending on priority.
+# The client connects with TCP.
+# The syslogd writes local messages into multiple files depending on priority.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the messages appear in the correct log files.
+# Check that local syslog messages end up the correct priority file.
 
 use strict;
 use warnings;
 use Sys::Syslog;
 
-my (@messages, @priorities);
-foreach my $fac (qw(local5 local6 local7)) {
-    foreach my $sev (qw(notice warning err)) {
-	my $msg = "$fac.$sev";
-	push @messages, $msg;
-	no strict 'refs';
-	my $prio = ("Sys::Syslog::LOG_".uc($fac))->() |
-	    ("Sys::Syslog::LOG_".uc($sev))->();
-	push @priorities, $prio;
-    }
-}
-
 my %selector2messages = (
-    "*.*" => [@messages],
-    "*.info" => [@messages],
-    "*.notice" => [@messages],
-    "*.warning" => [ grep { /\.(warning|err)$/ } @messages],
-    "*.err" => [ grep { /\.err$/ } @messages],
-    "*.crit" => [],
-    "*.none" => [],
-    "local5.*" => [qw(local5.notice local5.warning local5.err)],
-    "local5.info" => [qw(local5.notice local5.warning local5.err)],
-    "local5.notice" => [qw(local5.notice local5.warning local5.err)],
-    "local5.warning" => [qw(local5.warning local5.err)],
-    "local5.err" => [qw(local5.err)],
-    "local5.crit" => [],
-    "local5.none" => [],
-    "local5.warning;local5.err" => [qw(local5.err)],
-    "local5.err;local5.warning" => [qw(local5.warning local5.err)],
-    "local6.warning;local7.err" => [qw(local6.warning local6.err local7.err)],
-    "local6.err;local7.err" => [qw(local6.err local7.err)],
-    "local6,local7.err" => [qw(local6.err local7.err)],
-    "local6,local7.warning;local6.err" => [qw(local6.err local7.warning
-	local7.err)],
-    "*.*;local6,local7.none" => [qw(local5.notice local5.warning local5.err)],
+    "syslog.*"       => [qw{ start .*accepted .*close exiting.* }],
+    "syslog.debug"   => [qw{ start .*accepted .*close exiting.* }],
+    "syslog.info"    => [qw{ start .*accepted .*close exiting.* }],
+    "syslog.notice"  => [qw{ exiting.* }],
+    "syslog.warning" => [qw{ exiting.* }],
+    "syslog.err"     => [qw{ exiting.* }],
+    "syslog.crit"    => [],
+    "syslog.alert"   => [],
+    "syslog.emerg"   => [],
+    "syslog.none"    => [],
 );
 
 sub selector2config {
@@ -60,12 +36,16 @@ sub selector2config {
 
 sub messages2loggrep {
     my %s2m = @_;
+
+    my %allmsg;
+    @allmsg{map { @$_} values %s2m} = ();
+
     my @loggrep;
     foreach my $sel (sort keys %s2m) {
 	my @m = @{$s2m{$sel}};
-	my (%msg, %nomsg);
+	my %msg;
 	@msg{@m} = ();
-	@nomsg{@messages} = ();
+	my %nomsg = %allmsg;
 	delete @nomsg{@m};
 	push @loggrep, {
 	    (map { qr/: $_$/ => 1 } sort keys %msg),
@@ -77,26 +57,15 @@ sub messages2loggrep {
 
 our %args = (
     client => {
-	func => sub {
-	    my $self = shift;
-	    for (my $i = 0; $i < @messages; $i++) {
-		syslog($priorities[$i], $messages[$i]);
-	    }
-	    write_log($self);
-	},
+	logsock => { type => "tcp", host => "127.0.0.1", port => 514 },
     },
     syslogd => {
+	options => ["-T", "127.0.0.1:514"],
 	conf => selector2config(%selector2messages),
     },
     multifile => [
 	(map { { loggrep => $_ } } (messages2loggrep(%selector2messages))),
     ],
-    server => {
-	loggrep => { map { qr/ <$_>/ => 1 } @priorities },
-    },
-    file => {
-	loggrep => { map { qr/: $_$/ => 1 } @messages },
-    },
 );
 
 1;
