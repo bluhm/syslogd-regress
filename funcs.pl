@@ -289,7 +289,7 @@ sub selector2config {
     return $conf;
 }
 
-sub messages2loggrep {
+sub selector2loggrep {
     my %s2m = @_;
     my %allmsg;
     @allmsg{map { @$_} values %s2m} = ();

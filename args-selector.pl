@@ -61,7 +61,7 @@ our %args = (
 	conf => selector2config(%selector2messages),
     },
     multifile => [
-	(map { { loggrep => $_ } } (messages2loggrep(%selector2messages))),
+	(map { { loggrep => $_ } } (selector2loggrep(%selector2messages))),
     ],
     server => {
 	loggrep => { map { qr/ <$_>/ => 1 } @priorities },
