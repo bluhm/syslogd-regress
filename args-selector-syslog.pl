@@ -15,8 +15,7 @@ my %selector2messages = (
 	[qw{ start .*accepted .*close .*accepted .*peer exiting.* }],
     "syslog.debug"   =>
 	[qw{ start .*accepted .*close .*accepted .*peer exiting.* }],
-    "syslog.info"    =>
-	[qw{ start .*accepted .*close .*accepted .*peer exiting.* }],
+    "syslog.info"    => [qw{ start .*peer exiting.* }],
     "syslog.notice"  => [qw{ .*peer exiting.* }],
     "syslog.warning" => [qw{ exiting.* }],
     "syslog.err"     => [qw{ exiting.* }],
