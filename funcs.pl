@@ -297,11 +297,11 @@ sub selector2loggrep {
     foreach my $sel (sort keys %s2m) {
 	my @m = @{$s2m{$sel}};
 	my %msg;
-	@msg{@m} = ();
+	$msg{$_}++ foreach (@m);
 	my %nomsg = %allmsg;
 	delete @nomsg{@m};
 	push @loggrep, {
-	    (map { qr/: $_$/ => 1 } sort keys %msg),
+	    (map { qr/: $_$/ => $msg{$_} } sort keys %msg),
 	    (map { qr/: $_$/ => 0 } sort keys %nomsg),
 	};
     }
