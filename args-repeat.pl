@@ -1,3 +1,4 @@
+# Start syslogd with -r option.
 # The client writes messages repeatedly to Sys::Syslog native method.
 # The syslogd writes it into a file and through a pipe and to tty.
 # The syslogd passes it via UDP to the loghost.
