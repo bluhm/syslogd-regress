@@ -114,7 +114,7 @@ sub child {
 		    or die ref($self), " setlogsock failed: $!";
 	}
 	# we take LOG_UUCP as it is not used nowadays
-	openlog("syslogd-regress", "ndelay,perror,pid", LOG_UUCP);
+	openlog("syslogd-regress", "perror,pid", LOG_UUCP);
 }
 
 1;
