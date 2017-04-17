@@ -15,64 +15,64 @@ use Socket;
 our %args = (
     client => {
 	connectproto => "none",
+	redo => [
+	    {
+		proto  => "udp",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 514,
+	    },
+	    {
+		proto  => "udp",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 513,
+	    },
+	    {
+		proto  => "udp",
+		domain => AF_INET6,
+		addr   => "::1",
+		port   => 514,
+	    },
+	    {
+		proto  => "tcp",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 514,
+	    },
+	    {
+		proto  => "tcp",
+		domain => AF_INET6,
+		addr   => "::1",
+		port   => 513,
+	    },
+	    {
+		proto  => "tcp",
+		domain => AF_INET6,
+		addr   => "::1",
+		port   => 514,
+	    },
+	    {
+		proto  => "tls",
+		domain => AF_INET6,
+		addr   => "::1",
+		port   => 6514,
+	    },
+	    {
+		proto  => "tls",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 6514,
+	    },
+	    {
+		proto  => "tls",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 6515,
+	    },
+	],
 	func => sub {
 	    my $self = shift;
-	    $self->{redo} ||= [
-		{
-		    proto  => "udp",
-		    domain => AF_INET,
-		    addr   => "127.0.0.1",
-		    port   => 514,
-		},
-		{
-		    proto  => "udp",
-		    domain => AF_INET,
-		    addr   => "127.0.0.1",
-		    port   => 513,
-		},
-		{
-		    proto  => "udp",
-		    domain => AF_INET6,
-		    addr   => "::1",
-		    port   => 514,
-		},
-		{
-		    proto  => "tcp",
-		    domain => AF_INET,
-		    addr   => "127.0.0.1",
-		    port   => 514,
-		},
-		{
-		    proto  => "tcp",
-		    domain => AF_INET6,
-		    addr   => "::1",
-		    port   => 513,
-		},
-		{
-		    proto  => "tcp",
-		    domain => AF_INET6,
-		    addr   => "::1",
-		    port   => 514,
-		},
-		{
-		    proto  => "tls",
-		    domain => AF_INET6,
-		    addr   => "::1",
-		    port   => 6514,
-		},
-		{
-		    proto  => "tls",
-		    domain => AF_INET,
-		    addr   => "127.0.0.1",
-		    port   => 6514,
-		},
-		{
-		    proto  => "tls",
-		    domain => AF_INET,
-		    addr   => "127.0.0.1",
-		    port   => 6515,
-		},
-	    ];
 	    write_message($self, "client proto: ". $self->{connectproto});
 	    close($self->{cs}) if $self->{cs};
 	    if (my $connect = shift @{$self->{redo}}) {
