@@ -19,15 +19,15 @@ our %args = (
     },
     console => {
 	loggrep => {
-            qr{".*/file-noexist.log": No such file or directory} => 1,
+	    qr{".*/file-noexist.log": No such file or directory} => 1,
 	    get_testgrep() => 1,
-        },
+	},
     },
     file => {
 	loggrep => {
-            qr{".*/file-noexist.log": No such file or directory} => 0,
+	    qr{".*/file-noexist.log": No such file or directory} => 0,
 	    get_testgrep() => 1,
-        },
+	},
     },
 );
 
