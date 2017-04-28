@@ -1,9 +1,7 @@
-# The client writes a message to a localhost IPv4 UDP socket.
-# The syslogd writes it into a file and through a pipe.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
-# Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains the localhost name.
+# The client writes messages to localhost IPv4 and IPv6 UDP socket.
+# The syslogd does not receive them as it is started without -u.
+# Check that client does send the message, but it is not in the file.
+# Check that there is no recvfrom localhost in syslogd ktrace.
 
 use strict;
 use warnings;
@@ -11,17 +9,67 @@ use Socket;
 
 our %args = (
     client => {
-	connect => { domain => AF_INET, addr => "127.0.0.1", port => 514 },
+	connectaddr => "none",
+	redo => [
+	    {
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+	    },
+	    {
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+	    },
+	    {
+		domain => AF_INET6,
+		addr   => "::1",
+	    },
+	],
+	func => sub {
+	    my $self = shift;
+	    write_message($self, "client addr: ". $self->{connectaddr});
+	    if ($self->{cs}) {
+		# wait for possible icmp errors, port is open
+		sleep .1;
+		close($self->{cs})
+		    or die ref($self), " close failed: $!";
+	    };
+	    if (my $connect = shift @{$self->{redo}}) {
+		$self->{connectdomain} = $connect->{domain};
+		$self->{connectaddr}   = $connect->{addr};
+		$self->{connectproto}  = "udp";
+		$self->{connectport}   = "514";
+	    } else {
+		delete $self->{connectdomain};
+		$self->{logsock} = { type => "native" };
+		setlogsock($self->{logsock})
+		    or die ref($self), " setlogsock failed: $!";
+		sleep .1;
+		write_log($self);
+		undef $self->{redo};
+	    }
+	},
+	loggrep => {
+	    qr/client addr:/ => 4,
+	    get_testgrep() => 1,
+	}
     },
     syslogd => {
-	options => ["-u"],
-	fstat => {
-	    qr/^root .* internet/ => 0,
-	    qr/^_syslogd .* internet/ => 2,
+	options => [],
+	loghost => "/dev/null",
+	ktrace => {
+	    qr/127\.0\.0\.1/ => 0,
+	    qr/\[::1\]/ => 0,
 	},
     },
+    server => {
+	noserver => 1,
+    },
     file => {
-	loggrep => qr/ localhost /. get_testgrep(),
+	loggrep => {
+	    qr/client addr: none/ => 1,
+	    qr/client addr:/ => 1,
+	    get_testgrep() => 1,
+	}
     },
 );
 
