@@ -1,6 +1,7 @@
 # The client writes messages to localhost IPv4 and IPv6 UDP socket.
 # The syslogd does not receive them as it is started without -u.
 # Check that client does send the message, but it is not in the file.
+# Check with fstat that both *:514 sockets are bound.
 # Check that there is no recvfrom localhost in syslogd ktrace.
 
 use strict;
@@ -56,6 +57,9 @@ our %args = (
     syslogd => {
 	options => [],
 	loghost => "/dev/null",
+	fstat => {
+	    qr/^_syslogd syslogd .* internet6? dgram udp \*:514$/ => 2,
+	},
 	ktrace => {
 	    qr/127\.0\.0\.1/ => 0,
 	    qr/\[::1\]/ => 0,
