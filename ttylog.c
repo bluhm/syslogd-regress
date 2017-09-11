@@ -215,7 +215,7 @@ void
 iostdin(int sig)
 {
 	char buf[8192];
-	size_t n;
+	ssize_t n;
 
 	fprintf(lg, "signal iostdin %d\n", sig);
 	if ((n = read(0, buf, sizeof(buf))) < 0)
