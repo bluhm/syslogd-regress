@@ -4,6 +4,7 @@
 # The server receives the message on its TCP socket.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check that syslogd and server log contain localhost address.
+# Check that with TCP server all other sockets are closed.
 
 use strict;
 use warnings;

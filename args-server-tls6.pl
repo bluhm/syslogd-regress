@@ -4,6 +4,7 @@
 # The server receives the message on its TLS socket.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check that syslogd and server log contain ::1 address.
+# Check that with TLS server all other sockets are closed.
 
 use strict;
 use warnings;
