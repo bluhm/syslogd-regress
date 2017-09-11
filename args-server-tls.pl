@@ -16,6 +16,10 @@ our %args = (
 	    qr/Logging to FORWTLS \@tls:\/\/localhost:\d+/ => '>=4',
 	    get_testgrep() => 1,
 	},
+	fstat => {
+	    qr/internet/ => 1,
+	    qr/^_syslogd .* stream tcp / => 1,
+	},
     },
     server => {
 	listen => { domain => AF_UNSPEC, proto => "tls", addr => "localhost" },

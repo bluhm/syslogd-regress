@@ -16,6 +16,10 @@ our %args = (
 	    qr/Logging to FORWTCP \@tcp:\/\/\[::1\]:\d+/ => '>=4',
 	    get_testgrep() => 1,
 	},
+	fstat => {
+	    qr/stream tcp/ => 1,
+	    qr/^_syslogd .* internet6 stream tcp / => 1,
+	},
     },
     server => {
 	listen => { domain => AF_INET6, proto => "tcp", addr => "::1" },
