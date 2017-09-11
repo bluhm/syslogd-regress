@@ -4,7 +4,7 @@
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the syslogd has one IPv4 socket in fstat output.
+# Check that the syslogd has both any UDP sockets in fstat output.
 
 use strict;
 use warnings;
