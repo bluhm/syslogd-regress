@@ -1,4 +1,3 @@
-# Test with default values, that is:
 # The client writes a message to a localhost IPv4 UDP socket.
 # The syslogd writes it into a file and through a pipe.
 # The syslogd passes it via UDP to the loghost.
