@@ -258,14 +258,14 @@ sub accept_between2logs {
 	my $self = shift;
 	my $func = shift;
 
-	if ($self->{redo}) {
-		$self->{redo} = 0;
-		read_message($self, $testlog);
-		read_message($self, $downlog);
-	} else {
+	unless ($self->{redo}) {
 		read_message($self, $firstlog);
 		$func->($self, @_);
 		$self->{redo} = 1;
+	} else {
+		$self->{redo} = 0;
+		read_message($self, $testlog);
+		read_message($self, $downlog);
 	}
 }
 
