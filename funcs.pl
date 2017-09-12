@@ -201,7 +201,7 @@ sub redo_connect {
 	if ($self->{cs}) {
 		# wait for possible icmp errors, port is open
 		sleep .1;
-		close($self->{cs})
+		close(delete $self->{cs})
 		    or die ref($self), " close failed: $!";
 	}
 	if (my $redo = shift @{$self->{redo}}) {

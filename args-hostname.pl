@@ -6,10 +6,13 @@
 
 use strict;
 use warnings;
+use Socket;
+use Sys::Hostname;
+
+(my $host = hostname()) =~ s/\..*//;
 
 our %args = (
     client => {
-	connectproto => "none",
 	redo => [
 	    { connect => {
 		proto  => "udp",
@@ -17,27 +20,41 @@ our %args = (
 		addr   => "127.0.0.1",
 		port   => 514,
 	    }},
+	    { connect => {
+		proto  => "tcp",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 514,
+	    }},
+	    { connect => {
+		proto  => "tls",
+		domain => AF_INET,
+		addr   => "127.0.0.1",
+		port   => 6514,
+	    }},
 	    { logsock => {
 		type  => "native",
 	    }},
 	],
-	func => sub {
+	func => sub { redo_connect( shift, sub {
 	    my $self = shift;
-	    write_message($self, "client proto: ". $self->{connectproto});
-	    close($self->{cs}) if $self->{cs};
-	    if (my $connect = shift @{$self->{redo}}) {
-		$self->{connectproto}  = $connect->{proto};
-		$self->{connectdomain} = $connect->{domain};
-		$self->{connectaddr}   = $connect->{addr};
-		$self->{connectport}   = $connect->{port};
-	    } else {
-		delete $self->{connectdomain};
-		$self->{logsock} = { type => "native" };
-		setlogsock($self->{logsock})
-		    or die ref($self), " setlogsock failed: $!";
-		write_log($self);
-		undef $self->{redo};
-	    }
+	    write_message($self, "client connect proto: ".
+		$self->{connectproto}) if $self->{connectproto};
+	    write_message($self, "client logsock type: ".
+		$self->{logsock}{type}) if $self->{logsock};
+	})},
+    },
+    syslogd => {
+	options => [qw(-h -U 127.0.0.1:514 -T 127.0.0.1:514 -S 127.0.0.1:6514)],
+    },
+    server => {
+	loggrep => {
+	    qr/ client connect / => 3,
+	    qr/:\d\d $host client connect proto: udp$/ => 1,
+	    qr/:\d\d $host client connect proto: tcp$/ => 1,
+	    qr/:\d\d $host client connect proto: tls$/ => 1,
+	    qr/ client logsock / => 1,
+	    qr/:\d\d $host syslogd-.*: client logsock type: native$/ => 1,
 	},
     },
 );

@@ -34,7 +34,9 @@ sub new {
 	$args{logfile} ||= "client.log";
 	$args{up} ||= "Openlog";
 	my $self = Proc::new($class, %args);
-	$self->{connectproto} ||= "udp";
+	if (defined($self->{connectdomain})) {
+		$self->{connectproto} ||= "udp";
+	}
 	return $self;
 }
 
