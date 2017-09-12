@@ -13,18 +13,24 @@ our %args = (
     client => {
 	connectaddr => "none",
 	redo => [
-	    {
+	    { connect => {
 		domain => AF_INET,
 		addr   => "127.0.0.1",
-	    },
-	    {
+		proto  => "udp",
+		port   => "514",
+	    }},
+	    { connect => {
 		domain => AF_INET,
 		addr   => "127.0.0.1",
-	    },
-	    {
+		proto  => "udp",
+		port   => "514",
+	    }},
+	    { connect => {
 		domain => AF_INET6,
 		addr   => "::1",
-	    },
+		proto  => "udp",
+		port   => "514",
+	    }},
 	],
 	func => sub {
 	    my $self = shift;
@@ -35,13 +41,27 @@ our %args = (
 		close($self->{cs})
 		    or die ref($self), " close failed: $!";
 	    };
-	    if (my $connect = shift @{$self->{redo}}) {
-		$self->{connectdomain} = $connect->{domain};
-		$self->{connectaddr}   = $connect->{addr};
-		$self->{connectproto}  = "udp";
-		$self->{connectport}   = "514";
+	    if (my $redo = shift @{$self->{redo}}) {
+		if (my $connect = $redo->{connect}) {
+		    delete $self->{logsock};
+		    $self->{connectdomain} = $connect->{domain};
+		    $self->{connectaddr}   = $connect->{addr};
+		    $self->{connectproto}  = $connect->{proto};
+		    $self->{connectport}   = $connect->{port};
+		} elsif (my $logsock = $redo->{logsock}) {
+		    delete $self->{connectdomain};
+		    delete $self->{connectaddr};
+		    delete $self->{connectproto};
+		    delete $self->{connectport};
+		    $self->{logsock} = $logsock;
+		} else {
+		    die ref($self), " no connect or logsock in redo";
+		}
 	    } else {
 		delete $self->{connectdomain};
+		delete $self->{connectaddr};
+		delete $self->{connectproto};
+		delete $self->{connectport};
 		$self->{logsock} = { type => "native" };
 		setlogsock($self->{logsock})
 		    or die ref($self), " setlogsock failed: $!";
