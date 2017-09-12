@@ -193,6 +193,47 @@ sub write_tcp {
 	print STDERR "<<< $msg\n";
 }
 
+sub redo_connect {
+	my $self = shift;
+	my $func = shift;
+
+	$func->($self, @_);
+	if ($self->{cs}) {
+		# wait for possible icmp errors, port is open
+		sleep .1;
+		close($self->{cs})
+		    or die ref($self), " close failed: $!";
+	}
+	if (my $redo = shift @{$self->{redo}}) {
+		if (my $connect = $redo->{connect}) {
+			delete $self->{logsock};
+			$self->{connectdomain} = $connect->{domain};
+			$self->{connectaddr}   = $connect->{addr};
+			$self->{connectproto}  = $connect->{proto};
+			$self->{connectport}   = $connect->{port};
+		} elsif (my $logsock = $redo->{logsock}) {
+			delete $self->{connectdomain};
+			delete $self->{connectaddr};
+			delete $self->{connectproto};
+			delete $self->{connectport};
+			$self->{logsock} = $logsock;
+		} else {
+			die ref($self), " no connect or logsock in redo";
+		}
+	} else {
+		delete $self->{connectdomain};
+		delete $self->{connectaddr};
+		delete $self->{connectproto};
+		delete $self->{connectport};
+		$self->{logsock} = { type => "native" };
+		setlogsock($self->{logsock})
+		    or die ref($self), " setlogsock failed: $!";
+		sleep .1;
+		write_log($self);
+		undef $self->{redo};
+	}
+}
+
 ########################################################################
 # Server funcs
 ########################################################################
