@@ -258,6 +258,21 @@ sub read_between2logs {
 	}
 }
 
+sub accept_between2logs {
+	my $self = shift;
+	my $func = shift;
+
+	if ($self->{redo}) {
+		$self->{redo} = 0;
+		read_message($self, $testlog);
+		read_message($self, $downlog);
+	} else {
+		read_message($self, $firstlog);
+		$func->($self, @_);
+		$self->{redo} = 1;
+	}
+}
+
 sub read_message {
 	my $self = shift;
 	my $regex = shift;
