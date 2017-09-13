@@ -35,6 +35,19 @@ our %args = (
 	    { logsock => {
 		type  => "native",
 	    }},
+	    { logsock => {
+		type  => "unix",
+	    }},
+	    { logsock => {
+		type  => "udp",
+		host => "127.0.0.1",
+		port => 514,
+	    }},
+	    { logsock => {
+		type  => "tcp",
+		host => "127.0.0.1",
+		port => 514,
+	    }},
 	],
 	func => sub { redo_connect( shift, sub {
 	    my $self = shift;
@@ -45,7 +58,8 @@ our %args = (
 	})},
     },
     syslogd => {
-	options => [qw(-h -U 127.0.0.1:514 -T 127.0.0.1:514 -S 127.0.0.1:6514)],
+	options => [qw(-h -n -rr
+	    -U 127.0.0.1:514 -T 127.0.0.1:514 -S 127.0.0.1:6514)],
     },
     server => {
 	loggrep => {
@@ -53,8 +67,24 @@ our %args = (
 	    qr/:\d\d $host client connect proto: udp$/ => 1,
 	    qr/:\d\d $host client connect proto: tcp$/ => 1,
 	    qr/:\d\d $host client connect proto: tls$/ => 1,
-	    qr/ client logsock / => 1,
-	    qr/:\d\d $host syslogd-.*: client logsock type: native$/ => 1,
+	    qr/ client logsock / => 4,
+	    qr/:\d\d $host syslogd-.*: client logsock type: native/ => 1,
+	    qr/:\d\d $host syslogd-.*: client logsock type: unix/ => 1,
+	    qr/:\d\d $host syslogd-.*: client logsock type: udp/ => 1,
+	    qr/:\d\d $host syslogd-.*: client logsock type: tcp/ => 1,
+	},
+    },
+    file => {
+	loggrep => {
+	    qr/ client connect / => 3,
+	    qr/:\d\d 127.0.0.1 client connect proto: udp$/ => 1,
+	    qr/:\d\d 127.0.0.1 client connect proto: tcp$/ => 1,
+	    qr/:\d\d 127.0.0.1 client connect proto: tls$/ => 1,
+	    qr/ client logsock / => 4,
+	    qr/:\d\d $host syslogd-.*: client logsock type: native/ => 1,
+	    qr/:\d\d $host syslogd-.*: client logsock type: unix/ => 1,
+	    qr/:\d\d 127.0.0.1 syslogd-.*: client logsock type: udp/ => 1,
+	    qr/:\d\d 127.0.0.1 syslogd-.*: client logsock type: tcp/ => 1,
 	},
     },
 );
