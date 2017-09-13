@@ -29,6 +29,7 @@ our %args = (
 	},
     },
     syslogd => {
+	options => ["-Z"],
 	loggrep => {
 	    get_testgrep() => 1,
 	    qr/logline: .* msg .* foobar/ => 3,
