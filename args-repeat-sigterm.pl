@@ -20,8 +20,8 @@ our %args = (
 	    ${$self->{syslogd}}->loggrep(qr/ msg .* foobar/, 5, 3)
 		or die ref($self), " syslogd did not receive 3 foobar log";
 	    ${$self->{syslogd}}->kill_syslogd('TERM');
-            ${$self->{syslogd}}->loggrep(qr/syslogd: exited/, 8)
-                or die ref($self), " syslogd did not exit";
+	    ${$self->{syslogd}}->loggrep(qr/syslogd: exited/, 8)
+		or die ref($self), " syslogd did not exit";
 	},
 	loggrep => {
 	    get_testgrep() => 1,
