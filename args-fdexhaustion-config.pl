@@ -6,6 +6,7 @@
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
 # Check the error messages and multiple log file content.
+# Check that the error messages appear on the console.
 
 use strict;
 use warnings;
@@ -27,6 +28,12 @@ our %args = (
 	(map { { loggrep => get_testgrep() } } 0..13),
 	(map { { loggrep => { qr/./s => 0 } } } 14..19),
     ],
+    console => {
+	loggrep => {
+	    get_testgrep() => 1,
+	    qr/priv_open_log .*: Message too long/ => 6,
+	}
+    }
 );
 
 1;
