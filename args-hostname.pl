@@ -1,8 +1,9 @@
-# The client writes a message to Sys::Syslog native method.
-# The syslogd writes it into a file and through a pipe and to tty.
-# The syslogd passes it via UDP to the loghost.
-# The server receives the message on its UDP socket.
+# The client writes messages with various methods.
+# The syslogd writes them into a file and through a pipe and to tty.
+# The syslogd is run with -h, adds a hostname, and passes them to loghost.
+# The server receives the messages on its UDP socket.
 # Find the message in client, file, pipe, console, user, syslogd, server log.
+# Check that the hostname in file and server log is correct.
 
 use strict;
 use warnings;
