@@ -27,6 +27,7 @@ regress:
 
 # Automatically generate regress targets from test cases in directory.
 
+PROGS =			ttylog
 PERLS =			Client.pm Proc.pm RSyslogd.pm Server.pm \
 			Syslogc.pm   Syslogd.pm funcs.pl syslogd.pl
 ARGS !=			cd ${.CURDIR} && ls args-*.pl
