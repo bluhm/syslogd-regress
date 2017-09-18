@@ -69,7 +69,7 @@ our %args = (
 	    get_secondlog() => 1,
 	    get_thirdlog() => 1,
 	    qr/syslogd\[\d+\]: write to file "$fslog": /.
-		qr/No space left on device/ => 1,
+		qr/No space left on device/ => '>=1',
 	    qr/bsd: .* on $fspath: file system full/ => '>=1',
 	    qr/syslogd\[\d+\]: dropped \d+ messages to file "$fslog"/ => '>=1',
 	},
