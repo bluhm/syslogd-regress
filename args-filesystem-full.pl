@@ -28,11 +28,10 @@ open(my $log, '>', $fslog)
 
 our %args = (
     client => {
-	func => sub {
+	func => sub { write_between2logs(shift, sub {
 	    my $self = shift;
 	    open(my $big, '>', $fsbig)
 		or die ref($self), " create $fsbig failed: $!";
-	    write_message($self, get_firstlog());
 	    ${$self->{syslogd}}->loggrep(get_firstlog(), 5)
 		or die ref($self), " first log not in syslogd log";
 	    undef $!;
@@ -45,7 +44,7 @@ our %args = (
 	    ${$self->{syslogd}}->loggrep(qr/file system full/, 5)
 		or die ref($self), " file system full not in syslogd log";
 	    # a single message still fits, write 4 KB logs to reach next block
-	    write_lines($self, 100, 30);
+	    write_lines($self, 50, 1024);
 	    ${$self->{syslogd}}->loggrep(qr/write to file .* $errors/, 10)
 		or die ref($self), " write to file error not in syslogd log";
 	    close($big);
@@ -53,14 +52,17 @@ our %args = (
 		or die ref($self), " remove $fsbig failed: $!";
 	    # wait until syslogd has processed everything
 	    write_message($self, get_secondlog());
-	    ${$self->{server}}->loggrep(get_secondlog(), 10)
+	    ${$self->{server}}->loggrep(get_secondlog(), 8)
 		or die ref($self), " second log not in server log";
 	    write_message($self, get_thirdlog());
-	    write_log($self);
-	},
+	})},
     },
     syslogd => {
 	outfile => $fslog,
+	loggrep => {
+	    get_testgrep() => 1,
+	    get_charlog() => 50,
+	},
     },
     server => {
 	loggrep => {
@@ -81,7 +83,6 @@ our %args = (
 	    get_thirdlog() => 1,
 	    qr/syslogd\[\d+\]: write to file "$fslog": /.
 		qr/No space left on device/ => 0,
-	    qr/bsd: .* on $fspath: file system full/ => 1,
 	    qr/syslogd\[\d+\]: dropped \d+ messages to file "$fslog"/ => '>=1',
 	},
     },
