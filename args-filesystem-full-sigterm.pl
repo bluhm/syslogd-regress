@@ -42,10 +42,8 @@ our %args = (
 	    }
 	    $!{ENOSPC}
 		or die ref($self), " fill $fsbig failed: $!";
-	    ${$self->{syslogd}}->loggrep(qr/file system full/, 5)
-		or die ref($self), " file system full not in syslogd log";
 	    # a single message still fits, write 4 KB logs to reach next block
-	    write_lines($self, 50, 70);
+	    write_lines($self, 100, 70);
 	    ${$self->{syslogd}}->loggrep(qr/write to file .* $errors/, 10)
 		or die ref($self), " write to file error not in syslogd log";
 	    close($big);
@@ -58,7 +56,7 @@ our %args = (
     syslogd => {
 	outfile => $fslog,
 	loggrep => {
-	    get_charlog() => 50,
+	    get_charlog() => 100,
 	},
     },
     server => {
@@ -87,7 +85,7 @@ our %args = (
 	    get_testgrep() => 0,
 	    qr/syslogd\[\d+\]: write to file "$fslog": /.
 		qr/No space left on device/ => 0,
-	    qr/syslogd\[\d+\]: dropped \d+ messages to file/ => 0,
+	    qr/syslogd\[\d+\]: dropped \d+ messages to file$/ => 0,
 	},
     },
     pipe => { nocheck => 1 },
