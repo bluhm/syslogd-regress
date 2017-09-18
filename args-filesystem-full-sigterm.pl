@@ -1,14 +1,14 @@
 # Create a log file on a file system that can be easily filled.
 # The client writes messages to Sys::Syslog native method.
 # While writing messages, the client fills the log file system.
-# After the file system has been filled, remove the big file and recover.
+# After the file system has been filled, kill the syslogd.
 # The syslogd writes it into a file and through a pipe and to tty.
 # The syslogd passes it via UDP to the loghost.
 # The server receives the message on its UDP socket.
 # Find the message in client, file, pipe, console, user, syslogd, server log.
 # Check that syslogd error 'No space left on device' error is logged to server.
 # Check that kernel error 'file system full' error is logged.
-# Check that 'dropped messages to file' is logged by server and file.
+# Check that the final 'dropped messages to file' is logged by server.
 
 use strict;
 use warnings;
@@ -49,8 +49,6 @@ our %args = (
 	    ${$self->{syslogd}}->loggrep(qr/write to file .* $errors/, 10)
 		or die ref($self), " write to file error not in syslogd log";
 	    close($big);
-	    unlink($fsbig)
-		or die ref($self), " remove $fsbig failed: $!";
 	    # wait until syslogd has processed everything
 	    write_message($self, get_secondlog());
 	    ${$self->{server}}->loggrep(get_secondlog(), 8)
@@ -60,30 +58,40 @@ our %args = (
     syslogd => {
 	outfile => $fslog,
 	loggrep => {
-	    get_testgrep() => 1,
 	    get_charlog() => 50,
 	},
     },
     server => {
+	func => sub {
+	    my $self = shift;
+	    read_log($self);
+	    ${$self->{syslogd}}->kill_syslogd('TERM');
+	    ${$self->{syslogd}}->loggrep("syslogd: exited", 5)
+		or die ref($self), " no 'syslogd: exited' in syslogd log";
+	    read_message($self, "exiting on signal 15");
+	},
 	loggrep => {
 	    get_firstlog() => 1,
 	    get_secondlog() => 1,
 	    get_testgrep() => 1,
+	    qr/syslogd\[\d+\]: start/ => 1,
 	    qr/syslogd\[\d+\]: write to file "$fslog": /.
 		qr/No space left on device/ => '>=1',
 	    qr/bsd: .* on $fspath: file system full/ => '>=1',
-	    qr/syslogd\[\d+\]: dropped \d+ messages to file "$fslog"/ => '>=1',
+	    qr/syslogd\[\d+\]: dropped \d+ messages to file$/ => 1,
 	},
     },
     file => {
 	loggrep => {
 	    get_firstlog() => 1,
-	    get_testgrep() => 1,
+	    get_testgrep() => 0,
 	    qr/syslogd\[\d+\]: write to file "$fslog": /.
 		qr/No space left on device/ => 0,
-	    qr/syslogd\[\d+\]: dropped \d+ messages to file "$fslog"/ => '>=1',
+	    qr/syslogd\[\d+\]: dropped \d+ messages to file/ => 0,
 	},
     },
+    pipe => { nocheck => 1 },
+    tty => { nocheck => 1 },
 );
 
 1;
