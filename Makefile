@@ -107,6 +107,37 @@ toobig:
 sys/syscall.ph: /usr/include/sys/syscall.h
 	cd /usr/include && h2ph -h -d ${.OBJDIR} ${@:R:S/$/.h/}
 
+# Create a full file system on vnd to trigger ENOSPC error.
+
+.PHONY: disk mount unconfig
+
+disk: unconfig
+	dd if=/dev/zero of=diskimage bs=512 count=4k
+	vnconfig vnd0 diskimage
+	newfs vnd0c
+
+mount: disk
+	mkdir -p /mnt/regress-syslogd
+	mount /dev/vnd0c /mnt/regress-syslogd
+
+unconfig:
+	-umount -f /dev/vnd0c 2>/dev/null || true
+	-rmdir /mnt/regress-syslogd 2>/dev/null || true
+	-vnconfig -u vnd0 2>/dev/null || true
+	-rm -f stamp-filesystem
+
+stamp-filesystem:
+	@echo '\n======== $@ ========'
+	${.MAKE} -C ${.CURDIR} mount
+	date >$@
+
+REGRESS_TARGETS +=	cleanup-filesystem
+cleanup-filesystem:
+	@echo '\n======== $@ ========'
+	umount /mnt/regress-syslogd
+	${.MAKE} -C ${.CURDIR} unconfig
+
+${REGRESS_TARGETS:M*filesystem*}: stamp-filesystem
 ${REGRESS_TARGETS:M*tls*}: client.crt server.crt 127.0.0.1.crt
 ${REGRESS_TARGETS:M*multilisten*}: 127.0.0.1.crt
 ${REGRESS_TARGETS:M*empty*}: empty
