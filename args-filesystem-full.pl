@@ -6,9 +6,12 @@
 
 use strict;
 use warnings;
-use Errno;
+use Errno ':POSIX';
 use File::Path qw(remove_tree);
 use Time::HiRes;
+
+my @errors = (ENOSPC);
+my $errors = "(". join("|", map { $! = $_ } @errors). ")";
 
 my $fspath = "/mnt/regress-syslogd";
 my $fslog = "$fspath/file.log";
@@ -25,29 +28,56 @@ our %args = (
 	    open(my $big, '>', $fsbig)
 		or die ref($self), " create $fsbig failed: $!";
 	    write_message($self, get_firstlog());
-	    sleep .1;
+	    ${$self->{syslogd}}->loggrep(get_firstlog(), 5)
+		or die ref($self), " first log not in syslogd log";
 	    undef $!;
 	    for (my $i = 0; $i < 100000; $i++) {
-		syswrite($big, "regress syslogd file system ful\n", 32)
+		syswrite($big, "regress syslogd file system full\n", 33)
 		    or last;
 	    }
 	    $!{ENOSPC}
 		or die ref($self), " fill $fsbig failed: $!";
-	    write_message($self, get_secondlog());
+	    ${$self->{syslogd}}->loggrep(qr/file system full/, 5)
+		or die ref($self), " file system full not in syslogd log";
 	    # a single message still fits, write 4 KB logs to reach next block
-	    write_lines($self, 50, 60);
-	    sleep 5;
+	    write_lines($self, 100, 30);
+	    ${$self->{syslogd}}->loggrep(qr/write to file .* $errors/, 10)
+		or die ref($self), " write to file error not in syslogd log";
 	    close($big);
 	    unlink($fsbig)
 		or die ref($self), " remove $fsbig failed: $!";
-	    sleep .1;
+	    # wait until syslogd has processed everything
+	    write_message($self, get_secondlog());
+	    ${$self->{server}}->loggrep(get_secondlog(), 10)
+		or die ref($self), " second log not in server log";
 	    write_message($self, get_thirdlog());
 	    write_log($self);
 	},
     },
     syslogd => {
-	conf => "*.*\t$fslog\n",
-    }
+	outfile => $fslog,
+    },
+    server => {
+	loggrep => {
+	    get_testgrep() => 1,
+	    get_firstlog() => 1,
+	    get_secondlog() => 1,
+	    get_thirdlog() => 1,
+	    qr/syslogd\[\d+\]: write to file "$fslog": /.
+		qr/No space left on device/ => 1,
+	    qr/syslogd\[\d+\]: dropped \d+ messages to file "$fslog"/ => '>=1',
+	},
+    },
+    file => {
+	loggrep => {
+	    get_testgrep() => 1,
+	    get_firstlog() => 1,
+	    get_thirdlog() => 1,
+	    qr/syslogd\[\d+\]: write to file "$fslog": /.
+		qr/No space left on device/ => 0,
+	    qr/syslogd\[\d+\]: dropped \d+ messages to file "$fslog"/ => '>=1',
+	},
+    },
 );
 
 1;
