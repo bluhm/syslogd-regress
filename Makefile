@@ -128,14 +128,14 @@ unconfig:
 
 stamp-filesystem:
 	@echo '\n======== $@ ========'
-	${.MAKE} -C ${.CURDIR} mount
+	${SUDO} ${.MAKE} -C ${.CURDIR} mount
 	date >$@
 
 REGRESS_TARGETS +=	cleanup-filesystem
 cleanup-filesystem:
 	@echo '\n======== $@ ========'
-	umount /mnt/regress-syslogd
-	${.MAKE} -C ${.CURDIR} unconfig
+	${SUDO} umount /mnt/regress-syslogd
+	${SUDO} ${.MAKE} -C ${.CURDIR} unconfig
 
 ${REGRESS_TARGETS:M*filesystem*}: stamp-filesystem
 ${REGRESS_TARGETS:M*tls*}: client.crt server.crt 127.0.0.1.crt
