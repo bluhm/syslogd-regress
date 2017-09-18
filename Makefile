@@ -114,7 +114,7 @@ sys/syscall.ph: /usr/include/sys/syscall.h
 disk: unconfig
 	dd if=/dev/zero of=diskimage bs=512 count=4k
 	vnconfig vnd0 diskimage
-	newfs vnd0c
+	newfs -b 4096 -f 2048 -m 0 vnd0c
 
 mount: disk
 	mkdir -p /mnt/regress-syslogd
@@ -129,6 +129,7 @@ unconfig:
 stamp-filesystem:
 	@echo '\n======== $@ ========'
 	${SUDO} ${.MAKE} -C ${.CURDIR} mount
+	${SUDO} chmod 1777 /mnt/regress-syslogd
 	date >$@
 
 REGRESS_TARGETS +=	cleanup-filesystem
