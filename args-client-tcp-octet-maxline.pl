@@ -8,7 +8,7 @@
 
 use strict;
 use warnings;
-use Socket qw(IPPROTO_TCP TCP_NOPUSH);
+use Socket qw(AF_INET IPPROTO_TCP TCP_NOPUSH);
 use constant MAXLINE => 8192;
 use constant MAX_UDPMSG => 1180;
 
