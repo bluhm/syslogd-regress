@@ -37,7 +37,7 @@ our %args = (
     syslogd => {
 	options => [ "-a" => "unix.sock", "-a" => "file.sock" ],
 	loggrep => {
-	    qr/connect unix "file.sock": Socket is already connected/ => 1,
+	    qr/connect unix "file.sock": $errors/ => 1,
 	},
     },
     file => {
