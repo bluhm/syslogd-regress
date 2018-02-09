@@ -1,10 +1,11 @@
-# The client writes messages to MAXUNIX unix domain sockets.
-# The syslogd -a writes them into a file and through a pipe.
-# The syslogd -a passes them via UDP to the loghost.
+# The client writes messages to unix domain sockets and file.
+# The syslogd -a creates unix domain sockets but not over an existing file.
+# The syslogd passes message via UDP to the loghost.
 # The server receives the messages on its UDP socket.
 # Find the message in client, file, pipe, syslogd, server log.
-# Check that the file log contains a message from every socket.
-# Check that no error is printed.
+# Check client could not write to existing regular file.
+# Check that the file log contains only the message from unix socket.
+# Check that unix socket was removed, but regular file preserved..
 
 use strict;
 use warnings;
