@@ -100,7 +100,11 @@ $c = Client->new(
 ) unless $args{client}{noclient};
 ($rc, $c) = ($c, $rc) if $rc;  # chain client -> rsyslogd -> syslogd
 
-$c->run->up if !$args{client}{noclient} && $c->{early};
+if (!$args{client}{noclient} && $c->{early}) {
+	$c->run->up;
+	$c->loggrep(get_firstlog(), 10)
+	   or die ref($c), " no first log during early startup";
+}
 $r->run unless $r->{late};
 $s->run->up unless $args{server}{noserver};
 $r->run if $r->{late};
