@@ -87,8 +87,8 @@ sub write_message {
 		my $msg = join("", @_);
 		if ($self->{connectdomain} eq "sendsyslog") {
 			my $flags = $self->{connect}{flags} || 0;
-			sendsyslog($msg, $flags) or die ref($self),
-			    " sendsyslog failed: $!";
+			sendsyslog($msg, $flags)
+			    or die ref($self), " sendsyslog failed: $!";
 		} elsif ($self->{connectproto} eq "udp") {
 			# writing UDP packets works only with syswrite()
 			defined(my $n = syswrite(STDOUT, $msg))
