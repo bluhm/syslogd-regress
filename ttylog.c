@@ -40,7 +40,7 @@ void terminate(int);
 void iostdin(int);
 
 FILE *lg;
-char ptyname[16], *console, *username, *tty, *logfile;
+char ptyname[16], *console, *username, *logfile, *tty;
 int mfd, sfd;
 
 __dead void
@@ -221,13 +221,13 @@ iostdin(int sig)
 	/* try to read as many log messages as possible before terminating */
 	if (fcntl(mfd, F_SETFL, O_NONBLOCK) == -1)
 		err(1, "fcntl O_NONBLOCK");
-        while ((n = read(mfd, buf, sizeof(buf))) > 0) {
-                fprintf(lg, ">>> ");
-                if (fwrite(buf, 1, n, lg) != (size_t)n)
-                        err(1, "fwrite %s", logfile);
-                if (buf[n-1] != '\n')
-                        fprintf(lg, "\n");
-        }
+	while ((n = read(mfd, buf, sizeof(buf))) > 0) {
+		fprintf(lg, ">>> ");
+		if (fwrite(buf, 1, n, lg) != (size_t)n)
+			err(1, "fwrite %s", logfile);
+		if (buf[n-1] != '\n')
+			fprintf(lg, "\n");
+	}
 	if (n < 0 && errno != EAGAIN)
 		err(1, "read %s", ptyname);
 
