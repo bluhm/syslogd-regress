@@ -40,7 +40,7 @@ void terminate(int);
 void iostdin(int);
 
 FILE *lg;
-char *console, *username, *tty, *logfile;
+char ptyname[16], *console, *username, *tty, *logfile;
 int mfd, sfd;
 
 __dead void
@@ -54,7 +54,7 @@ usage()
 int
 main(int argc, char *argv[])
 {
-	char buf[8192], ptyname[16];
+	char buf[8192];
 	struct sigaction act;
 	sigset_t set;
 	ssize_t n;
@@ -228,6 +228,8 @@ iostdin(int sig)
                 if (buf[n-1] != '\n')
                         fprintf(lg, "\n");
         }
+	if (n < 0 && errno != EAGAIN)
+		err(1, "read %s", ptyname);
 
 	if ((n = read(0, buf, sizeof(buf))) < 0)
 		err(1, "read stdin");
