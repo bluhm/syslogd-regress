@@ -64,7 +64,7 @@ sub write_log {
 
 	write_message($self, $testlog);
 	IO::Handle::flush(\*STDOUT);
-	${$self->{syslogd}}->loggrep($testlog, 2);
+	${$self->{syslogd}}->loggrep($testlog, 4);
 	write_shutdown($self);
 }
 
@@ -76,7 +76,7 @@ sub write_between2logs {
 	$func->($self, @_);
 	write_message($self, $testlog);
 	IO::Handle::flush(\*STDOUT);
-	${$self->{syslogd}}->loggrep($testlog, 2);
+	${$self->{syslogd}}->loggrep($testlog, 4);
 	write_shutdown($self);
 }
 
