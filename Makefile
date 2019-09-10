@@ -36,7 +36,7 @@ REGRESS_TARGETS =	${ARGS:S/^/run-/}
 SKIP_REGRESS_TARGETS =	${REGRESS_TARGETS:Mrun-args-rsyslog*}
 .endif
 LDFLAGS +=		-lutil
-CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
+CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-* *.pid
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog *.ph */*.ph
 CLEANFILES +=		*.pem *.req *.key *.crt *.srl empty toobig diskimage
 
