@@ -31,12 +31,10 @@ PROGS =			ttylog
 PERLS =			Client.pm Proc.pm RSyslogd.pm Server.pm \
 			Syslogc.pm   Syslogd.pm funcs.pl syslogd.pl
 ARGS !=			cd ${.CURDIR} && ls args-*.pl
-.if exists (/usr/local/sbin/rsyslogd)
-TARGETS ?=		${ARGS}
-.else
-TARGETS ?=		${ARGS:Nargs-rsyslog*}
+REGRESS_TARGETS =	${ARGS:S/^/run-/}
+.if ! exists(/usr/local/sbin/rsyslogd)
+SKIP_REGRESS_TARGETS =	${REGRESS_TARGETS:Mrun-args-rsyslog*}
 .endif
-REGRESS_TARGETS =	${TARGETS:S/^/run-/}
 LDFLAGS +=		-lutil
 CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-*
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog *.ph */*.ph
