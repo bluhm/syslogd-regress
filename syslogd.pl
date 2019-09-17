@@ -125,6 +125,7 @@ foreach (@m) {
 $c->run->up if !$args{client}{noclient} && !$c->{early};
 $rc->run->up if $args{rsyslogd}{connect};
 
+$rc->down if $args{rsyslogd}{connect};
 $c->down if !$args{client}{noclient} && !$c->{early};
 $s->down unless $args{server}{noserver};
 foreach (@m) {
