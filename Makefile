@@ -40,6 +40,12 @@ CLEANFILES +=		*.log *.log.? *.conf ktrace.out stamp-* *.pid
 CLEANFILES +=		*.out *.sock *.ktrace *.fstat ttylog *.ph */*.ph
 CLEANFILES +=		*.pem *.req *.key *.crt *.srl empty toobig diskimage
 
+run-args-rsyslog-client-tls.pl:
+	@echo '\n======== $@ ========'
+	# rsyslogd TLS client side is totally unreliable.  Startup of
+	# GnuTLS may take a long time on slow machines.  Disable test.
+	@echo DISABLED
+
 .MAIN: all
 
 REGRESS_SETUP_ONCE +=	setup

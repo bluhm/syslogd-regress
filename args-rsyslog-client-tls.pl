@@ -23,9 +23,6 @@ our %args = (
 	    qr/omfile.* /.get_testgrep() => 1,
 	    qr/GnuTLS handshake succeeded/ => 1,
 	},
-	down => "Clean shutdown completed".
-	    # theres seems to be a bug in rsyslogd 8.1905.0
-	    "|cooperative worker termination failed",
     },
     syslogd => {
 	options => ["-S", "127.0.0.1"],
