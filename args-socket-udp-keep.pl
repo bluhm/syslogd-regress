@@ -13,9 +13,9 @@ use Socket;
 our %args = (
     syslogd => {
 	loghost => '@tcp://127.0.0.1:$connectport',
-	conf => "*.*\t\@udp4://nonexist.example.com\n",
+	conf => "*.*\t\@udp6://nonexist.example.com\n",
 	fstat => {
-	    qr/ internet dgram udp \*:514$/ => 1,
+	    qr/ internet dgram udp \*:514$/ => 0,
 	    qr/ internet6 dgram udp \*:514$/ => 1,
 	},
     },
