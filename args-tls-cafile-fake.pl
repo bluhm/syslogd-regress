@@ -29,7 +29,7 @@ our %args = (
 	exit => 255,
 	loggrep => {
 	    qr/listen sock: (127.0.0.1|::1) \d+/ => 1,
-	    qr/SSL accept attempt failed because of handshake problems/ => 1,
+	    qr/SSL accept attempt failed error:.*SSL_internal/ => 1,
 	    get_testgrep() => 0,
 	},
     },

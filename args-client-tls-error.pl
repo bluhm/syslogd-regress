@@ -9,9 +9,6 @@ use warnings;
 use Socket;
 use Errno ':POSIX';
 
-my @errors = (ECONNRESET);
-my $errors = "(". join("|", map { $! = $_ } @errors). ")";
-
 our %args = (
     client => {
 	connect => { domain => AF_INET, proto => "tls", addr => "127.0.0.1",
@@ -43,7 +40,7 @@ our %args = (
     file => {
 	loggrep => {
 	    qr/syslogd\[\d+\]: tls logger .* connection error: /.
-		qr/read failed: $errors/ => 1,
+		qr/read failed: .*SSL_internal/ => 1,
 	},
     },
     pipe => { nocheck => 1, },

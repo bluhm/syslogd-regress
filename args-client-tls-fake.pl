@@ -21,8 +21,8 @@ our %args = (
 	exit => 255,
 	loggrep => {
 	    qr/Client IO::Socket::SSL socket connect failed: /.
-		qr/,SSL connect attempt failed /.
-		qr/because of handshake problems error:/ => 1,
+		qr/.*,SSL connect attempt failed /.
+		qr/.*SSL_internal/ => 1,
 	},
     },
     syslogd => {

@@ -11,9 +11,6 @@ use warnings;
 use Socket;
 use Errno ':POSIX';
 
-my @errors = (ECONNRESET);
-my $errors = "(". join("|", map { $! = $_ } @errors). ")";
-
 our %args = (
     client => {
 	func => sub {
@@ -43,7 +40,7 @@ our %args = (
     file => {
 	loggrep => {
 	    qr/syslogd\[\d+\]: loghost .* connection error: /.
-		qr/read failed: $errors/ => 1,
+		qr/read failed: .*SSL_internal/ => 1,
 	},
     },
 );
