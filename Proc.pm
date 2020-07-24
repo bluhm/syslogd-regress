@@ -120,8 +120,11 @@ sub run {
 			    " setrlimit $name to $newsoft failed: $!";
 		}
 	}
-	if ($self->{ktrace}) {
-		my @cmd = ("ktrace", "-f", $self->{ktracefile}, "-p", $$);
+	my @ktrace = $ENV{KTRACE} || ();
+	@ktrace = "ktrace" if $self->{ktrace} && !@ktrace;
+	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
+	if (@ktrace) {
+		my @cmd = (@ktrace, "-p", $$);
 		system(@cmd)
 		    and die ref($self), " system '@cmd' failed: $?";
 	}
