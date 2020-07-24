@@ -1,6 +1,6 @@
 #	$OpenBSD: Proc.pm,v 1.8 2016/05/03 19:13:04 bluhm Exp $
 
-# Copyright (c) 2010-2015 Alexander Bluhm <bluhm@openbsd.org>
+# Copyright (c) 2010-2020 Alexander Bluhm <bluhm@openbsd.org>
 # Copyright (c) 2014 Florian Riehm <mail@friehm.de>
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -65,7 +65,9 @@ sub new {
 	$self->{down} ||= "Shutdown";
 	$self->{func} && ref($self->{func}) eq 'CODE'
 	    or croak "$class func not given";
-	!$self->{ktrace} || $self->{ktracefile}
+	$self->{ktracepid} && $self->{ktraceexec}
+	    and croak "$class ktrace both pid and exec given";
+	!($self->{ktracepid} || $self->{ktraceexec}) || $self->{ktracefile}
 	    or croak "$class ktrace file not given";
 	$self->{logfile}
 	    or croak "$class log file not given";
@@ -120,11 +122,9 @@ sub run {
 			    " setrlimit $name to $newsoft failed: $!";
 		}
 	}
-	my @ktrace = $ENV{KTRACE} || ();
-	@ktrace = "ktrace" if $self->{ktrace} && !@ktrace;
-	push @ktrace, "-i", "-f", $self->{ktracefile} if @ktrace;
-	if (@ktrace) {
-		my @cmd = (@ktrace, "-p", $$);
+	if ($self->{ktracepid}) {
+		my @cmd = ($self->{ktracepid}, "-i", "-f", $self->{ktracefile},
+		    "-p", $$);
 		system(@cmd)
 		    and die ref($self), " system '@cmd' failed: $?";
 	}
