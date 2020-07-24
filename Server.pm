@@ -104,6 +104,8 @@ sub run {
 sub child {
 	my $self = shift;
 
+	$SIG{PIPE} = 'IGNORE';
+
 	my $as = $self->{ls};
 	if ($self->{listenproto} ne "udp") {
 		$as = $self->{ls}->accept()

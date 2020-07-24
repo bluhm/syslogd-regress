@@ -45,6 +45,8 @@ sub new {
 sub child {
 	my $self = shift;
 
+	$SIG{PIPE} = 'IGNORE';
+
 	if (defined($self->{connectdomain}) &&
 	    $self->{connectdomain} ne "sendsyslog") {
 		my $cs;
