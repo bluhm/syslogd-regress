@@ -104,6 +104,10 @@ sub run {
 sub child {
 	my $self = shift;
 
+	# TLS 1.3 writes multiple messages without acknowledgement.
+	# If the other side closes early, we want broken pipe error.
+	$SIG{PIPE} = 'IGNORE' if $self->{listenproto} eq "tls";
+
 	my $as = $self->{ls};
 	if ($self->{listenproto} ne "udp") {
 		$as = $self->{ls}->accept()
