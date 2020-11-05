@@ -47,7 +47,8 @@ sub child {
 
 	# TLS 1.3 writes multiple messages without acknowledgement.
 	# If the other side closes early, we want broken pipe error.
-	$SIG{PIPE} = 'IGNORE' if $self->{connectproto} eq "tls";
+	$SIG{PIPE} = 'IGNORE' if defined($self->{connectdomain}) &&
+	    $self->{connectproto} eq "tls";
 
 	if (defined($self->{connectdomain}) &&
 	    $self->{connectdomain} ne "sendsyslog") {
