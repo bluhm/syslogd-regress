@@ -44,6 +44,7 @@ our %args = (
 		or die ref($self), " fill $fsbig failed: $!";
 	    # a single message still fits, write 4 KB logs to reach next block
 	    write_lines($self, 100, 70);
+	    write_lines($self, 9, 1);
 	    ${$self->{syslogd}}->loggrep(qr/write to file .* $errors/, 10)
 		or die ref($self), " write to file error not in syslogd log";
 	    close($big);
