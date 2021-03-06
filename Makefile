@@ -27,7 +27,7 @@ regress:
 
 # Automatically generate regress targets from test cases in directory.
 
-PROGS =			ttylog
+PROGS =			ttylog logflush
 PERLS =			Client.pm Proc.pm RSyslogd.pm Server.pm \
 			Syslogc.pm   Syslogd.pm funcs.pl syslogd.pl
 ARGS !=			cd ${.CURDIR} && ls args-*.pl
@@ -144,7 +144,7 @@ ${REGRESS_TARGETS:M*empty*}: empty
 ${REGRESS_TARGETS:M*toobig*}: toobig
 ${REGRESS_TARGETS:M*fake*}: fake-ca.crt
 ${REGRESS_TARGETS:M*sendsyslog*}: sys/syscall.ph
-${REGRESS_TARGETS}: ttylog
+${REGRESS_TARGETS}: ttylog logflush
 
 # make perl syntax check for all args files
 

@@ -100,6 +100,10 @@ $c = Client->new(
 ) unless $args{client}{noclient};
 ($rc, $c) = ($c, $rc) if $rc;  # chain client -> rsyslogd -> syslogd
 
+my @sudo = $ENV{SUDO} ? $ENV{SUDO} : ();
+my @cmd = (@sudo, "./logflush");
+system(@cmd)
+    and die "Command '@cmd' failed: $?";
 if (!$args{client}{noclient} && $c->{early}) {
 	$c->run->up;
 	$c->loggrep(get_firstlog(), 10)
