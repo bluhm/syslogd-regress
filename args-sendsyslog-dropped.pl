@@ -18,7 +18,7 @@ my $kerngrep = qr/sendsyslog: dropped \d+ messages?, error $errno, pid \d+$/;
 our %args = (
     client => {
 	early => 1,
-	func => sub { 
+	func => sub {
 	    my $self = shift;
 	    write_message($self, "stash $_") foreach (1..LOGSTASH_SIZE);
 	    write_between2logs($self, sub {

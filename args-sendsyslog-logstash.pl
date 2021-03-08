@@ -16,7 +16,7 @@ use constant LOGSTASH_SIZE => 100;
 our %args = (
     client => {
 	early => 1,
-	func => sub { 
+	func => sub {
 	    my $self = shift;
 	    write_message($self, "stash $_") foreach (0..LOGSTASH_SIZE);
 	    write_between2logs($self, sub {
