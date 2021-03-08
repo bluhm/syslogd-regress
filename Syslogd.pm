@@ -184,9 +184,11 @@ sub child {
 	}
 	print STDERR "syslogd not running\n";
 
-	my @flush = (@sudo, "./logflush");
-	system(@flush)
-	    and die "Command '@flush' failed: $?";
+	unless (${$self->{client}}->{early}) {
+		my @flush = (@sudo, "./logflush");
+		system(@flush)
+		    and die "Command '@flush' failed: $?";
+	}
 
 	chdir $self->{chdir}
 	    or die ref($self), " chdir '$self->{chdir}' failed: $!"
