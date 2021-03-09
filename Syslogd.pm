@@ -1,4 +1,4 @@
-#	$OpenBSD: Syslogd.pm,v 1.25 2020/07/24 22:12:00 bluhm Exp $
+#	$OpenBSD: Syslogd.pm,v 1.26 2021/03/09 15:16:28 bluhm Exp $
 
 # Copyright (c) 2010-2020 Alexander Bluhm <bluhm@openbsd.org>
 # Copyright (c) 2014 Florian Riehm <mail@friehm.de>

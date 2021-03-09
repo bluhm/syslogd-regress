@@ -1,4 +1,4 @@
-/*	$OpenBSD$	*/
+/*	$OpenBSD: logflush.c,v 1.1 2021/03/09 15:16:28 bluhm Exp $	*/
 
 /*
  * Copyright (c) 2021 Alexander Bluhm <bluhm@openbsd.org>
