@@ -1,4 +1,4 @@
-/*	$OpenBSD: ttylog.c,v 1.7 2019/07/09 15:09:38 bluhm Exp $	*/
+/*	$OpenBSD: ttylog.c,v 1.8 2021/07/06 11:50:34 bluhm Exp $	*/
 
 /*
  * Copyright (c) 2015 Alexander Bluhm <bluhm@openbsd.org>
