@@ -113,8 +113,7 @@ main(int argc, char *argv[])
 	act.sa_handler = timeout;
 	if (sigaction(SIGALRM, &act, NULL) == -1)
 		err(1, "sigaction SIGALRM");
-	if (alarm(30) == (unsigned int)-1)
-		err(1, "alarm");
+	alarm(30);
 
 	fprintf(lg, "%s: started\n", getprogname());
 
