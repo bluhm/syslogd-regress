@@ -7,7 +7,6 @@
 
 use strict;
 use warnings;
-use IO::Socket::INET6;
 
 our %args = (
     client => {
@@ -20,8 +19,8 @@ our %args = (
 	    $s[0] = \*STDOUT;
 	    # open additional connections until syslogd deferres
 	    for (my $i = 1; $i <= 30; $i++) {
-		$s[$i] = IO::Socket::INET6->new(
-		    Domain              => AF_INET,
+		$s[$i] = IO::Socket::IP->new(
+		    Family              => AF_INET,
 		    Proto               => "tcp",
 		    PeerAddr            => "127.0.0.1",
 		    PeerPort            => 514,
