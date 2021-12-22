@@ -45,7 +45,7 @@ sub find_ports {
 	my @sockets = (1..$num);
 	foreach my $s (@sockets) {
 		$s = IO::Socket::IP->new(
-		    Family    => $domain,
+		    Domain    => $domain,
 		    LocalAddr => $addr,
 		    Proto     => $proto,
 		) or die "find_ports: create and bind socket failed: $!";

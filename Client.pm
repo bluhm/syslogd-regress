@@ -74,7 +74,6 @@ sub child {
 			$cs = $iosocket->new(
 			    Proto               => $proto,
 			    Domain              => $self->{connectdomain},
-			    Family              => $self->{connectdomain},
 			    PeerAddr            => $self->{connectaddr},
 			    PeerPort            => $self->{connectport},
 			    $self->{sslcert} ?

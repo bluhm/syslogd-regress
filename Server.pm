@@ -51,7 +51,6 @@ sub listen {
 	    Proto		=> $proto,
 	    ReuseAddr		=> 1,
 	    Domain		=> $self->{listendomain},
-	    Family		=> $self->{listendomain},
 	    $self->{listenaddr}	? (LocalAddr => $self->{listenaddr}) : (),
 	    $self->{listenport}	? (LocalPort => $self->{listenport}) : (),
 	    SSL_server          => 1,

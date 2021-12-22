@@ -24,7 +24,7 @@ our %args = (
 	func => sub {
 	    my $self = shift;
 	    IO::Socket::IP->new(
-		Family              => AF_INET,
+		Domain              => AF_INET,
 		Proto               => "tcp",
 		PeerAddr            => "127.0.0.1",
 		PeerPort            => 6514,
