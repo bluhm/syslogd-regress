@@ -1,4 +1,4 @@
-#	$OpenBSD: Makefile,v 1.33 2021/12/02 15:56:15 kn Exp $
+#	$OpenBSD: Makefile,v 1.34 2021/12/22 15:14:13 bluhm Exp $
 
 # The following ports must be installed for the regression tests:
 # p5-Socket6		Perl defines relating to AF_INET6 sockets
