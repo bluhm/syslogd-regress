@@ -132,6 +132,10 @@ sub run {
 		$self->child();
 		print STDERR $self->{up}, "\n";
 		$self->{func}->($self);
+		my $ts;
+		$ts ||= $self->{cs}
+		    if $self->{connectproto} && $self->{connectproto} eq "tls";
+		$ts->close(SSL_fast_shutdown => 0) if $ts;
 	} while ($self->{redo});
 	print STDERR "Shutdown", "\n";
 
