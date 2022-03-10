@@ -18,6 +18,7 @@ our %args = (
 	    port => 6514 },
 	func => sub {
 	    my $self = shift;
+	    delete $self->{ts};
 	    setsockopt(STDOUT, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0))
 		or die ref($self), " set socket linger failed: $!";
 	},

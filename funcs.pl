@@ -212,6 +212,7 @@ sub redo_connect {
 		sleep .1;
 		close(delete $self->{cs})
 		    or die ref($self), " close failed: $!";
+		delete $self->{ts};
 	}
 	if (my $redo = shift @{$self->{redo}}) {
 		if (my $connect = $redo->{connect}) {
