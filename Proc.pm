@@ -25,6 +25,7 @@ use Errno;
 use IO::File;
 use POSIX;
 use Time::HiRes qw(time alarm sleep);
+use IO::Socket::SSL;
 
 my %CHILDREN;
 
@@ -135,7 +136,9 @@ sub run {
 		my $ts;
 		$ts ||= $self->{cs}
 		    if $self->{connectproto} && $self->{connectproto} eq "tls";
-		$ts->close(SSL_fast_shutdown => 0) if $ts;
+		$ts->close(SSL_fast_shutdown => 0)
+		    or die ref($self), " SSL shutdown: $!,$SSL_ERROR"
+		    if $ts;
 	} while ($self->{redo});
 	print STDERR "Shutdown", "\n";
 
