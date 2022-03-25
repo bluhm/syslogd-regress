@@ -1,4 +1,4 @@
-#	$OpenBSD: Proc.pm,v 1.9 2020/07/24 22:12:00 bluhm Exp $
+#	$OpenBSD: Proc.pm,v 1.10 2022/03/25 14:15:10 bluhm Exp $
 
 # Copyright (c) 2010-2020 Alexander Bluhm <bluhm@openbsd.org>
 # Copyright (c) 2014 Florian Riehm <mail@friehm.de>
